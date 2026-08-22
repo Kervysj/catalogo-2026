@@ -371,7 +371,7 @@
         <a href="https://wa.me/58414995831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20quiero%20más%20información" target="_blank" class="social-icon bg-wa" title="Escríbenos al WhatsApp">
             <i class="fa-brands fa-whatsapp"></i>
         </a>
-        <!-- Comunidad de WhatsApp (Si quieres usar el mismo número u otro enlace, puedes cambiarlo aquí) -->
+        <!-- Comunidad de WhatsApp -->
         <a href="https://wa.me/58414995831?text=Hola,%20quiero%20unirme%20a%20la%20comunidad" target="_blank" class="social-icon bg-group" title="Únete a nuestra Comunidad">
             <i class="fa-solid fa-users"></i>
         </a>
@@ -382,8 +382,8 @@
     </div>
 
     <script>
-        // URL de tu Apps Script configurada previamente
-        const urlAPI = "https://script.google.com/macros/s/AKfycbyf9UscbcmgqEkJx_0j5UxGWK2qpFudgFGheCBt252FufxghkQUKH-b8BeZU8NNg/exec";
+        // URL de tu Apps Script configurada correctamente
+        const urlAPI = "https://script.google.com/macros/s/AKfycbyfjv9UscbcmgqeKjx_0j5UxGWK2qpFudgFGcHeCBt252fUfxgkhcQUKH-b8BeZLU8NNg/exec";
 
         let listaProductosGlobal = [];
 
@@ -474,7 +474,6 @@
             }
             document.getElementById('modal-desc').innerHTML = descripcionTexto;
 
-            // Configurar enlace de WhatsApp inteligente usando tu número y el código del producto de la fila
             let numeroWa = prod.whatsapp ? prod.whatsapp.toString().trim() : "58414995831";
             let mensaje = encodeURIComponent(`Hola, me interesa este producto:\n\n*Código:* ${prod.codigo_producto || 'N/A'}\n*Producto:* ${prod.nombre}\n*Precio:* $${prod.precio}`);
             document.getElementById('modal-wa-btn').href = `https://wa.me/${numeroWa}?text=${mensaje}`;
