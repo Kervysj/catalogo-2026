@@ -479,13 +479,15 @@
             
             let mensaje = "";
 
-            // SI LA CATEGORÍA ES "servicios" O "servicio", TOMA LOS REQUISITOS DE LA CELDA
             if (categoriaProd === 'servicios' || categoriaProd === 'servicio') {
-                let requisitosEspecificos = masDetalles ? masDetalles : "Por favor indícame lo necesario para este servicio.";
-                mensaje = encodeURIComponent(`Hola, quiero solicitar el servicio de *${prod.nombre}* ($${prod.precio}).\n\nAquí mis datos / requisitos:\n${requisitosEspecificos}`);
+                // AQUÍ ESTÁ LA MAGIA: Reemplaza las comas (",") o barras diagonales ("/") de tu celda por saltos de línea automáticos en WhatsApp
+                let requisitosLimpios = masDetalles 
+                    ? masDetalles.replace(/[,/]/g, '\n-') 
+                    : "Por favor indícame lo necesario para este servicio.";
+                
+                mensaje = encodeURIComponent(`Hola, quiero solicitar el servicio de *${prod.nombre}* ($${prod.precio}).\n\nAquí mis datos / requisitos:\n- ${requisitosLimpios}`);
             } else {
-                // PRODUCTO NORMAL (Mantiene tu misma lógica intacta)
-                mensaje = encodeURIComponent(`Hola, me interesa este producto:\n\n*Código:* ${prod.codigo_producto || prod.id || 'N/A'}\n*Producto:* ${prod.nombre}\n*Precio:* $${prod.precio}\n*Ver foto:* ${prod.imagen}`);
+                mensaje = encodeURIComponent(`Hola, me interesa este producto:\n\n*Código:* ${prod.codigo_producto || prod.id || 'N/A'}\n*Producto:* ${prod.nombre}\n*Precio:* `$${prod.precio}\n*Ver foto:* ${prod.imagen}`);
             }
             
             document.getElementById('modal-wa-btn').href = `https://wa.me/${numeroWa}?text=${mensaje}`;
