@@ -474,10 +474,19 @@
             }
             document.getElementById('modal-desc').innerHTML = descripcionTexto;
 
-            let numeroWa = prod.whatsapp ? prod.whatsapp.toString().trim() : "58414995831";
+            let numeroWa = prod.whatsapp ? prod.whatsapp.toString().trim() : "584149956831";
+            let categoriaProd = prod.categoria ? prod.categoria.trim().toLowerCase() : '';
             
-            // Mensaje actualizado incluyendo el enlace de la foto para que se genere la vista previa en WhatsApp
-            let mensaje = encodeURIComponent(`Hola, me interesa este producto:\n\n*Código:* ${prod.codigo_producto || prod.id || 'N/A'}\n*Producto:* ${prod.nombre}\n*Precio:* $${prod.precio}\n*Ver foto:* ${prod.imagen}`);
+            let mensaje = "";
+
+            // SI LA CATEGORÍA ES "servicios" O "servicio", TOMA LOS REQUISITOS DE LA CELDA
+            if (categoriaProd === 'servicios' || categoriaProd === 'servicio') {
+                let requisitosEspecificos = masDetalles ? masDetalles : "Por favor indícame lo necesario para este servicio.";
+                mensaje = encodeURIComponent(`Hola, quiero solicitar el servicio de *${prod.nombre}* ($${prod.precio}).\n\nAquí mis datos / requisitos:\n${requisitosEspecificos}`);
+            } else {
+                // PRODUCTO NORMAL (Mantiene tu misma lógica intacta)
+                mensaje = encodeURIComponent(`Hola, me interesa este producto:\n\n*Código:* ${prod.codigo_producto || prod.id || 'N/A'}\n*Producto:* ${prod.nombre}\n*Precio:* $${prod.precio}\n*Ver foto:* ${prod.imagen}`);
+            }
             
             document.getElementById('modal-wa-btn').href = `https://wa.me/${numeroWa}?text=${mensaje}`;
 
