@@ -475,7 +475,10 @@
             document.getElementById('modal-desc').innerHTML = descripcionTexto;
 
             let numeroWa = prod.whatsapp ? prod.whatsapp.toString().trim() : "58414995831";
-            let mensaje = encodeURIComponent(`Hola, me interesa este producto:\n\n*Código:* ${prod.codigo_producto || 'N/A'}\n*Producto:* ${prod.nombre}\n*Precio:* $${prod.precio}`);
+            
+            // Mensaje actualizado incluyendo el enlace de la foto para que se genere la vista previa en WhatsApp
+            let mensaje = encodeURIComponent(`Hola, me interesa este producto:\n\n*Código:* ${prod.codigo_producto || prod.id || 'N/A'}\n*Producto:* ${prod.nombre}\n*Precio:* $${prod.precio}\n*Ver foto:* ${prod.imagen}`);
+            
             document.getElementById('modal-wa-btn').href = `https://wa.me/${numeroWa}?text=${mensaje}`;
 
             document.getElementById('product-modal').classList.add('active');
