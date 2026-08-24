@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo Digital</title>
-    <!-- Fuente moderna e iconos de FontAwesome para redes sociales -->
+    <!-- Fuente moderna e iconos de FontAwesome -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -31,6 +31,12 @@
             color: var(--text-main);
             padding: 20px;
             padding-bottom: 80px;
+            opacity: 0;
+            animation: fadeInBody 0.6s ease forwards;
+        }
+
+        @keyframes fadeInBody {
+            to { opacity: 1; }
         }
 
         header {
@@ -44,6 +50,9 @@
             font-weight: 700;
             margin-bottom: 8px;
             color: #0f172a;
+            background: linear-gradient(135deg, #0f172a 0%, #2563eb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         header p {
@@ -51,28 +60,34 @@
             font-size: 1rem;
         }
 
-        /* Barra de Búsqueda */
+        /* Barra de Búsqueda Interactiva */
         .search-container {
             max-width: 500px;
             margin: 0 auto 25px auto;
             position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .search-container:focus-within {
+            transform: scale(1.02);
         }
 
         .search-input {
             width: 100%;
-            padding: 12px 20px 12px 45px;
+            padding: 14px 20px 14px 48px;
             border-radius: 30px;
-            border: 1px solid #cbd5e1;
+            border: 2px solid #e2e8f0;
             font-size: 1rem;
             outline: none;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             background-color: #ffffff;
-            box-shadow: 0 2px 4px rgb(0 0 0 / 0.02);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.02);
+            color: var(--text-main);
         }
 
         .search-input:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12), 0 10px 15px -3px rgb(0 0 0 / 0.05);
         }
 
         .search-icon {
@@ -81,39 +96,50 @@
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-muted);
-            font-size: 1rem;
+            font-size: 1.1rem;
+            transition: color 0.3s;
+        }
+
+        .search-input:focus ~ .search-icon {
+            color: var(--primary-color);
         }
 
         /* Botones de Filtro por Categoría */
         .filters {
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
             margin-bottom: 35px;
         }
 
         .filter-btn {
             background-color: #ffffff;
-            border: 1px solid #e2e8f0;
-            padding: 10px 20px;
+            border: 2px solid #e2e8f0;
+            padding: 10px 22px;
             border-radius: 30px;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--text-muted);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 2px 4px rgb(0 0 0 / 0.02);
         }
 
-        .filter-btn:hover, .filter-btn.active {
+        .filter-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
             background-color: var(--primary-color);
             color: #ffffff;
             border-color: var(--primary-color);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
         }
 
-        /* Grid de Productos */
+        /* Grid de Productos con animación de aparición */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -122,23 +148,36 @@
             margin: 0 auto;
         }
 
+        @keyframes cardEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         /* Tarjeta de Producto (Card) */
         .card {
             background-color: var(--card-bg);
             border-radius: 16px;
             overflow: hidden;
             box-shadow: var(--shadow);
-            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             cursor: pointer;
             display: flex;
             flex-direction: column;
             position: relative;
             border: 1px solid #f1f5f9;
+            animation: cardEntrance 0.5s ease forwards;
         }
 
         .card:hover {
-            transform: translateY(-8px);
+            transform: translateY(-8px) scale(1.01);
             box-shadow: var(--shadow-hover);
+            border-color: rgba(37, 99, 235, 0.2);
         }
 
         .card-img-container {
@@ -153,11 +192,11 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.6s ease;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .card:hover img {
-            transform: scale(1.05);
+            transform: scale(1.08);
         }
 
         .card-body {
@@ -182,6 +221,11 @@
             font-weight: 600;
             margin-bottom: 8px;
             color: #0f172a;
+            transition: color 0.2s;
+        }
+
+        .card:hover .card-title {
+            color: var(--primary-color);
         }
 
         .card-price {
@@ -198,6 +242,11 @@
             border-top: 1px solid #f1f5f9;
             padding-top: 10px;
             font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .card:hover .card-hint {
+            color: var(--primary-color);
         }
 
         /* Ventana Modal (Detalles) */
@@ -208,16 +257,19 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
+            background-color: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(6px);
             justify-content: center;
             align-items: center;
             padding: 20px;
             z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .modal.active {
             display: flex;
+            opacity: 1;
         }
 
         .modal-content {
@@ -227,25 +279,31 @@
             width: 100%;
             overflow: hidden;
             box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-            animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
         }
 
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: scale(0.92) translateY(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
+        .modal.active .modal-content {
+            transform: scale(1) translateY(0);
         }
 
         .modal-img-container {
             width: 100%;
             height: 280px;
             background: #f1f5f9;
+            overflow: hidden;
         }
 
         .modal-img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .modal-content:hover .modal-img {
+            transform: scale(1.03);
         }
 
         .modal-body {
@@ -260,19 +318,20 @@
             color: #fff;
             border: none;
             border-radius: 50%;
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             cursor: pointer;
             font-size: 1.1rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s;
+            transition: all 0.2s;
             z-index: 10;
         }
 
         .modal-close:hover {
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
+            transform: rotate(90deg);
         }
 
         .modal-title {
@@ -301,7 +360,7 @@
             font-size: 0.95rem;
             margin-bottom: 25px;
             line-height: 1.6;
-            max-height: 160px;
+            max-height: 150px;
             overflow-y: auto;
         }
 
@@ -319,30 +378,31 @@
             text-decoration: none;
             font-weight: 600;
             font-size: 1.05rem;
-            transition: background-color 0.3s, transform 0.2s;
-            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
         }
 
         .whatsapp-btn:hover {
-            background-color: #1ebd59;
+            background-color: #20ba5a;
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5);
         }
 
-        /* Spinner de carga */
+        /* Loader */
         .loader-container {
             text-align: center;
             grid-column: 1 / -1;
-            padding: 40px;
+            padding: 50px;
             color: var(--text-muted);
         }
 
         .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            width: 36px;
-            height: 36px;
+            border: 4px solid rgba(0, 0, 0, 0.08);
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             border-left-color: var(--primary-color);
-            animation: spin 1s linear infinite;
+            animation: spin 0.8s linear infinite;
             margin: 0 auto 15px auto;
         }
 
@@ -351,11 +411,11 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Barra Flotante de Redes Sociales y Ubicación (Inferior Derecha) */
+        /* Barra Flotante de Redes Sociales */
         .social-float {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 25px;
+            right: 25px;
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -363,22 +423,22 @@
         }
 
         .social-icon {
-            width: 50px;
-            height: 50px;
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-size: 1.4rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             text-decoration: none;
         }
 
         .social-icon:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+            transform: scale(1.12) rotate(5deg);
+            box-shadow: 0 10px 22px rgba(0,0,0,0.3);
         }
 
         .bg-wa { background-color: #25d366; }
@@ -393,15 +453,15 @@
         <p>Selecciona un producto para ver detalles y realizar tu pedido al instante</p>
     </header>
 
-    <!-- Barra de Búsqueda en Tiempo Real -->
+    <!-- Barra de Búsqueda -->
     <div class="search-container">
+        <input type="text" id="search-input" class="search-input" placeholder="Buscar productos o servicios..." oninput="filtrarCombinado()">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input type="text" id="search-input" class="search-input" placeholder="Buscar productos o servicios..." oninput="filtrarPorBusqueda()">
     </div>
 
     <!-- Botones de Filtrado Dinámicos -->
     <div class="filters" id="filters-container">
-        <button class="filter-btn active" onclick="filtrarProductos('todos', this)">Todos</button>
+        <button class="filter-btn active" onclick="cambiarCategoria('todos', this)">Todos</button>
     </div>
 
     <!-- Contenedor del Grid de Productos -->
@@ -449,7 +509,7 @@
         const urlAPI = "https://script.google.com/macros/s/AKfycbyfjv9UscbcmgqeKjx_0j5UxGWK2qpFudgFGcHeCBt252fUfxgkhcQUKH-b8BeZLU8NNg/exec";
 
         let listaProductosGlobal = [];
-        let categoriaActual = 'todos';
+        let categoriaSeleccionada = 'todos';
 
         function cargarCatalogo() {
             fetch(urlAPI)
@@ -474,13 +534,15 @@
             grid.innerHTML = '';
 
             if (lista.length === 0) {
-                grid.innerHTML = '<p style="text-align:center; grid-column:1/-1; color: var(--text-muted);">No se encontraron productos disponibles.</p>';
+                grid.innerHTML = '<p style="text-align:center; grid-column:1/-1; color: var(--text-muted); padding: 40px;">No se encontraron productos disponibles.</p>';
                 return;
             }
 
-            lista.forEach((prod) => {
+            lista.forEach((prod, index) => {
                 const card = document.createElement('div');
                 card.className = 'card';
+                // Retraso escalonado sutil para la animación de entrada
+                card.style.animationDelay = `${index * 0.05}s`;
                 card.onclick = () => abrirModal(prod);
 
                 card.innerHTML = `
@@ -504,36 +566,44 @@
             const filtrosContainer = document.getElementById('filters-container');
             const categoriasUnicas = [...new Set(productos.map(p => p.categoria ? p.categoria.trim() : 'General'))];
             
-            let htmlBotones = `<button class="filter-btn active" onclick="filtrarProductos('todos', this)">Todos</button>`;
+            let htmlBotones = `<button class="filter-btn ${categoriaSeleccionada === 'todos' ? 'active' : ''}" onclick="cambiarCategoria('todos', this)">Todos</button>`;
             categoriasUnicas.forEach(cat => {
-                htmlBotones += `<button class="filter-btn" onclick="filtrarProductos('${cat}', this)">${cat}</button>`;
+                const isActive = categoriaSeleccionada.toLowerCase() === cat.toLowerCase() ? 'active' : '';
+                htmlBotones += `<button class="filter-btn ${isActive}" onclick="cambiarCategoria('${cat}', this)">${cat}</button>`;
             });
             filtrosContainer.innerHTML = htmlBotones;
         }
 
-        function filtrarProductos(cat, elementoBtn) {
-            categoriaActual = cat;
+        function cambiarCategoria(cat, elementoBtn) {
+            categoriaSeleccionada = cat;
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            if(elementoBtn) elementoBtn.classList.add('active');
-
-            aplicarFiltrosCombinados();
+            if(elementoBtn) {
+                elementoBtn.classList.add('active');
+            } else {
+                // Si se actualiza programáticamente, busca el botón correspondiente
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    if(btn.textContent.trim().toLowerCase() === cat.toLowerCase()) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+            filtrarCombinado();
         }
 
-        function filtrarPorBusqueda() {
-            aplicarFiltrosCombinados();
-        }
-
-        function aplicarFiltrosCombinados() {
+        function filtrarCombinado() {
             const textoBusqueda = document.getElementById('search-input').value.toLowerCase().trim();
 
             let listaFiltrada = listaProductosGlobal;
 
             // Filtro por categoría
-            if (categoriaActual !== 'todos') {
-                listaFiltrada = listaFiltrada.filter(p => (p.categoria ? p.categoria.trim() : 'General') === categoriaActual);
+            if (categoriaSeleccionada !== 'todos') {
+                listaFiltrada = listaFiltrada.filter(p => {
+                    const catProd = p.categoria ? p.categoria.trim().toLowerCase() : 'general';
+                    return catProd === categoriaSeleccionada.toLowerCase();
+                });
             }
 
-            // Filtro por texto de búsqueda
+            // Filtro por buscador en tiempo real
             if (textoBusqueda !== '') {
                 listaFiltrada = listaFiltrada.filter(p => {
                     const nombre = p.nombre ? p.nombre.toLowerCase() : '';
@@ -583,7 +653,6 @@
             document.getElementById('product-modal').classList.remove('active');
         }
 
-        // Cerrar modal haciendo clic fuera o presionando ESC
         window.onclick = function(event) {
             const modal = document.getElementById('product-modal');
             if (event.target === modal) {
