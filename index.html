@@ -22,9 +22,10 @@
     
     <style>
         :root {
-            --primary-color: #2563eb;
-            --primary-hover: #1d4ed8;
-            --accent-color: #f59e0b;
+            --primary-color: #2563eb;       /* Azul principal moderno */
+            --primary-hover: #1d4ed8;     /* Azul hover */
+            --danger-color: #dc2626;        /* Rojo dinámico para alertas y acentos */
+            --danger-hover: #b91c1c;
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
             --text-main: #0f172a;
@@ -32,7 +33,7 @@
             --border-color: #e2e8f0;
             --shadow-subtle: 0 4px 6px -1px rgb(0 0 0 / 0.04), 0 2px 4px -2px rgb(0 0 0 / 0.04);
             --shadow-hover: 0 20px 25px -5px rgb(37 99 235 / 0.12), 0 8px 10px -6px rgb(37 99 235 / 0.08);
-            --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         * {
@@ -67,7 +68,7 @@
             font-weight: 700;
             margin-bottom: 8px;
             letter-spacing: -0.02em;
-            background: linear-gradient(135deg, #0f172a 30%, #2563eb 100%);
+            background: linear-gradient(135deg, var(--danger-color) 0%, var(--primary-color) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -77,7 +78,7 @@
             font-size: 0.98rem;
         }
 
-        /* Buscador con efectos interactivos */
+        /* Buscador rápido e interactivo */
         .search-container {
             max-width: 520px;
             margin: 0 auto 25px auto;
@@ -104,7 +105,7 @@
 
         .search-input:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.1), var(--shadow-subtle);
+            box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.12), var(--shadow-subtle);
         }
 
         .search-icon {
@@ -112,13 +113,14 @@
             left: 20px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-muted);
+            color: var(--danger-color);
             font-size: 1.1rem;
-            transition: color 0.3s;
+            transition: var(--transition-smooth);
         }
 
         .search-input:focus ~ .search-icon {
             color: var(--primary-color);
+            transform: translateY(-50%) scale(1.1);
         }
 
         /* Botones de Filtros Dinámicos */
@@ -134,7 +136,7 @@
         .filter-btn {
             background-color: #ffffff;
             border: 2px solid var(--border-color);
-            padding: 10px 20px;
+            padding: 10px 22px;
             border-radius: 30px;
             cursor: pointer;
             font-weight: 600;
@@ -155,7 +157,7 @@
             color: #ffffff;
             border-color: var(--primary-color);
             transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
         }
 
         /* Grid de Productos */
@@ -189,7 +191,7 @@
         .card:hover {
             transform: translateY(-6px);
             box-shadow: var(--shadow-hover);
-            border-color: rgba(37, 99, 235, 0.25);
+            border-color: rgba(37, 99, 235, 0.3);
         }
 
         .card-img-container {
@@ -223,7 +225,7 @@
             font-size: 0.72rem;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            color: var(--primary-color);
+            color: var(--danger-color);
             font-weight: 700;
             margin-bottom: 6px;
         }
@@ -261,7 +263,7 @@
             color: var(--primary-color);
         }
 
-        /* Modal con Efectos de Zoom e Interactividad */
+        /* Modal con Zoom Interactivo */
         .modal {
             display: none;
             position: fixed;
@@ -269,7 +271,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(15, 23, 42, 0.7);
+            background-color: rgba(15, 23, 42, 0.75);
             backdrop-filter: blur(8px);
             justify-content: center;
             align-items: center;
@@ -290,7 +292,7 @@
             max-width: 480px;
             width: 100%;
             overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.3);
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.35);
             transform: scale(0.92) translateY(15px);
             transition: var(--transition-smooth);
             position: relative;
@@ -300,7 +302,6 @@
             transform: scale(1) translateY(0);
         }
 
-        /* Contenedor de la foto con Zoom Interactivo */
         .modal-img-container {
             width: 100%;
             height: 280px;
@@ -326,7 +327,7 @@
             position: absolute;
             bottom: 12px;
             right: 12px;
-            background: rgba(0, 0, 0, 0.65);
+            background: rgba(15, 23, 42, 0.75);
             color: #fff;
             padding: 6px 12px;
             border-radius: 20px;
@@ -347,7 +348,7 @@
             position: absolute;
             top: 15px;
             right: 15px;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(15, 23, 42, 0.7);
             color: #fff;
             border: none;
             border-radius: 50%;
@@ -363,7 +364,7 @@
         }
 
         .modal-close:hover {
-            background: rgba(0, 0, 0, 0.85);
+            background: var(--danger-color);
             transform: rotate(90deg) scale(1.1);
         }
 
@@ -421,7 +422,7 @@
             box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5);
         }
 
-        /* Spinner de carga */
+        /* Spinner */
         .loader-container {
             text-align: center;
             grid-column: 1 / -1;
@@ -476,7 +477,7 @@
 
         .bg-wa { background-color: #25d366; }
         .bg-fb { background-color: #1877f2; }
-        .bg-maps { background-color: #ea4335; }
+        .bg-maps { background-color: var(--danger-color); }
     </style>
 </head>
 <body>
@@ -488,7 +489,7 @@
 
     <!-- Barra de Búsqueda -->
     <div class="search-container">
-        <input type="text" id="search-input" class="search-input" placeholder="Buscar productos o servicios..." oninput="filtrarCombinado()">
+        <input type="text" id="search-input" class="search-input" placeholder="Buscar por nombre, descripción o código..." oninput="filtrarCombinado()">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
     </div>
 
@@ -501,7 +502,7 @@
     <div class="grid" id="product-grid">
         <div class="loader-container">
             <div class="spinner"></div>
-            <p>Sincronizando catálogo...</p>
+            <p>Sincronizando catálogo con Google Sheets...</p>
         </div>
     </div>
 
@@ -546,28 +547,33 @@
         let categoriaSeleccionada = 'todos';
         let isZoomed = false;
 
-        function cargarCatalogo() {
+        function cargarCatalogo(silencioso = false) {
+            if (!silencioso) {
+                // Solo muestra el loader si es la carga inicial
+            }
+
             fetch(urlAPI)
                 .then(response => response.json())
                 .then(data => {
-                    // Filtrar solo los disponibles asegurando compatibilidad con tu API
                     listaProductosGlobal = data.filter(prod => {
                         if (!prod.status) return false;
                         return prod.status.toString().trim().toLowerCase() === 'disponible';
                     });
 
+                    // Mantener los botones de categoría sincronizados sin perder el estado actual
                     construirBotonesCategorias(listaProductosGlobal);
-                    mostrarProductos(listaProductosGlobal);
+                    filtrarCombinado();
                 })
                 .catch(error => {
                     console.error('Error al conectar con la API:', error);
-                    document.getElementById('product-grid').innerHTML = '<p style="text-align:center; grid-column:1/-1; color: #ef4444;">Error al cargar los productos. Verifica tu conexión.</p>';
+                    if (!silencioso) {
+                        document.getElementById('product-grid').innerHTML = '<p style="text-align:center; grid-column:1/-1; color: var(--danger-color);">Error al cargar los productos. Verifica tu conexión.</p>';
+                    }
                 });
         }
 
         function construirBotonesCategorias(productos) {
             const filtrosContainer = document.getElementById('filters-container');
-            // Obtener categorías únicas limpias
             const categoriasUnicas = [...new Set(productos.map(p => p.categoria ? p.categoria.trim() : 'General'))];
             
             let htmlBotones = `<button class="filter-btn ${categoriaSeleccionada === 'todos' ? 'active' : ''}" onclick="cambiarCategoria('todos', this)">Todos</button>`;
@@ -583,7 +589,6 @@
         function cambiarCategoria(cat, elementoBtn) {
             categoriaSeleccionada = cat;
             
-            // Actualizar clases activas visualmente en los botones
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             if (elementoBtn) {
                 elementoBtn.classList.add('active');
@@ -602,7 +607,7 @@
             const textoBusqueda = document.getElementById('search-input').value.toLowerCase().trim();
             let listaFiltrada = listaProductosGlobal;
 
-            // 1. Filtrar por Categoría seleccionada
+            // 1. Filtrar por Categoría
             if (categoriaSeleccionada !== 'todos') {
                 listaFiltrada = listaFiltrada.filter(p => {
                     const catProd = p.categoria ? p.categoria.trim().toLowerCase() : 'general';
@@ -610,13 +615,15 @@
                 });
             }
 
-            // 2. Filtrar por Texto de Búsqueda
+            // 2. Filtrar por Buscador (Nombre, Descripción o Código) de forma inmediata
             if (textoBusqueda !== '') {
                 listaFiltrada = listaFiltrada.filter(p => {
                     const nombre = p.nombre ? p.nombre.toLowerCase() : '';
                     const desc = p.descripcion ? p.descripcion.toLowerCase() : '';
-                    const codigo = p.codigo_producto ? p.codigo_producto.toLowerCase() : '';
-                    return nombre.includes(textoBusqueda) || desc.includes(textoBusqueda) || codigo.includes(textoBusqueda);
+                    const masDetalles = (p.mas_detalles || p['mas detalles'] || '').toLowerCase();
+                    const codigo = (p.codigo_producto || p.id || '').toLowerCase();
+                    
+                    return nombre.includes(textoBusqueda) || desc.includes(textoBusqueda) || masDetalles.includes(textoBusqueda) || codigo.includes(textoBusqueda);
                 });
             }
 
@@ -628,14 +635,14 @@
             grid.innerHTML = '';
 
             if (lista.length === 0) {
-                grid.innerHTML = '<p style="text-align:center; grid-column:1/-1; color: var(--text-muted); padding: 40px;">No se encontraron productos con estos criterios.</p>';
+                grid.innerHTML = '<p style="text-align:center; grid-column:1/-1; color: var(--text-muted); padding: 40px;">No se encontraron productos o servicios con este criterio de búsqueda.</p>';
                 return;
             }
 
             lista.forEach((prod, index) => {
                 const card = document.createElement('div');
                 card.className = 'card';
-                card.style.animationDelay = `${index * 0.04}s`;
+                card.style.animationDelay = `${index * 0.03}s`;
                 card.onclick = () => abrirModal(prod);
 
                 card.innerHTML = `
@@ -697,7 +704,6 @@
             document.body.style.overflow = 'auto';
         }
 
-        // Función interactiva de Zoom en la foto al hacer clic
         function toggleZoom(event) {
             const container = event.currentTarget;
             const img = container.querySelector('.modal-img');
@@ -726,7 +732,13 @@
             }
         });
 
-        cargarCatalogo();
+        // Carga inicial
+        cargarCatalogo(false);
+
+        // Sincronización automática de Google Sheets en segundo plano cada 30 segundos
+        setInterval(() => {
+            cargarCatalogo(true);
+        }, 30000);
     </script>
 </body>
 </html>
