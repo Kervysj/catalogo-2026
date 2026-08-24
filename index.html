@@ -683,7 +683,7 @@
 
     <header>
         <h1>Catálogo Digital</h1>
-        <p>Selecciona un producto físico o explora nuestros servicios especializados</p>
+        <p>Explora nuestros productos y servicios disponibles</p>
     </header>
 
     <!-- Botones de Acceso Rápido: Pagos, Delivery y Recargas Free Fire -->
@@ -701,7 +701,7 @@
 
     <!-- Barra de Búsqueda -->
     <div class="search-container">
-        <input type="text" id="search-input" class="search-input" placeholder="Buscar productos del catálogo..." oninput="filtrarCombinado()">
+        <input type="text" id="search-input" class="search-input" placeholder="Buscar productos, servicios..." oninput="filtrarCombinado()">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
     </div>
 
@@ -809,27 +809,33 @@
             return c.includes('recarga') || c.includes('saldo');
         }
 
+        function esStreaming(cat) {
+            if (!cat) return false;
+            const c = cat.toLowerCase();
+            return c.includes('streaming');
+        }
+
+        // Exclusivamente para ocultar de la pantalla principal ("Todos")
+        function debeOcultarseEnPrincipal(cat) {
+            return esRecargaDeSaldo(cat) || esStreaming(cat);
+        }
+
         function esServicio(cat) {
             if (!cat) return false;
             const c = cat.toLowerCase();
             return c.includes('servicio') || c.includes('streaming');
         }
 
-        function esEspecialOCategoriaServicio(cat) {
-            return esRecargaDeSaldo(cat) || esServicio(cat);
-        }
-
         function construirBotonesCategorias(productos) {
             const filtrosContainer = document.getElementById('filters-container');
             const categoriasUnicas = [...new Set(productos.map(p => p.categoria ? p.categoria.trim() : 'General'))];
             
-            let htmlBotones = `<button class="filter-btn ${categoriaSeleccionada === 'todos' ? 'active' : ''}" onclick="cambiarCategoria('todos', this)">Catálogo General</button>`;
+            let htmlBotones = `<button class="filter-btn ${categoriaSeleccionada === 'todos' ? 'active' : ''}" onclick="cambiarCategoria('todos', this)">Todos</button>`;
             
             categoriasUnicas.forEach(cat => {
                 const isActive = categoriaSeleccionada.toLowerCase() === cat.toLowerCase() ? 'active' : '';
-                const esEspecial = esEspecialOCategoriaServicio(cat);
+                const esEspecial = debeOcultarseEnPrincipal(cat);
                 const claseEspecial = esEspecial ? 'special-filter' : '';
-                // Si es recarga o streaming, le colocamos un icono distintivo en el texto del botón opcionalmente o solo el color
                 const iconoExtra = esEspecial ? '<i class="fa-solid fa-bolt" style="font-size:0.75rem; margin-right:4px;"></i>' : '';
                 
                 htmlBotones += `<button class="filter-btn ${claseEspecial} ${isActive}" onclick="cambiarCategoria('${cat}', this)">${iconoExtra}${cat}</button>`;
@@ -861,10 +867,10 @@
             let listaFiltrada = listaProductosGlobal;
 
             if (categoriaSeleccionada === 'todos') {
-                // EXCLUSIÓN CLAVE: En la pantalla principal ("Todos"), filtramos para ocultar recargas y streaming
-                listaFiltrada = listaFiltrada.filter(p => !esEspecialOCategoriaServicio(p.categoria));
+                // Oculta SOLAMENTE Recargas de Saldo y Streaming en la principal, manteniendo todo el resto y otros servicios
+                listaFiltrada = listaFiltrada.filter(p => !debeOcultarseEnPrincipal(p.categoria));
             } else {
-                // Si el usuario seleccionó explícitamente una categoría en los botones
+                // Al hacer clic en un filtro específico, muestra esa categoría exacta
                 listaFiltrada = listaFiltrada.filter(p => {
                     const catProd = p.categoria ? p.categoria.trim().toLowerCase() : 'general';
                     return catProd === categoriaSeleccionada.toLowerCase();
@@ -1046,7 +1052,7 @@
                 bodyElem.innerHTML = `
                     <div style="background:#f8fafc; border:1px solid var(--border-color); padding:18px; border-radius:14px; margin-top:15px; text-align:center;">
                         <p style="color:var(--text-main); font-weight:600; font-size:1rem; line-height:1.5;">🚀 Contamos con servicio de delivery disponible.</p>
-                        <p style="color:var(--text-muted); font-size:0.9rem; margin-top:10px;">El costo del envío varía del sector de ubicación.</p>
+                        <p style="color:var(--text-muted); font-size:0.9rem; margin-top:10px;">El costo del envío varía según tu ubicación.</p>
                     </div>
                 `;
             }
