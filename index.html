@@ -481,6 +481,26 @@
             overflow-y: auto;
         }
 
+        /* Alerta especial para recargas de saldo o servicios dentro del modal */
+        .recharge-alert-box {
+            background-color: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 0.88rem;
+            color: #92400e;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .recharge-alert-box i {
+            color: #d97706;
+            font-size: 1.1rem;
+            margin-top: 2px;
+        }
+
         .modal-actions {
             display: flex;
             gap: 10px;
@@ -690,6 +710,8 @@
                 <h2 id="modal-title" class="modal-title"></h2>
                 <div id="modal-code" class="modal-code"></div>
                 <div id="modal-price" class="modal-price"></div>
+                <!-- Contenedor dinámico para alertas (Recargas o Servicios) -->
+                <div id="recharge-alert-container"></div>
                 <p id="modal-desc" class="modal-desc"></p>
                 <div class="modal-actions">
                     <a id="modal-wa-btn" class="whatsapp-btn" href="#" target="_blank">
@@ -817,6 +839,26 @@
             mostrarProductos(listaFiltrada);
         }
 
+        function esRecargaDeSaldo(cat) {
+            if (!cat) return false;
+            const c = cat.toLowerCase();
+            return c.includes('recarga') || c.includes('saldo');
+        }
+
+        function esServicio(cat) {
+            if (!cat) return false;
+            const c = cat.toLowerCase();
+            return c.includes('servicio') || c.includes('streaming');
+        }
+
+        function calcularPrecioFinal(prod) {
+            let precioBase = parseFloat(prod.precio) || 0;
+            if (esRecargaDeSaldo(prod.categoria)) {
+                return precioBase * 1.12; // Suma el 12% adicional automáticamente
+            }
+            return precioBase;
+        }
+
         function mostrarProductos(lista) {
             const grid = document.getElementById('product-grid');
             grid.innerHTML = '';
@@ -832,6 +874,8 @@
                 card.style.animationDelay = `${index * 0.03}s`;
                 card.onclick = () => abrirModal(prod);
 
+                const precioFinal = calcularPrecioFinal(prod);
+
                 card.innerHTML = `
                     <div class="card-img-container">
                         <img src="${prod.imagen}" alt="${prod.nombre}" loading="lazy">
@@ -843,9 +887,9 @@
                         <div>
                             <div class="card-category">${prod.categoria || 'General'}</div>
                             <h3 class="card-title">${prod.nombre}</h3>
-                            <div class="card-price">$${prod.precio}</div>
+                            <div class="card-price">$${precioFinal.toFixed(2)}</div>
                         </div>
-                        <div class="card-hint"><i class="fa-solid fa-eye"></i> Ver detalles y comprar</div>
+                        <div class="card-hint"><i class="fa-solid fa-eye"></i> Ver detalles y solicitar</div>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -853,7 +897,8 @@
         }
 
         function compartirProducto(event, prod) {
-            const textoCompartir = `¡Mira este servicio/producto disponible!\n\n📌 *${prod.nombre}*\n💰 Precio: $${prod.precio}\n📝 ${prod.descripcion || ''}\n🖼️ Foto: ${prod.imagen}\n\n¡Consíguelo aquí!`;
+            const precioFinal = calcularPrecioFinal(prod);
+            const textoCompartir = `¡Mira este servicio disponible!\n\n📌 *${prod.nombre}*\n💰 Precio: $${precioFinal.toFixed(2)}\n📝 ${prod.descripcion || ''}\n🖼️ Foto: ${prod.imagen}\n\n¡Consíguelo aquí!`;
 
             if (navigator.share) {
                 navigator.share({
@@ -887,7 +932,33 @@
             document.getElementById('modal-category').innerText = prod.categoria || '';
             document.getElementById('modal-title').innerText = prod.nombre;
             document.getElementById('modal-code').innerText = `Código: ${prod.codigo_producto || prod.id || 'N/A'}`;
-            document.getElementById('modal-price').innerText = `$${prod.precio}`;
+            
+            const precioFinal = calcularPrecioFinal(prod);
+            document.getElementById('modal-price').innerText = `$${precioFinal.toFixed(2)}`;
+
+            // Manejo de la alerta y aviso visual (Recarga de saldo o Servicio)
+            const alertContainer = document.getElementById('recharge-alert-container');
+            if (esRecargaDeSaldo(prod.categoria)) {
+                alertContainer.innerHTML = `
+                    <div class="recharge-alert-box">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <div>
+                            <strong>Nota importante:</strong> Este monto incluye un 12% adicional. <em>El trámite de recarga se realiza estrictamente una vez verificado y confirmado el pago.</em>
+                        </div>
+                    </div>
+                `;
+            } else if (esServicio(prod.categoria)) {
+                alertContainer.innerHTML = `
+                    <div class="recharge-alert-box">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <div>
+                            <strong>Aviso importante:</strong> <em>Cualquier servicio se realiza estrictamente después del pago correspondiente.</em>
+                        </div>
+                    </div>
+                `;
+            } else {
+                alertContainer.innerHTML = '';
+            }
             
             let descripcionTexto = prod.descripcion || '';
             let masDetalles = prod.mas_detalles || prod['mas detalles'] || '';
@@ -897,13 +968,17 @@
             document.getElementById('modal-desc').innerHTML = descripcionTexto;
 
             let numeroWa = prod.whatsapp ? prod.whatsapp.toString().trim() : "584149956831";
-            let categoriaProd = prod.categoria ? prod.categoria.trim().toLowerCase() : '';
             let mensaje = "";
 
-            if (categoriaProd.includes('servicio') || categoriaProd.includes('streaming') || categoriaProd.includes('recarga')) {
-                mensaje = encodeURIComponent(`Hola, quiero solicitar el servicio de *${prod.nombre}* ($${prod.precio}).\n\nPor favor indícame los pasos para procesarlo.`);
+            if (esRecargaDeSaldo(prod.categoria)) {
+                mensaje = encodeURIComponent(`Hola, quiero procesar la recarga de saldo: *${prod.nombre}* (Total: $${precioFinal.toFixed(2)} con 12% incluido).\n\nPor favor indícame los datos para realizar el pago.`);
             } else {
-                mensaje = encodeURIComponent(`Hola, me interesa este artículo:\n\n*Código:* ${prod.codigo_producto || prod.id || 'N/A'}\n*Producto:* ${prod.nombre}\n*Precio:* $${prod.precio}\n*Foto:* ${prod.imagen}`);
+                let categoriaProd = prod.categoria ? prod.categoria.trim().toLowerCase() : '';
+                if (categoriaProd.includes('servicio') || categoriaProd.includes('streaming')) {
+                    mensaje = encodeURIComponent(`Hola, quiero solicitar el servicio de *${prod.nombre}* ($${precioFinal.toFixed(2)}).\n\nPor favor indícame los pasos.`);
+                } else {
+                    mensaje = encodeURIComponent(`Hola, me interesa este artículo:\n\n*Código:* ${prod.codigo_producto || prod.id || 'N/A'}\n*Producto:* ${prod.nombre}\n*Precio:* $${precioFinal.toFixed(2)}\n*Foto:* ${prod.imagen}`);
+                }
             }
             
             document.getElementById('modal-wa-btn').href = `https://wa.me/${numeroWa}?text=${mensaje}`;
