@@ -27,6 +27,7 @@
             --danger-color: #dc2626;        /* Rojo dinámico para alertas y acentos */
             --danger-hover: #b91c1c;
             --gaming-color: #06b6d4;        /* Color cian/neón gaming para Free Fire */
+            --special-cat-color: #9333ea;   /* Morado vibrante para destacar recargas y streaming en filtros */
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
             --text-main: #0f172a;
@@ -216,6 +217,26 @@
             border-color: var(--primary-color);
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+        }
+
+        /* Estilo especial para los botones de filtros que son recargas o streaming */
+        .filter-btn.special-filter {
+            border-color: rgba(147, 51, 234, 0.4);
+            color: var(--special-cat-color);
+            background: linear-gradient(135deg, #ffffff 0%, #f3e8ff 100%);
+        }
+
+        .filter-btn.special-filter:hover {
+            border-color: var(--special-cat-color);
+            color: var(--special-cat-color);
+            box-shadow: 0 6px 16px rgba(147, 51, 234, 0.2);
+        }
+
+        .filter-btn.special-filter.active {
+            background-color: var(--special-cat-color);
+            color: #ffffff;
+            border-color: var(--special-cat-color);
+            box-shadow: 0 6px 16px rgba(147, 51, 234, 0.35);
         }
 
         /* Grid de Productos */
@@ -662,7 +683,7 @@
 
     <header>
         <h1>Catálogo Digital</h1>
-        <p>Selecciona un producto, servicio o recarga para procesar tu solicitud</p>
+        <p>Selecciona un producto físico o explora nuestros servicios especializados</p>
     </header>
 
     <!-- Botones de Acceso Rápido: Pagos, Delivery y Recargas Free Fire -->
@@ -680,7 +701,7 @@
 
     <!-- Barra de Búsqueda -->
     <div class="search-container">
-        <input type="text" id="search-input" class="search-input" placeholder="Buscar producto, streaming, recargas..." oninput="filtrarCombinado()">
+        <input type="text" id="search-input" class="search-input" placeholder="Buscar productos del catálogo..." oninput="filtrarCombinado()">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
     </div>
 
@@ -782,15 +803,36 @@
                 });
         }
 
+        function esRecargaDeSaldo(cat) {
+            if (!cat) return false;
+            const c = cat.toLowerCase();
+            return c.includes('recarga') || c.includes('saldo');
+        }
+
+        function esServicio(cat) {
+            if (!cat) return false;
+            const c = cat.toLowerCase();
+            return c.includes('servicio') || c.includes('streaming');
+        }
+
+        function esEspecialOCategoriaServicio(cat) {
+            return esRecargaDeSaldo(cat) || esServicio(cat);
+        }
+
         function construirBotonesCategorias(productos) {
             const filtrosContainer = document.getElementById('filters-container');
             const categoriasUnicas = [...new Set(productos.map(p => p.categoria ? p.categoria.trim() : 'General'))];
             
-            let htmlBotones = `<button class="filter-btn ${categoriaSeleccionada === 'todos' ? 'active' : ''}" onclick="cambiarCategoria('todos', this)">Todos</button>`;
+            let htmlBotones = `<button class="filter-btn ${categoriaSeleccionada === 'todos' ? 'active' : ''}" onclick="cambiarCategoria('todos', this)">Catálogo General</button>`;
             
             categoriasUnicas.forEach(cat => {
                 const isActive = categoriaSeleccionada.toLowerCase() === cat.toLowerCase() ? 'active' : '';
-                htmlBotones += `<button class="filter-btn ${isActive}" onclick="cambiarCategoria('${cat}', this)">${cat}</button>`;
+                const esEspecial = esEspecialOCategoriaServicio(cat);
+                const claseEspecial = esEspecial ? 'special-filter' : '';
+                // Si es recarga o streaming, le colocamos un icono distintivo en el texto del botón opcionalmente o solo el color
+                const iconoExtra = esEspecial ? '<i class="fa-solid fa-bolt" style="font-size:0.75rem; margin-right:4px;"></i>' : '';
+                
+                htmlBotones += `<button class="filter-btn ${claseEspecial} ${isActive}" onclick="cambiarCategoria('${cat}', this)">${iconoExtra}${cat}</button>`;
             });
             
             filtrosContainer.innerHTML = htmlBotones;
@@ -804,7 +846,7 @@
                 elementoBtn.classList.add('active');
             } else {
                 document.querySelectorAll('.filter-btn').forEach(btn => {
-                    if (btn.textContent.trim().toLowerCase() === cat.toLowerCase()) {
+                    if (btn.textContent.trim().toLowerCase().includes(cat.toLowerCase())) {
                         btn.classList.add('active');
                     }
                 });
@@ -818,7 +860,11 @@
             const textoBusqueda = inputVal ? inputVal.toLowerCase().trim() : '';
             let listaFiltrada = listaProductosGlobal;
 
-            if (categoriaSeleccionada !== 'todos') {
+            if (categoriaSeleccionada === 'todos') {
+                // EXCLUSIÓN CLAVE: En la pantalla principal ("Todos"), filtramos para ocultar recargas y streaming
+                listaFiltrada = listaFiltrada.filter(p => !esEspecialOCategoriaServicio(p.categoria));
+            } else {
+                // Si el usuario seleccionó explícitamente una categoría en los botones
                 listaFiltrada = listaFiltrada.filter(p => {
                     const catProd = p.categoria ? p.categoria.trim().toLowerCase() : 'general';
                     return catProd === categoriaSeleccionada.toLowerCase();
@@ -839,18 +885,6 @@
             mostrarProductos(listaFiltrada);
         }
 
-        function esRecargaDeSaldo(cat) {
-            if (!cat) return false;
-            const c = cat.toLowerCase();
-            return c.includes('recarga') || c.includes('saldo');
-        }
-
-        function esServicio(cat) {
-            if (!cat) return false;
-            const c = cat.toLowerCase();
-            return c.includes('servicio') || c.includes('streaming');
-        }
-
         function calcularPrecioFinal(prod) {
             let precioBase = parseFloat(prod.precio) || 0;
             if (esRecargaDeSaldo(prod.categoria)) {
@@ -864,7 +898,7 @@
             grid.innerHTML = '';
 
             if (lista.length === 0) {
-                grid.innerHTML = '<p style="text-align:center; grid-column:1/-1; color: var(--text-muted); padding: 40px;">No se encontraron elementos con este criterio de búsqueda.</p>';
+                grid.innerHTML = '<p style="text-align:center; grid-column:1/-1; color: var(--text-muted); padding: 40px;">No se encontraron elementos en esta sección.</p>';
                 return;
             }
 
@@ -898,7 +932,7 @@
 
         function compartirProducto(event, prod) {
             const precioFinal = calcularPrecioFinal(prod);
-            const textoCompartir = `¡Mira este servicio disponible!\n\n📌 *${prod.nombre}*\n💰 Precio: $${precioFinal.toFixed(2)}\n📝 ${prod.descripcion || ''}\n🖼️ Foto: ${prod.imagen}\n\n¡Consíguelo aquí!`;
+            const textoCompartir = `¡Mira este artículo disponible!\n\n📌 *${prod.nombre}*\n💰 Precio: $${precioFinal.toFixed(2)}\n📝 ${prod.descripcion || ''}\n🖼️ Foto: ${prod.imagen}\n\n¡Consíguelo aquí!`;
 
             if (navigator.share) {
                 navigator.share({
@@ -1012,7 +1046,7 @@
                 bodyElem.innerHTML = `
                     <div style="background:#f8fafc; border:1px solid var(--border-color); padding:18px; border-radius:14px; margin-top:15px; text-align:center;">
                         <p style="color:var(--text-main); font-weight:600; font-size:1rem; line-height:1.5;">🚀 Contamos con servicio de delivery disponible.</p>
-                        <p style="color:var(--text-muted); font-size:0.9rem; margin-top:10px;">El costo del envío varía dependiendo de tu zona o sector de ubicación.</p>
+                        <p style="color:var(--text-muted); font-size:0.9rem; margin-top:10px;">El costo del envío varía del sector de ubicación.</p>
                     </div>
                 `;
             }
