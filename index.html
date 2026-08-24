@@ -4,19 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo Digital</title>
-    <!-- Fuente moderna e iconos de FontAwesome -->
+    <!-- Configuración para PWA (Instalable) -->
+    <meta name="theme-color" content="#2563eb">
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,{
+        %22name%22: %22Catálogo Digital%22,
+        %22short_name%22: %22Catálogo%22,
+        %22start_url%22: %22.%22,
+        %22display%22: %22standalone%22,
+        %22background_color%22: %22%23f8fafc%22,
+        %22theme_color%22: %22%232563eb%22,
+        %22icons%22: [{%22src%22: %22https://cdn-icons-png.flaticon.com/512/1170/1170576.png%22, %22sizes%22: %22512x512%22, %22type%22: %22image/png%22}]
+    }">
+    
+    <!-- Fuente moderna e iconos -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         :root {
             --primary-color: #2563eb;
             --primary-hover: #1d4ed8;
+            --accent-color: #f59e0b;
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
-            --text-main: #1e293b;
+            --text-main: #0f172a;
             --text-muted: #64748b;
-            --shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
-            --shadow-hover: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --border-color: #e2e8f0;
+            --shadow-subtle: 0 4px 6px -1px rgb(0 0 0 / 0.04), 0 2px 4px -2px rgb(0 0 0 / 0.04);
+            --shadow-hover: 0 20px 25px -5px rgb(37 99 235 / 0.12), 0 8px 10px -6px rgb(37 99 235 / 0.08);
+            --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         * {
@@ -24,15 +40,16 @@
             margin: 0;
             padding: 0;
             font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
             padding: 20px;
-            padding-bottom: 80px;
+            padding-bottom: 90px;
             opacity: 0;
-            animation: fadeInBody 0.6s ease forwards;
+            animation: fadeInBody 0.5s ease forwards;
         }
 
         @keyframes fadeInBody {
@@ -41,58 +58,58 @@
 
         header {
             text-align: center;
-            margin-bottom: 25px;
-            padding-top: 20px;
+            margin-bottom: 30px;
+            padding-top: 15px;
         }
 
         header h1 {
-            font-size: 2.2rem;
+            font-size: 2.3rem;
             font-weight: 700;
             margin-bottom: 8px;
-            color: #0f172a;
-            background: linear-gradient(135deg, #0f172a 0%, #2563eb 100%);
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #0f172a 30%, #2563eb 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         header p {
             color: var(--text-muted);
-            font-size: 1rem;
+            font-size: 0.98rem;
         }
 
-        /* Barra de Búsqueda Interactiva */
+        /* Buscador con efectos interactivos */
         .search-container {
-            max-width: 500px;
+            max-width: 520px;
             margin: 0 auto 25px auto;
             position: relative;
-            transition: transform 0.3s ease;
+            transition: var(--transition-smooth);
         }
 
         .search-container:focus-within {
-            transform: scale(1.02);
+            transform: scale(1.01);
         }
 
         .search-input {
             width: 100%;
-            padding: 14px 20px 14px 48px;
-            border-radius: 30px;
-            border: 2px solid #e2e8f0;
+            padding: 15px 20px 15px 50px;
+            border-radius: 35px;
+            border: 2px solid var(--border-color);
             font-size: 1rem;
             outline: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: var(--transition-smooth);
             background-color: #ffffff;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.02);
+            box-shadow: var(--shadow-subtle);
             color: var(--text-main);
         }
 
         .search-input:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12), 0 10px 15px -3px rgb(0 0 0 / 0.05);
+            box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.1), var(--shadow-subtle);
         }
 
         .search-icon {
             position: absolute;
-            left: 18px;
+            left: 20px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-muted);
@@ -104,25 +121,27 @@
             color: var(--primary-color);
         }
 
-        /* Botones de Filtro por Categoría */
+        /* Botones de Filtros Dinámicos */
         .filters {
             display: flex;
             justify-content: center;
-            gap: 12px;
+            gap: 10px;
             flex-wrap: wrap;
             margin-bottom: 35px;
+            padding: 0 10px;
         }
 
         .filter-btn {
             background-color: #ffffff;
-            border: 2px solid #e2e8f0;
-            padding: 10px 22px;
+            border: 2px solid var(--border-color);
+            padding: 10px 20px;
             border-radius: 30px;
             cursor: pointer;
             font-weight: 600;
+            font-size: 0.9rem;
             color: var(--text-muted);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 2px 4px rgb(0 0 0 / 0.02);
+            transition: var(--transition-smooth);
+            box-shadow: var(--shadow-subtle);
         }
 
         .filter-btn:hover {
@@ -136,10 +155,10 @@
             color: #ffffff;
             border-color: var(--primary-color);
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+            box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
         }
 
-        /* Grid de Productos con animación de aparición */
+        /* Grid de Productos */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -149,40 +168,33 @@
         }
 
         @keyframes cardEntrance {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Tarjeta de Producto (Card) */
         .card {
             background-color: var(--card-bg);
-            border-radius: 16px;
+            border-radius: 18px;
             overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: var(--shadow-subtle);
+            transition: var(--transition-smooth);
             cursor: pointer;
             display: flex;
             flex-direction: column;
             position: relative;
             border: 1px solid #f1f5f9;
-            animation: cardEntrance 0.5s ease forwards;
+            animation: cardEntrance 0.4s ease forwards;
         }
 
         .card:hover {
-            transform: translateY(-8px) scale(1.01);
+            transform: translateY(-6px);
             box-shadow: var(--shadow-hover);
-            border-color: rgba(37, 99, 235, 0.2);
+            border-color: rgba(37, 99, 235, 0.25);
         }
 
         .card-img-container {
             width: 100%;
-            height: 220px;
+            height: 210px;
             overflow: hidden;
             background: #f1f5f9;
             position: relative;
@@ -192,11 +204,11 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .card:hover img {
-            transform: scale(1.08);
+            transform: scale(1.07);
         }
 
         .card-body {
@@ -208,7 +220,7 @@
         }
 
         .card-category {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             text-transform: uppercase;
             letter-spacing: 0.08em;
             color: var(--primary-color);
@@ -220,7 +232,7 @@
             font-size: 1.05rem;
             font-weight: 600;
             margin-bottom: 8px;
-            color: #0f172a;
+            color: var(--text-main);
             transition: color 0.2s;
         }
 
@@ -236,7 +248,7 @@
         }
 
         .card-hint {
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
             text-align: center;
             border-top: 1px solid #f1f5f9;
@@ -249,7 +261,7 @@
             color: var(--primary-color);
         }
 
-        /* Ventana Modal (Detalles) */
+        /* Modal con Efectos de Zoom e Interactividad */
         .modal {
             display: none;
             position: fixed;
@@ -257,8 +269,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(15, 23, 42, 0.65);
-            backdrop-filter: blur(6px);
+            background-color: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(8px);
             justify-content: center;
             align-items: center;
             padding: 20px;
@@ -274,13 +286,13 @@
 
         .modal-content {
             background-color: #ffffff;
-            border-radius: 20px;
-            max-width: 500px;
+            border-radius: 22px;
+            max-width: 480px;
             width: 100%;
             overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-            transform: scale(0.9) translateY(20px);
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.3);
+            transform: scale(0.92) translateY(15px);
+            transition: var(--transition-smooth);
             position: relative;
         }
 
@@ -288,26 +300,47 @@
             transform: scale(1) translateY(0);
         }
 
+        /* Contenedor de la foto con Zoom Interactivo */
         .modal-img-container {
             width: 100%;
             height: 280px;
             background: #f1f5f9;
             overflow: hidden;
+            position: relative;
+            cursor: zoom-in;
+        }
+
+        .modal-img-container.zoomed {
+            cursor: zoom-out;
         }
 
         .modal-img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.5s ease;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-origin: center center;
         }
 
-        .modal-content:hover .modal-img {
-            transform: scale(1.03);
+        .zoom-hint-badge {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(0, 0, 0, 0.65);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            backdrop-filter: blur(4px);
         }
 
         .modal-body {
-            padding: 28px;
+            padding: 25px;
         }
 
         .modal-close {
@@ -325,31 +358,31 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
+            transition: var(--transition-smooth);
             z-index: 10;
         }
 
         .modal-close:hover {
             background: rgba(0, 0, 0, 0.85);
-            transform: rotate(90deg);
+            transform: rotate(90deg) scale(1.1);
         }
 
         .modal-title {
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 6px;
-            color: #0f172a;
+            color: var(--text-main);
         }
 
         .modal-code {
             font-size: 0.85rem;
             color: var(--text-muted);
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             font-weight: 600;
         }
 
         .modal-price {
-            font-size: 1.4rem;
+            font-size: 1.35rem;
             color: #059669;
             font-weight: 700;
             margin-bottom: 15px;
@@ -357,10 +390,10 @@
 
         .modal-desc {
             color: var(--text-muted);
-            font-size: 0.95rem;
-            margin-bottom: 25px;
+            font-size: 0.93rem;
+            margin-bottom: 22px;
             line-height: 1.6;
-            max-height: 150px;
+            max-height: 130px;
             overflow-y: auto;
         }
 
@@ -374,11 +407,11 @@
             color: white;
             text-align: center;
             padding: 14px;
-            border-radius: 12px;
+            border-radius: 14px;
             text-decoration: none;
             font-weight: 600;
-            font-size: 1.05rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 1.02rem;
+            transition: var(--transition-smooth);
             box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
         }
 
@@ -388,7 +421,7 @@
             box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5);
         }
 
-        /* Loader */
+        /* Spinner de carga */
         .loader-container {
             text-align: center;
             grid-column: 1 / -1;
@@ -397,7 +430,7 @@
         }
 
         .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.08);
+            border: 3px solid rgba(37, 99, 235, 0.1);
             width: 40px;
             height: 40px;
             border-radius: 50%;
@@ -411,7 +444,7 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Barra Flotante de Redes Sociales */
+        /* Barra Flotante Interactiva */
         .social-float {
             position: fixed;
             bottom: 25px;
@@ -423,16 +456,16 @@
         }
 
         .social-icon {
-            width: 52px;
-            height: 52px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             box-shadow: 0 6px 16px rgba(0,0,0,0.2);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: var(--transition-smooth);
             text-decoration: none;
         }
 
@@ -459,25 +492,26 @@
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
     </div>
 
-    <!-- Botones de Filtrado Dinámicos -->
+    <!-- Botones de Filtros -->
     <div class="filters" id="filters-container">
         <button class="filter-btn active" onclick="cambiarCategoria('todos', this)">Todos</button>
     </div>
 
-    <!-- Contenedor del Grid de Productos -->
+    <!-- Grid de Productos -->
     <div class="grid" id="product-grid">
         <div class="loader-container">
             <div class="spinner"></div>
-            <p>Cargando productos desde la base de datos...</p>
+            <p>Sincronizando catálogo...</p>
         </div>
     </div>
 
-    <!-- Ventana Modal Interactiva -->
-    <div class="modal" id="product-modal">
-        <div class="modal-content">
+    <!-- Ventana Modal -->
+    <div class="modal" id="product-modal" onclick="if(event.target === this) cerrarModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModal()"><i class="fa-solid fa-xmark"></i></button>
-            <div class="modal-img-container">
+            <div class="modal-img-container" id="modal-img-container" onclick="toggleZoom(event)">
                 <img id="modal-img" class="modal-img" src="" alt="">
+                <div class="zoom-hint-badge"><i class="fa-solid fa-magnifying-glass-plus"></i> Clic para zoom</div>
             </div>
             <div class="modal-body">
                 <div id="modal-category" class="card-category"></div>
@@ -492,15 +526,15 @@
         </div>
     </div>
 
-    <!-- Botones Flotantes de Contacto, Redes y Ubicación -->
+    <!-- Botones Flotantes -->
     <div class="social-float">
-        <a href="https://wa.me/584149956831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20quiero%20más%20información" target="_blank" class="social-icon bg-wa" title="Escríbenos al WhatsApp">
+        <a href="https://wa.me/584149956831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20quiero%20más%20información" target="_blank" class="social-icon bg-wa" title="WhatsApp">
             <i class="fa-brands fa-whatsapp"></i>
         </a>
-        <a href="https://tinyurl.com/pageimc" target="_blank" class="social-icon bg-fb" title="Síguenos en Facebook">
+        <a href="https://tinyurl.com/pageimc" target="_blank" class="social-icon bg-fb" title="Facebook">
             <i class="fa-brands fa-facebook-f"></i>
         </a>
-        <a href="https://maps.app.goo.gl/guVQ4JRGzRMVjUUy9" target="_blank" class="social-icon bg-maps" title="Ver ubicación en Google Maps">
+        <a href="https://maps.app.goo.gl/guVQ4JRGzRMVjUUy9" target="_blank" class="social-icon bg-maps" title="Ubicación">
             <i class="fa-solid fa-location-dot"></i>
         </a>
     </div>
@@ -510,11 +544,13 @@
 
         let listaProductosGlobal = [];
         let categoriaSeleccionada = 'todos';
+        let isZoomed = false;
 
         function cargarCatalogo() {
             fetch(urlAPI)
                 .then(response => response.json())
                 .then(data => {
+                    // Filtrar solo los disponibles asegurando compatibilidad con tu API
                     listaProductosGlobal = data.filter(prod => {
                         if (!prod.status) return false;
                         return prod.status.toString().trim().toLowerCase() === 'disponible';
@@ -524,78 +560,49 @@
                     mostrarProductos(listaProductosGlobal);
                 })
                 .catch(error => {
-                    console.error('Error al conectar con Google Sheets:', error);
-                    document.getElementById('product-grid').innerHTML = '<p style="text-align:center; grid-column:1/-1; color: #ef4444;">Error al cargar los productos. Verifica tu conexión o la URL de la API.</p>';
+                    console.error('Error al conectar con la API:', error);
+                    document.getElementById('product-grid').innerHTML = '<p style="text-align:center; grid-column:1/-1; color: #ef4444;">Error al cargar los productos. Verifica tu conexión.</p>';
                 });
-        }
-
-        function mostrarProductos(lista) {
-            const grid = document.getElementById('product-grid');
-            grid.innerHTML = '';
-
-            if (lista.length === 0) {
-                grid.innerHTML = '<p style="text-align:center; grid-column:1/-1; color: var(--text-muted); padding: 40px;">No se encontraron productos disponibles.</p>';
-                return;
-            }
-
-            lista.forEach((prod, index) => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                // Retraso escalonado sutil para la animación de entrada
-                card.style.animationDelay = `${index * 0.05}s`;
-                card.onclick = () => abrirModal(prod);
-
-                card.innerHTML = `
-                    <div class="card-img-container">
-                        <img src="${prod.imagen}" alt="${prod.nombre}" loading="lazy">
-                    </div>
-                    <div class="card-body">
-                        <div>
-                            <div class="card-category">${prod.categoria || 'General'}</div>
-                            <h3 class="card-title">${prod.nombre}</h3>
-                            <div class="card-price">$${prod.precio}</div>
-                        </div>
-                        <div class="card-hint"><i class="fa-solid fa-magnifying-glass"></i> Ver detalles y comprar</div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
         }
 
         function construirBotonesCategorias(productos) {
             const filtrosContainer = document.getElementById('filters-container');
+            // Obtener categorías únicas limpias
             const categoriasUnicas = [...new Set(productos.map(p => p.categoria ? p.categoria.trim() : 'General'))];
             
             let htmlBotones = `<button class="filter-btn ${categoriaSeleccionada === 'todos' ? 'active' : ''}" onclick="cambiarCategoria('todos', this)">Todos</button>`;
+            
             categoriasUnicas.forEach(cat => {
                 const isActive = categoriaSeleccionada.toLowerCase() === cat.toLowerCase() ? 'active' : '';
                 htmlBotones += `<button class="filter-btn ${isActive}" onclick="cambiarCategoria('${cat}', this)">${cat}</button>`;
             });
+            
             filtrosContainer.innerHTML = htmlBotones;
         }
 
         function cambiarCategoria(cat, elementoBtn) {
             categoriaSeleccionada = cat;
+            
+            // Actualizar clases activas visualmente en los botones
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            if(elementoBtn) {
+            if (elementoBtn) {
                 elementoBtn.classList.add('active');
             } else {
-                // Si se actualiza programáticamente, busca el botón correspondiente
                 document.querySelectorAll('.filter-btn').forEach(btn => {
-                    if(btn.textContent.trim().toLowerCase() === cat.toLowerCase()) {
+                    if (btn.textContent.trim().toLowerCase() === cat.toLowerCase()) {
                         btn.classList.add('active');
                     }
                 });
             }
+
             filtrarCombinado();
         }
 
         function filtrarCombinado() {
             const textoBusqueda = document.getElementById('search-input').value.toLowerCase().trim();
-
             let listaFiltrada = listaProductosGlobal;
 
-            // Filtro por categoría
+            // 1. Filtrar por Categoría seleccionada
             if (categoriaSeleccionada !== 'todos') {
                 listaFiltrada = listaFiltrada.filter(p => {
                     const catProd = p.categoria ? p.categoria.trim().toLowerCase() : 'general';
@@ -603,7 +610,7 @@
                 });
             }
 
-            // Filtro por buscador en tiempo real
+            // 2. Filtrar por Texto de Búsqueda
             if (textoBusqueda !== '') {
                 listaFiltrada = listaFiltrada.filter(p => {
                     const nombre = p.nombre ? p.nombre.toLowerCase() : '';
@@ -616,8 +623,47 @@
             mostrarProductos(listaFiltrada);
         }
 
+        function mostrarProductos(lista) {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+
+            if (lista.length === 0) {
+                grid.innerHTML = '<p style="text-align:center; grid-column:1/-1; color: var(--text-muted); padding: 40px;">No se encontraron productos con estos criterios.</p>';
+                return;
+            }
+
+            lista.forEach((prod, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.animationDelay = `${index * 0.04}s`;
+                card.onclick = () => abrirModal(prod);
+
+                card.innerHTML = `
+                    <div class="card-img-container">
+                        <img src="${prod.imagen}" alt="${prod.nombre}" loading="lazy">
+                    </div>
+                    <div class="card-body">
+                        <div>
+                            <div class="card-category">${prod.categoria || 'General'}</div>
+                            <h3 class="card-title">${prod.nombre}</h3>
+                            <div class="card-price">$${prod.precio}</div>
+                        </div>
+                        <div class="card-hint"><i class="fa-solid fa-eye"></i> Ver detalles y comprar</div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
         function abrirModal(prod) {
-            document.getElementById('modal-img').src = prod.imagen;
+            isZoomed = false;
+            const imgContainer = document.getElementById('modal-img-container');
+            const imgElem = document.getElementById('modal-img');
+            imgContainer.classList.remove('zoomed');
+            imgElem.style.transform = 'scale(1)';
+            imgElem.style.transformOrigin = 'center center';
+
+            imgElem.src = prod.imagen;
             document.getElementById('modal-category').innerText = prod.categoria || '';
             document.getElementById('modal-title').innerText = prod.nombre;
             document.getElementById('modal-code').innerText = `Código: ${prod.codigo_producto || prod.id || 'N/A'}`;
@@ -632,31 +678,45 @@
 
             let numeroWa = prod.whatsapp ? prod.whatsapp.toString().trim() : "584149956831";
             let categoriaProd = prod.categoria ? prod.categoria.trim().toLowerCase() : '';
-            
             let mensaje = "";
 
             if (categoriaProd === 'servicios' || categoriaProd === 'servicio') {
-                let requisitosLimpios = masDetalles 
-                    ? masDetalles.replace(/[,/]/g, '\n-') 
-                    : "Por favor indícame lo necesario para este servicio.";
-                
-                mensaje = encodeURIComponent(`Hola, quiero solicitar el servicio de *${prod.nombre}* ($${prod.precio}).\n\nAquí mis datos / requisitos:\n- ${requisitosLimpios}`);
+                let requisitosLimpios = masDetalles ? masDetalles.replace(/[,/]/g, '\n-') : "Por favor indícame los detalles necesarios.";
+                mensaje = encodeURIComponent(`Hola, quiero solicitar el servicio de *${prod.nombre}* ($${prod.precio}).\n\nRequisitos:\n- ${requisitosLimpios}`);
             } else {
-                mensaje = encodeURIComponent(`Hola, me interesa este producto:\n\n*Código:* ${prod.codigo_producto || prod.id || 'N/A'}\n*Producto:* ${prod.nombre}\n*Precio:* $${prod.precio}\n*Ver foto:* ${prod.imagen}`);
+                mensaje = encodeURIComponent(`Hola, me interesa este producto:\n\n*Código:* ${prod.codigo_producto || prod.id || 'N/A'}\n*Producto:* ${prod.nombre}\n*Precio:* $${prod.precio}\n*Foto:* ${prod.imagen}`);
             }
             
             document.getElementById('modal-wa-btn').href = `https://wa.me/${numeroWa}?text=${mensaje}`;
             document.getElementById('product-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
         }
 
         function cerrarModal() {
             document.getElementById('product-modal').classList.remove('active');
+            document.body.style.overflow = 'auto';
         }
 
-        window.onclick = function(event) {
-            const modal = document.getElementById('product-modal');
-            if (event.target === modal) {
-                cerrarModal();
+        // Función interactiva de Zoom en la foto al hacer clic
+        function toggleZoom(event) {
+            const container = event.currentTarget;
+            const img = container.querySelector('.modal-img');
+            isZoomed = !isZoomed;
+
+            if (isZoomed) {
+                const rect = container.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+                const xPercent = (x / rect.width) * 100;
+                const yPercent = (y / rect.height) * 100;
+
+                img.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+                img.style.transform = 'scale(2.2)';
+                container.classList.add('zoomed');
+            } else {
+                img.style.transform = 'scale(1)';
+                img.style.transformOrigin = 'center center';
+                container.classList.remove('zoomed');
             }
         }
 
