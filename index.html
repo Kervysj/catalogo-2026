@@ -213,6 +213,31 @@
             transform: scale(1.07);
         }
 
+        /* Botón de compartir flotante en la tarjeta */
+        .card-share-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(15, 23, 42, 0.7);
+            color: #ffffff;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            z-index: 5;
+            backdrop-filter: blur(4px);
+        }
+
+        .card-share-btn:hover {
+            background: var(--primary-color);
+            transform: scale(1.1);
+        }
+
         .card-body {
             padding: 20px;
             display: flex;
@@ -398,12 +423,17 @@
             overflow-y: auto;
         }
 
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+
         .whatsapp-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            width: 100%;
+            gap: 8px;
+            flex-grow: 1;
             background-color: #25d366;
             color: white;
             text-align: center;
@@ -411,7 +441,7 @@
             border-radius: 14px;
             text-decoration: none;
             font-weight: 600;
-            font-size: 1.02rem;
+            font-size: 1rem;
             transition: var(--transition-smooth);
             box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
         }
@@ -419,7 +449,26 @@
         .whatsapp-btn:hover {
             background-color: #20ba5a;
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5);
+        }
+
+        .modal-share-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0 16px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+        }
+
+        .modal-share-btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
         }
 
         /* Spinner */
@@ -445,7 +494,31 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Barra Flotante Interactiva con Botón de Sugerencias */
+        /* Notificación emergente Toast (para cuando se copia al portapapeles) */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #0f172a;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 2000;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Barra Flotante Interactiva */
         .social-float {
             position: fixed;
             bottom: 25px;
@@ -478,7 +551,7 @@
         .bg-wa { background-color: #25d366; }
         .bg-fb { background-color: #1877f2; }
         .bg-maps { background-color: var(--danger-color); }
-        .bg-sug { background-color: #9333ea; } /* Morado vibrante para sugerencias */
+        .bg-sug { background-color: #9333ea; }
     </style>
 </head>
 <body>
@@ -521,14 +594,22 @@
                 <div id="modal-code" class="modal-code"></div>
                 <div id="modal-price" class="modal-price"></div>
                 <p id="modal-desc" class="modal-desc"></p>
-                <a id="modal-wa-btn" class="whatsapp-btn" href="#" target="_blank">
-                    <i class="fa-brands fa-whatsapp" style="font-size: 1.3rem;"></i> Comprar por WhatsApp
-                </a>
+                <div class="modal-actions">
+                    <a id="modal-wa-btn" class="whatsapp-btn" href="#" target="_blank">
+                        <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i> Comprar
+                    </a>
+                    <button id="modal-share-btn" class="modal-share-btn" title="Compartir producto">
+                        <i class="fa-solid fa-share-nodes"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Botones Flotantes (Incluye el nuevo botón de sugerencias) -->
+    <!-- Toast de Notificación -->
+    <div id="toast" class="toast"><i class="fa-solid fa-check-circle" style="color: #22c55e;"></i> ¡Enlace copiado al portapapeles!</div>
+
+    <!-- Botones Flotantes -->
     <div class="social-float">
         <a href="https://wa.me/584149956831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20tengo%20la%20siguiente%20sugerencia:" target="_blank" class="social-icon bg-sug" title="Enviar una sugerencia">
             <i class="fa-solid fa-lightbulb"></i>
@@ -607,7 +688,6 @@
             const textoBusqueda = inputVal ? inputVal.toLowerCase().trim() : '';
             let listaFiltrada = listaProductosGlobal;
 
-            // 1. Filtrar por Categoría
             if (categoriaSeleccionada !== 'todos') {
                 listaFiltrada = listaFiltrada.filter(p => {
                     const catProd = p.categoria ? p.categoria.trim().toLowerCase() : 'general';
@@ -615,7 +695,6 @@
                 });
             }
 
-            // 2. Filtrar por Buscador (Nombre, Descripción o Código) de forma robusta
             if (textoBusqueda !== '') {
                 listaFiltrada = listaFiltrada.filter(p => {
                     const nombre = p.nombre ? p.nombre.toString().toLowerCase() : '';
@@ -648,6 +727,9 @@
                 card.innerHTML = `
                     <div class="card-img-container">
                         <img src="${prod.imagen}" alt="${prod.nombre}" loading="lazy">
+                        <button class="card-share-btn" onclick="event.stopPropagation(); compartirProducto(event, ${JSON.stringify(prod).replace(/"/g, '&quot;')})" title="Compartir">
+                            <i class="fa-solid fa-share-nodes"></i>
+                        </button>
                     </div>
                     <div class="card-body">
                         <div>
@@ -660,6 +742,29 @@
                 `;
                 grid.appendChild(card);
             });
+        }
+
+        function compartirProducto(event, prod) {
+            const textoCompartir = `¡Mira este artículo en nuestro catálogo!\n\n📌 *${prod.nombre}*\n💰 Precio: $${prod.precio}\n📝 ${prod.descripcion || ''}\n🖼️ Foto: ${prod.imagen}\n\n¡Consíguelo aquí!`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: prod.nombre,
+                    text: textoCompartir,
+                    url: window.location.href
+                }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(textoCompartir + "\n" + window.location.href);
+                mostrarToast();
+            }
+        }
+
+        function mostrarToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
         }
 
         function abrirModal(prod) {
@@ -695,6 +800,8 @@
             }
             
             document.getElementById('modal-wa-btn').href = `https://wa.me/${numeroWa}?text=${mensaje}`;
+            document.getElementById('modal-share-btn').onclick = () => compartirProducto(null, prod);
+
             document.getElementById('product-modal').classList.add('active');
             document.body.style.overflow = 'hidden';
         }
