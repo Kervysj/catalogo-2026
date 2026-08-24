@@ -35,7 +35,7 @@
 
         header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             padding-top: 20px;
         }
 
@@ -47,6 +47,39 @@
         }
 
         header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* Barra de Búsqueda */
+        .search-container {
+            max-width: 500px;
+            margin: 0 auto 25px auto;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border-radius: 30px;
+            border: 1px solid #cbd5e1;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgb(0 0 0 / 0.02);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
             color: var(--text-muted);
             font-size: 1rem;
         }
@@ -268,6 +301,8 @@
             font-size: 0.95rem;
             margin-bottom: 25px;
             line-height: 1.6;
+            max-height: 160px;
+            overflow-y: auto;
         }
 
         .whatsapp-btn {
@@ -291,6 +326,29 @@
         .whatsapp-btn:hover {
             background-color: #1ebd59;
             transform: translateY(-2px);
+        }
+
+        /* Spinner de carga */
+        .loader-container {
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: var(--primary-color);
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* Barra Flotante de Redes Sociales y Ubicación (Inferior Derecha) */
@@ -335,6 +393,12 @@
         <p>Selecciona un producto para ver detalles y realizar tu pedido al instante</p>
     </header>
 
+    <!-- Barra de Búsqueda en Tiempo Real -->
+    <div class="search-container">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" id="search-input" class="search-input" placeholder="Buscar productos o servicios..." oninput="filtrarPorBusqueda()">
+    </div>
+
     <!-- Botones de Filtrado Dinámicos -->
     <div class="filters" id="filters-container">
         <button class="filter-btn active" onclick="filtrarProductos('todos', this)">Todos</button>
@@ -342,7 +406,10 @@
 
     <!-- Contenedor del Grid de Productos -->
     <div class="grid" id="product-grid">
-        <p style="text-align:center; grid-column:1/-1; color: var(--text-muted);">Cargando productos desde la base de datos...</p>
+        <div class="loader-container">
+            <div class="spinner"></div>
+            <p>Cargando productos desde la base de datos...</p>
+        </div>
     </div>
 
     <!-- Ventana Modal Interactiva -->
@@ -367,31 +434,27 @@
 
     <!-- Botones Flotantes de Contacto, Redes y Ubicación -->
     <div class="social-float">
-        <!-- WhatsApp de la empresa -->
         <a href="https://wa.me/584149956831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20quiero%20más%20información" target="_blank" class="social-icon bg-wa" title="Escríbenos al WhatsApp">
             <i class="fa-brands fa-whatsapp"></i>
         </a>
-        <!-- Página de Facebook -->
         <a href="https://tinyurl.com/pageimc" target="_blank" class="social-icon bg-fb" title="Síguenos en Facebook">
             <i class="fa-brands fa-facebook-f"></i>
         </a>
-        <!-- Enlace a Google Maps -->
         <a href="https://maps.app.goo.gl/guVQ4JRGzRMVjUUy9" target="_blank" class="social-icon bg-maps" title="Ver ubicación en Google Maps">
             <i class="fa-solid fa-location-dot"></i>
         </a>
     </div>
 
     <script>
-        // URL de tu Apps Script configurada correctamente
         const urlAPI = "https://script.google.com/macros/s/AKfycbyfjv9UscbcmgqeKjx_0j5UxGWK2qpFudgFGcHeCBt252fUfxgkhcQUKH-b8BeZLU8NNg/exec";
 
         let listaProductosGlobal = [];
+        let categoriaActual = 'todos';
 
         function cargarCatalogo() {
             fetch(urlAPI)
                 .then(response => response.json())
                 .then(data => {
-                    // Filtrar solo los productos que tengan el status "disponible"
                     listaProductosGlobal = data.filter(prod => {
                         if (!prod.status) return false;
                         return prod.status.toString().trim().toLowerCase() === 'disponible';
@@ -411,7 +474,7 @@
             grid.innerHTML = '';
 
             if (lista.length === 0) {
-                grid.innerHTML = '<p style="text-align:center; grid-column:1/-1; color: var(--text-muted);">No hay productos disponibles en este momento.</p>';
+                grid.innerHTML = '<p style="text-align:center; grid-column:1/-1; color: var(--text-muted);">No se encontraron productos disponibles.</p>';
                 return;
             }
 
@@ -449,15 +512,38 @@
         }
 
         function filtrarProductos(cat, elementoBtn) {
+            categoriaActual = cat;
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             if(elementoBtn) elementoBtn.classList.add('active');
 
-            if (cat === 'todos') {
-                mostrarProductos(listaProductosGlobal);
-            } else {
-                const filtrados = listaProductosGlobal.filter(p => (p.categoria ? p.categoria.trim() : 'General') === cat);
-                mostrarProductos(filtrados);
+            aplicarFiltrosCombinados();
+        }
+
+        function filtrarPorBusqueda() {
+            aplicarFiltrosCombinados();
+        }
+
+        function aplicarFiltrosCombinados() {
+            const textoBusqueda = document.getElementById('search-input').value.toLowerCase().trim();
+
+            let listaFiltrada = listaProductosGlobal;
+
+            // Filtro por categoría
+            if (categoriaActual !== 'todos') {
+                listaFiltrada = listaFiltrada.filter(p => (p.categoria ? p.categoria.trim() : 'General') === categoriaActual);
             }
+
+            // Filtro por texto de búsqueda
+            if (textoBusqueda !== '') {
+                listaFiltrada = listaFiltrada.filter(p => {
+                    const nombre = p.nombre ? p.nombre.toLowerCase() : '';
+                    const desc = p.descripcion ? p.descripcion.toLowerCase() : '';
+                    const codigo = p.codigo_producto ? p.codigo_producto.toLowerCase() : '';
+                    return nombre.includes(textoBusqueda) || desc.includes(textoBusqueda) || codigo.includes(textoBusqueda);
+                });
+            }
+
+            mostrarProductos(listaFiltrada);
         }
 
         function abrirModal(prod) {
@@ -480,7 +566,6 @@
             let mensaje = "";
 
             if (categoriaProd === 'servicios' || categoriaProd === 'servicio') {
-                // Reemplaza las comas o barras de tu celda por saltos de línea automáticos en WhatsApp
                 let requisitosLimpios = masDetalles 
                     ? masDetalles.replace(/[,/]/g, '\n-') 
                     : "Por favor indícame lo necesario para este servicio.";
@@ -491,7 +576,6 @@
             }
             
             document.getElementById('modal-wa-btn').href = `https://wa.me/${numeroWa}?text=${mensaje}`;
-
             document.getElementById('product-modal').classList.add('active');
         }
 
@@ -499,12 +583,19 @@
             document.getElementById('product-modal').classList.remove('active');
         }
 
+        // Cerrar modal haciendo clic fuera o presionando ESC
         window.onclick = function(event) {
             const modal = document.getElementById('product-modal');
             if (event.target === modal) {
                 cerrarModal();
             }
         }
+
+        window.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                cerrarModal();
+            }
+        });
 
         cargarCatalogo();
     </script>
