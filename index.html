@@ -59,7 +59,7 @@
 
         header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             padding-top: 15px;
         }
 
@@ -76,6 +76,48 @@
         header p {
             color: var(--text-muted);
             font-size: 0.98rem;
+        }
+
+        /* Banner de Información Rápida (Pagos y Delivery) */
+        .info-badges-container {
+            max-width: 600px;
+            margin: 0 auto 25px auto;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 0 10px;
+        }
+
+        .info-badge {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            padding: 10px 18px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-main);
+            box-shadow: var(--shadow-subtle);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .info-badge:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.15);
+        }
+
+        .info-badge i {
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+
+        .info-badge.red-icon i {
+            color: var(--danger-color);
         }
 
         /* Buscador rápido e interactivo */
@@ -288,7 +330,7 @@
             color: var(--primary-color);
         }
 
-        /* Modal con Zoom Interactivo */
+        /* Modales Generales (Productos e Info) */
         .modal {
             display: none;
             position: fixed;
@@ -471,6 +513,32 @@
             transform: translateY(-2px);
         }
 
+        /* Estilo específico para los modales informativos (Pagos y Delivery) */
+        .info-modal-list {
+            list-style: none;
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .info-modal-list li {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .info-modal-list li i {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
         /* Spinner */
         .loader-container {
             text-align: center;
@@ -494,7 +562,7 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Notificación emergente Toast (para cuando se copia al portapapeles) */
+        /* Notificación Toast */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -561,6 +629,16 @@
         <p>Selecciona un producto para ver detalles y realizar tu pedido al instante</p>
     </header>
 
+    <!-- Botones de Acceso Rápido: Métodos de Pago y Delivery -->
+    <div class="info-badges-container">
+        <div class="info-badge" onclick="abrirModalInfo('pagos')">
+            <i class="fa-solid fa-wallet"></i> Métodos de Pago
+        </div>
+        <div class="info-badge red-icon" onclick="abrirModalInfo('delivery')">
+            <i class="fa-solid fa-motorcycle"></i> Tenemos Delivery Disponible
+        </div>
+    </div>
+
     <!-- Barra de Búsqueda -->
     <div class="search-container">
         <input type="text" id="search-input" class="search-input" placeholder="Buscar por nombre, descripción o código..." oninput="filtrarCombinado()">
@@ -580,7 +658,7 @@
         </div>
     </div>
 
-    <!-- Ventana Modal -->
+    <!-- Ventana Modal de Producto -->
     <div class="modal" id="product-modal" onclick="if(event.target === this) cerrarModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModal()"><i class="fa-solid fa-xmark"></i></button>
@@ -602,6 +680,17 @@
                         <i class="fa-solid fa-share-nodes"></i>
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ventana Modal de Información (Pagos / Delivery) -->
+    <div class="modal" id="info-modal" onclick="if(event.target === this) cerrarModalInfo()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="cerrarModalInfo()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-body" style="padding-top: 35px;">
+                <div id="info-modal-header"></div>
+                <div id="info-modal-body-content"></div>
             </div>
         </div>
     </div>
@@ -811,6 +900,39 @@
             document.body.style.overflow = 'auto';
         }
 
+        function abrirModalInfo(tipo) {
+            const headerElem = document.getElementById('info-modal-header');
+            const bodyElem = document.getElementById('info-modal-body-content');
+
+            if (tipo === 'pagos') {
+                headerElem.innerHTML = `<h2 class="modal-title" style="color:var(--primary-color);"><i class="fa-solid fa-wallet"></i> Métodos de Pago</h2><p style="color:var(--text-muted); font-size:0.9rem; margin-top:5px;">Aceptamos las siguientes modalidades para tu comodidad:</p>`;
+                bodyElem.innerHTML = `
+                    <ul class="info-modal-list">
+                        <li><i class="fa-solid fa-mobile-screen-button"></i> Pago Móvil</li>
+                        <li><i class="fa-solid fa-building-columns"></i> Transferencia Bancaria</li>
+                        <li><i class="fa-brands fa-bitcoin"></i> Binance Pay</li>
+                    </ul>
+                    <p style="text-align:center; font-size:0.85rem; color:var(--text-muted); margin-top:20px;">Los datos exactos se coordinan al finalizar tu pedido por WhatsApp.</p>
+                `;
+            } else if (tipo === 'delivery') {
+                headerElem.innerHTML = `<h2 class="modal-title" style="color:var(--danger-color);"><i class="fa-solid fa-motorcycle"></i> Servicio de Delivery</h2><p style="color:var(--text-muted); font-size:0.9rem; margin-top:5px;">Llevamos tu pedido hasta la puerta de tu casa:</p>`;
+                bodyElem.innerHTML = `
+                    <div style="background:#f8fafc; border:1px solid var(--border-color); padding:18px; border-radius:14px; margin-top:15px; text-align:center;">
+                        <p style="color:var(--text-main); font-weight:600; font-size:1rem; line-height:1.5;">🚀 Contamos con servicio de delivery disponible.</p>
+                        <p style="color:var(--text-muted); font-size:0.9rem; margin-top:10px;">El costo del envío varía dependiendo de tu zona o sector de ubicación.</p>
+                    </div>
+                `;
+            }
+
+            document.getElementById('info-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarModalInfo() {
+            document.getElementById('info-modal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
         function toggleZoom(event) {
             const container = event.currentTarget;
             const img = container.querySelector('.modal-img');
@@ -836,6 +958,7 @@
         window.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
                 cerrarModal();
+                cerrarModalInfo();
             }
         });
 
