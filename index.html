@@ -22,12 +22,12 @@
     
     <style>
         :root {
-            --primary-color: #2563eb;       /* Azul principal moderno */
-            --primary-hover: #1d4ed8;     /* Azul hover */
-            --danger-color: #dc2626;        /* Rojo dinámico para alertas y acentos */
+            --primary-color: #2563eb;       
+            --primary-hover: #1d4ed8;     
+            --danger-color: #dc2626;        
             --danger-hover: #b91c1c;
-            --gaming-color: #06b6d4;        /* Color cian/neón gaming para Free Fire */
-            --special-cat-color: #9333ea;   /* Morado vibrante para destacar recargas y streaming en filtros */
+            --gaming-color: #06b6d4;        
+            --special-cat-color: #9333ea;   
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
             --text-main: #0f172a;
@@ -80,7 +80,6 @@
             font-size: 0.98rem;
         }
 
-        /* Banner de Información Rápida (Pagos, Delivery y Recargas Gaming) */
         .info-badges-container {
             max-width: 800px;
             margin: 0 auto 25px auto;
@@ -137,7 +136,6 @@
             box-shadow: 0 6px 16px rgba(6, 182, 212, 0.25);
         }
 
-        /* Buscador rápido e interactivo */
         .search-container {
             max-width: 520px;
             margin: 0 auto 25px auto;
@@ -182,7 +180,6 @@
             transform: translateY(-50%) scale(1.1);
         }
 
-        /* Botones de Filtros Dinámicos */
         .filters {
             display: flex;
             justify-content: center;
@@ -219,7 +216,6 @@
             box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
         }
 
-        /* Estilo especial para los botones de filtros que son recargas o streaming */
         .filter-btn.special-filter {
             border-color: rgba(147, 51, 234, 0.4);
             color: var(--special-cat-color);
@@ -239,7 +235,6 @@
             box-shadow: 0 6px 16px rgba(147, 51, 234, 0.35);
         }
 
-        /* Grid de Productos */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -292,7 +287,6 @@
             transform: scale(1.07);
         }
 
-        /* Botón de compartir flotante en la tarjeta */
         .card-share-btn {
             position: absolute;
             top: 12px;
@@ -367,7 +361,6 @@
             color: var(--primary-color);
         }
 
-        /* Modales Generales */
         .modal {
             display: none;
             position: fixed;
@@ -502,7 +495,6 @@
             overflow-y: auto;
         }
 
-        /* Alerta especial para recargas de saldo o servicios dentro del modal */
         .recharge-alert-box {
             background-color: #fffbeb;
             border: 1px solid #fde68a;
@@ -570,7 +562,6 @@
             transform: translateY(-2px);
         }
 
-        /* Estilo para los modales informativos (Pagos y Delivery) */
         .info-modal-list {
             list-style: none;
             margin-top: 15px;
@@ -596,7 +587,6 @@
             font-size: 1.2rem;
         }
 
-        /* Spinner */
         .loader-container {
             text-align: center;
             grid-column: 1 / -1;
@@ -619,7 +609,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Notificación Toast */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -643,7 +632,6 @@
             transform: translateX(-50%) translateY(0);
         }
 
-        /* Barra Flotante Interactiva */
         .social-float {
             position: fixed;
             bottom: 25px;
@@ -686,7 +674,6 @@
         <p>Explora nuestros productos y servicios disponibles</p>
     </header>
 
-    <!-- Botones de Acceso Rápido: Pagos, Delivery y Recargas Free Fire -->
     <div class="info-badges-container">
         <div class="info-badge" onclick="abrirModalInfo('pagos')">
             <i class="fa-solid fa-wallet"></i> Métodos de Pago
@@ -699,18 +686,15 @@
         </a>
     </div>
 
-    <!-- Barra de Búsqueda -->
     <div class="search-container">
         <input type="text" id="search-input" class="search-input" placeholder="Buscar productos, servicios..." oninput="filtrarCombinado()">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
     </div>
 
-    <!-- Botones de Filtros -->
     <div class="filters" id="filters-container">
         <button class="filter-btn active" onclick="cambiarCategoria('todos', this)">Todos</button>
     </div>
 
-    <!-- Grid de Productos -->
     <div class="grid" id="product-grid">
         <div class="loader-container">
             <div class="spinner"></div>
@@ -718,7 +702,6 @@
         </div>
     </div>
 
-    <!-- Ventana Modal de Producto -->
     <div class="modal" id="product-modal" onclick="if(event.target === this) cerrarModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModal()"><i class="fa-solid fa-xmark"></i></button>
@@ -731,7 +714,6 @@
                 <h2 id="modal-title" class="modal-title"></h2>
                 <div id="modal-code" class="modal-code"></div>
                 <div id="modal-price" class="modal-price"></div>
-                <!-- Contenedor dinámico para alertas (Recargas o Servicios) -->
                 <div id="recharge-alert-container"></div>
                 <p id="modal-desc" class="modal-desc"></p>
                 <div class="modal-actions">
@@ -746,7 +728,6 @@
         </div>
     </div>
 
-    <!-- Ventana Modal de Información (Pagos / Delivery) -->
     <div class="modal" id="info-modal" onclick="if(event.target === this) cerrarModalInfo()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModalInfo()"><i class="fa-solid fa-xmark"></i></button>
@@ -757,10 +738,8 @@
         </div>
     </div>
 
-    <!-- Toast de Notificación -->
     <div id="toast" class="toast"><i class="fa-solid fa-check-circle" style="color: #22c55e;"></i> ¡Enlace copiado al portapapeles!</div>
 
-    <!-- Botones Flotantes -->
     <div class="social-float">
         <a href="https://wa.me/584149956831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20tengo%20la%20siguiente%20sugerencia:" target="_blank" class="social-icon bg-sug" title="Enviar una sugerencia">
             <i class="fa-solid fa-lightbulb"></i>
@@ -803,27 +782,29 @@
                 });
         }
 
-        function esRecargaDeSaldo(cat) {
+        // Detecta servicio de recargas
+        function esServicioRecargas(cat) {
             if (!cat) return false;
             const c = cat.toLowerCase();
-            return c.includes('recarga') || c.includes('saldo');
+            return c.includes('recarga') || (c.includes('servicio') && c.includes('recarga'));
         }
 
+        // Detecta streaming
         function esStreaming(cat) {
             if (!cat) return false;
             const c = cat.toLowerCase();
             return c.includes('streaming');
         }
 
-        // Exclusivamente para ocultar de la pantalla principal ("Todos")
+        // Oculta exclusivamente "servicios de recargas" y "streaming" de la pantalla principal ("Todos")
         function debeOcultarseEnPrincipal(cat) {
-            return esRecargaDeSaldo(cat) || esStreaming(cat);
+            return esServicioRecargas(cat) || esStreaming(cat);
         }
 
-        function esServicio(cat) {
+        function esServicioGeneral(cat) {
             if (!cat) return false;
             const c = cat.toLowerCase();
-            return c.includes('servicio') || c.includes('streaming');
+            return c.includes('servicio');
         }
 
         function construirBotonesCategorias(productos) {
@@ -867,10 +848,10 @@
             let listaFiltrada = listaProductosGlobal;
 
             if (categoriaSeleccionada === 'todos') {
-                // Oculta SOLAMENTE Recargas de Saldo y Streaming en la principal, manteniendo todo el resto y otros servicios
+                // Filtra y oculta SOLAMENTE servicios de recargas y streaming en la principal
                 listaFiltrada = listaFiltrada.filter(p => !debeOcultarseEnPrincipal(p.categoria));
             } else {
-                // Al hacer clic en un filtro específico, muestra esa categoría exacta
+                // Al hacer clic en el filtro, muestra la categoría seleccionada
                 listaFiltrada = listaFiltrada.filter(p => {
                     const catProd = p.categoria ? p.categoria.trim().toLowerCase() : 'general';
                     return catProd === categoriaSeleccionada.toLowerCase();
@@ -893,8 +874,8 @@
 
         function calcularPrecioFinal(prod) {
             let precioBase = parseFloat(prod.precio) || 0;
-            if (esRecargaDeSaldo(prod.categoria)) {
-                return precioBase * 1.12; // Suma el 12% adicional automáticamente
+            if (esServicioRecargas(prod.categoria)) {
+                return precioBase * 1.12; // 12% adicional para recargas de saldo
             }
             return precioBase;
         }
@@ -976,23 +957,22 @@
             const precioFinal = calcularPrecioFinal(prod);
             document.getElementById('modal-price').innerText = `$${precioFinal.toFixed(2)}`;
 
-            // Manejo de la alerta y aviso visual (Recarga de saldo o Servicio)
             const alertContainer = document.getElementById('recharge-alert-container');
-            if (esRecargaDeSaldo(prod.categoria)) {
+            if (esServicioRecargas(prod.categoria)) {
                 alertContainer.innerHTML = `
                     <div class="recharge-alert-box">
                         <i class="fa-solid fa-triangle-exclamation"></i>
                         <div>
-                            <strong>Nota importante:</strong> Este monto incluye un 12% adicional. <em>El trámite de recarga se realiza estrictamente una vez verificado y confirmado el pago.</em>
+                            <strong>Nota importante:</strong> Este monto incluye un 12% adicional. <em>El trámite se realiza estrictamente una vez verificado y confirmado el pago.</em>
                         </div>
                     </div>
                 `;
-            } else if (esServicio(prod.categoria)) {
+            } else if (esStreaming(prod.categoria) || esServicioGeneral(prod.categoria)) {
                 alertContainer.innerHTML = `
                     <div class="recharge-alert-box">
                         <i class="fa-solid fa-circle-info"></i>
                         <div>
-                            <strong>Aviso importante:</strong> <em>Cualquier servicio se realiza estrictamente después del pago correspondiente.</em>
+                            <strong>Aviso importante:</strong> <em>Cualquier servicio se procesa estrictamente después de verificado el pago.</em>
                         </div>
                     </div>
                 `;
@@ -1010,15 +990,12 @@
             let numeroWa = prod.whatsapp ? prod.whatsapp.toString().trim() : "584149956831";
             let mensaje = "";
 
-            if (esRecargaDeSaldo(prod.categoria)) {
-                mensaje = encodeURIComponent(`Hola, quiero procesar la recarga de saldo: *${prod.nombre}* (Total: $${precioFinal.toFixed(2)} con 12% incluido).\n\nPor favor indícame los datos para realizar el pago.`);
+            if (esServicioRecargas(prod.categoria)) {
+                mensaje = encodeURIComponent(`Hola, quiero procesar la recarga: *${prod.nombre}* (Total: $${precioFinal.toFixed(2)} con 12% incluido).\n\nPor favor indícame los datos para realizar el pago.`);
+            } else if (esStreaming(prod.categoria) || esServicioGeneral(prod.categoria)) {
+                mensaje = encodeURIComponent(`Hola, quiero solicitar el servicio de *${prod.nombre}* ($${precioFinal.toFixed(2)}).\n\nPor favor indícame los pasos.`);
             } else {
-                let categoriaProd = prod.categoria ? prod.categoria.trim().toLowerCase() : '';
-                if (categoriaProd.includes('servicio') || categoriaProd.includes('streaming')) {
-                    mensaje = encodeURIComponent(`Hola, quiero solicitar el servicio de *${prod.nombre}* ($${precioFinal.toFixed(2)}).\n\nPor favor indícame los pasos.`);
-                } else {
-                    mensaje = encodeURIComponent(`Hola, me interesa este artículo:\n\n*Código:* ${prod.codigo_producto || prod.id || 'N/A'}\n*Producto:* ${prod.nombre}\n*Precio:* $${precioFinal.toFixed(2)}\n*Foto:* ${prod.imagen}`);
-                }
+                mensaje = encodeURIComponent(`Hola, me interesa este artículo:\n\n*Código:* ${prod.codigo_producto || prod.id || 'N/A'}\n*Producto:* ${prod.nombre}\n*Precio:* $${precioFinal.toFixed(2)}\n*Foto:* ${prod.imagen}`);
             }
             
             document.getElementById('modal-wa-btn').href = `https://wa.me/${numeroWa}?text=${mensaje}`;
@@ -1095,10 +1072,8 @@
             }
         });
 
-        // Carga inicial
         cargarCatalogo(false);
 
-        // Sincronización automática con Google Sheets cada 15 segundos en segundo plano
         setInterval(() => {
             cargarCatalogo(true);
         }, 15000);
