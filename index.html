@@ -445,7 +445,7 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Barra Flotante Interactiva */
+        /* Barra Flotante Interactiva con Botón de Sugerencias */
         .social-float {
             position: fixed;
             bottom: 25px;
@@ -478,6 +478,7 @@
         .bg-wa { background-color: #25d366; }
         .bg-fb { background-color: #1877f2; }
         .bg-maps { background-color: var(--danger-color); }
+        .bg-sug { background-color: #9333ea; } /* Morado vibrante para sugerencias */
     </style>
 </head>
 <body>
@@ -527,8 +528,11 @@
         </div>
     </div>
 
-    <!-- Botones Flotantes -->
+    <!-- Botones Flotantes (Incluye el nuevo botón de sugerencias) -->
     <div class="social-float">
+        <a href="https://wa.me/584149956831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20tengo%20la%20siguiente%20sugerencia:" target="_blank" class="social-icon bg-sug" title="Enviar una sugerencia">
+            <i class="fa-solid fa-lightbulb"></i>
+        </a>
         <a href="https://wa.me/584149956831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20quiero%20más%20información" target="_blank" class="social-icon bg-wa" title="WhatsApp">
             <i class="fa-brands fa-whatsapp"></i>
         </a>
@@ -548,10 +552,6 @@
         let isZoomed = false;
 
         function cargarCatalogo(silencioso = false) {
-            if (!silencioso) {
-                // Solo muestra el loader si es la carga inicial
-            }
-
             fetch(urlAPI)
                 .then(response => response.json())
                 .then(data => {
@@ -560,7 +560,6 @@
                         return prod.status.toString().trim().toLowerCase() === 'disponible';
                     });
 
-                    // Mantener los botones de categoría sincronizados sin perder el estado actual
                     construirBotonesCategorias(listaProductosGlobal);
                     filtrarCombinado();
                 })
@@ -604,7 +603,8 @@
         }
 
         function filtrarCombinado() {
-            const textoBusqueda = document.getElementById('search-input').value.toLowerCase().trim();
+            const inputVal = document.getElementById('search-input').value;
+            const textoBusqueda = inputVal ? inputVal.toLowerCase().trim() : '';
             let listaFiltrada = listaProductosGlobal;
 
             // 1. Filtrar por Categoría
@@ -615,13 +615,13 @@
                 });
             }
 
-            // 2. Filtrar por Buscador (Nombre, Descripción o Código) de forma inmediata
+            // 2. Filtrar por Buscador (Nombre, Descripción o Código) de forma robusta
             if (textoBusqueda !== '') {
                 listaFiltrada = listaFiltrada.filter(p => {
-                    const nombre = p.nombre ? p.nombre.toLowerCase() : '';
-                    const desc = p.descripcion ? p.descripcion.toLowerCase() : '';
-                    const masDetalles = (p.mas_detalles || p['mas detalles'] || '').toLowerCase();
-                    const codigo = (p.codigo_producto || p.id || '').toLowerCase();
+                    const nombre = p.nombre ? p.nombre.toString().toLowerCase() : '';
+                    const desc = p.descripcion ? p.descripcion.toString().toLowerCase() : '';
+                    const masDetalles = (p.mas_detalles || p['mas detalles'] || '').toString().toLowerCase();
+                    const codigo = (p.codigo_producto || p.id || '').toString().toLowerCase();
                     
                     return nombre.includes(textoBusqueda) || desc.includes(textoBusqueda) || masDetalles.includes(textoBusqueda) || codigo.includes(textoBusqueda);
                 });
@@ -735,10 +735,10 @@
         // Carga inicial
         cargarCatalogo(false);
 
-        // Sincronización automática de Google Sheets en segundo plano cada 30 segundos
+        // Sincronización automática con Google Sheets cada 15 segundos en segundo plano
         setInterval(() => {
             cargarCatalogo(true);
-        }, 30000);
+        }, 15000);
     </script>
 </body>
 </html>
