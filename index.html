@@ -27,7 +27,7 @@
             --danger-color: #dc2626;        
             --danger-hover: #b91c1c;
             --gaming-color: #06b6d4;        
-            --special-cat-color: #9333ea;   
+            --special-cat-color: #9333ea;   /* Morado vibrante para Streaming y Recarga saldo */
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
             --text-main: #0f172a;
@@ -216,6 +216,7 @@
             box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
         }
 
+        /* Estilo especial y color distinto para los botones de Striming y Recarga saldo */
         .filter-btn.special-filter {
             border-color: rgba(147, 51, 234, 0.4);
             color: var(--special-cat-color);
@@ -782,23 +783,22 @@
                 });
         }
 
-        // Detecta servicio de recargas
-        function esServicioRecargas(cat) {
+        // Validación exacta para "Striming" y "Recarga saldo"
+        function esStriming(cat) {
             if (!cat) return false;
-            const c = cat.toLowerCase();
-            return c.includes('recarga') || (c.includes('servicio') && c.includes('recarga'));
+            const c = cat.toLowerCase().trim();
+            return c === 'striming' || c.includes('streaming');
         }
 
-        // Detecta streaming
-        function esStreaming(cat) {
+        function esRecargaSaldo(cat) {
             if (!cat) return false;
-            const c = cat.toLowerCase();
-            return c.includes('streaming');
+            const c = cat.toLowerCase().trim();
+            return c === 'recarga saldo' || (c.includes('recarga') && c.includes('saldo'));
         }
 
-        // Oculta exclusivamente "servicios de recargas" y "streaming" de la pantalla principal ("Todos")
+        // Oculta exclusivamente Striming y Recarga saldo de la vista principal "Todos"
         function debeOcultarseEnPrincipal(cat) {
-            return esServicioRecargas(cat) || esStreaming(cat);
+            return esStriming(cat) || esRecargaSaldo(cat);
         }
 
         function esServicioGeneral(cat) {
@@ -817,7 +817,8 @@
                 const isActive = categoriaSeleccionada.toLowerCase() === cat.toLowerCase() ? 'active' : '';
                 const esEspecial = debeOcultarseEnPrincipal(cat);
                 const claseEspecial = esEspecial ? 'special-filter' : '';
-                const iconoExtra = esEspecial ? '<i class="fa-solid fa-bolt" style="font-size:0.75rem; margin-right:4px;"></i>' : '';
+                // Icono decorativo para los botones de Striming / Recarga saldo
+                const iconoExtra = esRecargaSaldo(cat) ? '<i class="fa-solid fa-bolt" style="font-size:0.75rem; margin-right:4px;"></i>' : (esStriming(cat) ? '<i class="fa-solid fa-tv" style="font-size:0.75rem; margin-right:4px;"></i>' : '');
                 
                 htmlBotones += `<button class="filter-btn ${claseEspecial} ${isActive}" onclick="cambiarCategoria('${cat}', this)">${iconoExtra}${cat}</button>`;
             });
@@ -848,10 +849,10 @@
             let listaFiltrada = listaProductosGlobal;
 
             if (categoriaSeleccionada === 'todos') {
-                // Filtra y oculta SOLAMENTE servicios de recargas y streaming en la principal
+                // Oculta "Striming" y "Recarga saldo" en la principal, manteniendo todo lo demás visible
                 listaFiltrada = listaFiltrada.filter(p => !debeOcultarseEnPrincipal(p.categoria));
             } else {
-                // Al hacer clic en el filtro, muestra la categoría seleccionada
+                // Al hacer clic en su botón superior, muestra exactamente los elementos de esa categoría
                 listaFiltrada = listaFiltrada.filter(p => {
                     const catProd = p.categoria ? p.categoria.trim().toLowerCase() : 'general';
                     return catProd === categoriaSeleccionada.toLowerCase();
@@ -874,8 +875,8 @@
 
         function calcularPrecioFinal(prod) {
             let precioBase = parseFloat(prod.precio) || 0;
-            if (esServicioRecargas(prod.categoria)) {
-                return precioBase * 1.12; // 12% adicional para recargas de saldo
+            if (esRecargaSaldo(prod.categoria)) {
+                return precioBase * 1.12; // 12% adicional automático para recargas de saldo
             }
             return precioBase;
         }
@@ -958,7 +959,7 @@
             document.getElementById('modal-price').innerText = `$${precioFinal.toFixed(2)}`;
 
             const alertContainer = document.getElementById('recharge-alert-container');
-            if (esServicioRecargas(prod.categoria)) {
+            if (esRecargaSaldo(prod.categoria)) {
                 alertContainer.innerHTML = `
                     <div class="recharge-alert-box">
                         <i class="fa-solid fa-triangle-exclamation"></i>
@@ -967,7 +968,7 @@
                         </div>
                     </div>
                 `;
-            } else if (esStreaming(prod.categoria) || esServicioGeneral(prod.categoria)) {
+            } else if (esStriming(prod.categoria) || esServicioGeneral(prod.categoria)) {
                 alertContainer.innerHTML = `
                     <div class="recharge-alert-box">
                         <i class="fa-solid fa-circle-info"></i>
@@ -990,9 +991,9 @@
             let numeroWa = prod.whatsapp ? prod.whatsapp.toString().trim() : "584149956831";
             let mensaje = "";
 
-            if (esServicioRecargas(prod.categoria)) {
+            if (esRecargaSaldo(prod.categoria)) {
                 mensaje = encodeURIComponent(`Hola, quiero procesar la recarga: *${prod.nombre}* (Total: $${precioFinal.toFixed(2)} con 12% incluido).\n\nPor favor indícame los datos para realizar el pago.`);
-            } else if (esStreaming(prod.categoria) || esServicioGeneral(prod.categoria)) {
+            } else if (esStriming(prod.categoria) || esServicioGeneral(prod.categoria)) {
                 mensaje = encodeURIComponent(`Hola, quiero solicitar el servicio de *${prod.nombre}* ($${precioFinal.toFixed(2)}).\n\nPor favor indícame los pasos.`);
             } else {
                 mensaje = encodeURIComponent(`Hola, me interesa este artículo:\n\n*Código:* ${prod.codigo_producto || prod.id || 'N/A'}\n*Producto:* ${prod.nombre}\n*Precio:* $${precioFinal.toFixed(2)}\n*Foto:* ${prod.imagen}`);
