@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Catálogo Digital y Servicios</title>
   <style>
-    /* ============ ESTILOS ORIGINALES ============ */
+    /* ============ ESTILOS ORIGINALES (NO MODIFICADOS) ============ */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
     body { background: #f4f4f4; color: #333; }
-    
+
     header {
       background: linear-gradient(135deg, #ff6b00, #ff9500);
       color: white;
@@ -17,7 +17,7 @@
     }
     header h1 { font-size: 28px; margin-bottom: 8px; }
     header p { opacity: 0.95; }
-    
+
     .info-box {
       background: white;
       margin: 15px;
@@ -37,7 +37,7 @@
       margin-top: 10px;
       font-weight: bold;
     }
-    
+
     .filtros {
       display: flex;
       flex-wrap: wrap;
@@ -59,21 +59,21 @@
       background: #ff6b00;
       color: white;
     }
-    
+
     #loading {
       text-align: center;
       padding: 40px;
       color: #666;
       font-style: italic;
     }
-    
+
     .grid-productos {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       gap: 15px;
       padding: 15px;
     }
-    
+
     .producto {
       background: white;
       border-radius: 12px;
@@ -83,7 +83,7 @@
       position: relative;
     }
     .producto:hover { transform: translateY(-4px); }
-    
+
     .producto-img {
       width: 100%;
       height: 180px;
@@ -91,7 +91,7 @@
       cursor: zoom-in;
       background: #eee;
     }
-    
+
     .producto-info { padding: 12px; }
     .producto-info h3 { font-size: 16px; margin-bottom: 6px; color: #222; }
     .producto-info .precio {
@@ -105,7 +105,7 @@
       color: #666;
       margin-bottom: 10px;
     }
-    
+
     .producto-botones {
       display: flex;
       gap: 6px;
@@ -133,7 +133,19 @@
       cursor: pointer;
       font-size: 13px;
     }
-    
+
+    .zoom-hint {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      pointer-events: none;
+    }
+
     .toast {
       position: fixed;
       bottom: 90px;
@@ -148,8 +160,7 @@
       transition: opacity 0.3s;
     }
     .toast.visible { opacity: 1; }
-    
-    /* Zoom de imagen */
+
     .zoom-overlay {
       display: none;
       position: fixed;
@@ -164,7 +175,7 @@
     .zoom-overlay.activo { display: flex; }
     .zoom-overlay img { max-width: 90%; max-height: 90%; }
 
-    /* ============ ESTILOS DEL CARRITO (NUEVO) ============ */
+    /* ============ ESTILOS NUEVOS: CARRITO ============ */
     .carrito-flotante {
       position: fixed;
       bottom: 20px;
@@ -207,7 +218,7 @@
       transition: background 0.2s;
     }
     .btn-agregar-carrito:hover { background: #218838; }
-    
+
     .modal-carrito {
       display: none;
       position: fixed;
@@ -261,17 +272,17 @@
       font-weight: bold;
       margin-top: 15px;
     }
-    .btn-vaciar {
+    .btn-secundario {
       background: #6c757d;
       color: white;
       border: none;
       padding: 10px 15px;
       border-radius: 6px;
       cursor: pointer;
-      margin-top: 10px;
+      margin-top: 8px;
       width: 100%;
     }
-    .btn-seguir {
+    .btn-azul {
       background: #007bff;
       color: white;
       border: none;
@@ -285,14 +296,16 @@
 </head>
 <body>
 
+  <!-- ============ HEADER ============ -->
   <header>
-    <h1>Catálogo Digital y Servicios</h1>
+    <h1>Catálogo Digital</h1>
     <p>Explora nuestros productos y servicios disponibles</p>
   </header>
 
+  <!-- ============ INFO BOXES ============ -->
   <div class="info-box">
     <h3>💳 Métodos de Pago</h3>
-    <p>Consultanos por WhatsApp</p>
+    <p>Contáctanos para más información</p>
   </div>
 
   <div class="info-box">
@@ -300,22 +313,42 @@
     <a href="https://soygamers.com/firestore" target="_blank">Recarga Diamantes Free Fire</a>
   </div>
 
+  <!-- ============ FILTROS ============ -->
   <div class="filtros" id="filtros">
     <button class="filtro-btn activo" data-categoria="Todos">Todos</button>
   </div>
 
+  <!-- ============ PRODUCTOS ============ -->
   <div id="loading">Sincronizando catálogo con Google Sheets...</div>
   <div class="grid-productos" id="grid-productos"></div>
 
+  <!-- ============ ZOOM ============ -->
   <div class="zoom-overlay" id="zoom-overlay" onclick="this.classList.remove('activo')">
     <img id="zoom-img" src="" alt="Zoom">
   </div>
 
+  <!-- ============ TOAST ============ -->
   <div class="toast" id="toast">¡Enlace copiado al portapapeles!</div>
 
-  <!-- ============ JAVASCRIPT ORIGINAL ============ -->
+  <!-- ============ CARRITO FLOTANTE ============ -->
+  <div class="carrito-flotante" onclick="document.getElementById('modal-carrito').classList.add('activo'); renderizarCarrito();">
+    🛒 Carrito <span class="carrito-badge" id="carrito-badge">0</span>
+  </div>
+
+  <!-- ============ MODAL CARRITO ============ -->
+  <div class="modal-carrito" id="modal-carrito">
+    <div class="modal-contenido">
+      <h2>🛒 Tu Carrito</h2>
+      <div id="carrito-items"></div>
+      <button class="btn-finalizar" onclick="finalizarCompra()">💬 Finalizar compra por WhatsApp</button>
+      <button class="btn-secundario" onclick="vaciarCarrito()">🗑️ Vaciar carrito</button>
+      <button class="btn-azul" onclick="document.getElementById('modal-carrito').classList.remove('activo')">Seguir comprando</button>
+    </div>
+  </div>
+
+  <!-- ============ JAVASCRIPT ORIGINAL (CONEXIÓN GOOGLE SHEETS) ============ -->
   <script>
-    // ⚠️ CAMBIA ESTE ID POR EL TUYO
+    // ⚠️ CAMBIA ESTE ID POR EL DE TU GOOGLE SHEETS
     const SHEET_ID = 'TU_ID_DE_GOOGLE_SHEETS_AQUI';
     const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
@@ -373,7 +406,7 @@
     function renderProductos(lista) {
       const grid = document.getElementById('grid-productos');
       grid.innerHTML = '';
-      lista.forEach(p => {
+      lista.forEach((p, idx) => {
         const nombre = p.nombre || p.producto || p.titulo || 'Producto';
         const precio = p.precio || '';
         const descripcion = p.descripcion || p.detalle || '';
@@ -384,6 +417,7 @@
         const div = document.createElement('div');
         div.className = 'producto';
         div.innerHTML = `
+          <div class="zoom-hint">🔍 Clic para zoom</div>
           <img class="producto-img" src="${imagen}" alt="${nombre}" 
                onclick="document.getElementById('zoom-img').src='${imagen}'; document.getElementById('zoom-overlay').classList.add('activo');">
           <div class="producto-info">
@@ -394,15 +428,18 @@
               <a href="${link}" target="_blank" class="btn-comprar">Comprar / Solicitar</a>
               <button class="btn-copiar" onclick="copiarLink('${link}')">📋</button>
             </div>
-            <button class="btn-agregar-carrito" onclick='agregarAlCarrito(${JSON.stringify({
-              titulo: nombre.replace(/'/g, "\\'"),
-              precio: String(precio).replace(/'/g, "\\'"),
-              link: link.replace(/'/g, "\\'"),
-              id: Date.now() + Math.random()
-            }).replace(/'/g, "&apos;")})'>🛒 Añadir al carrito</button>
+            <button class="btn-agregar-carrito" data-idx="${idx}">🛒 Añadir al carrito</button>
           </div>
         `;
         grid.appendChild(div);
+      });
+
+      // Asignar eventos a los botones del carrito
+      document.querySelectorAll('.btn-agregar-carrito').forEach(btn => {
+        btn.onclick = function() {
+          const idx = parseInt(this.dataset.idx);
+          agregarAlCarrito(lista[idx]);
+        };
       });
     }
 
@@ -417,34 +454,47 @@
     cargarCatalogo();
   </script>
 
-  <!-- ============ JAVASCRIPT DEL CARRITO (NUEVO) ============ -->
+  <!-- ============ JAVASCRIPT CARRITO (NUEVO) ============ -->
   <script>
-    // ⚠️ CAMBIA ESTE NÚMERO POR EL TUYO (código país + número, sin + ni espacios)
+    // ⚠️ CAMBIA ESTE NÚMERO por tu WhatsApp (código país + número, sin + ni espacios)
     const TELEFONO_WHATSAPP = '573001234567';
 
     let carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
 
-    function agregarAlCarrito(item) {
-      carrito.push(item);
-      guardarCarrito();
+    function agregarAlCarrito(p) {
+      const nombre = p.nombre || p.producto || p.titulo || 'Producto';
+      const precio = p.precio || '';
+      const link = p.link || p.enlace || '#';
+
+      carrito.push({
+        titulo: nombre,
+        precio: precio,
+        link: link,
+        id: Date.now() + Math.random()
+      });
+      localStorage.setItem('carrito', JSON.stringify(carrito));
       actualizarBadge();
       mostrarNotificacion('✅ Añadido al carrito');
     }
 
     function eliminarDelCarrito(index) {
       carrito.splice(index, 1);
-      guardarCarrito();
+      localStorage.setItem('carrito', JSON.stringify(carrito));
       actualizarBadge();
       renderizarCarrito();
     }
 
-    function guardarCarrito() {
-      localStorage.setItem('carrito', JSON.stringify(carrito));
+    function vaciarCarrito() {
+      if (confirm('¿Vaciar todo el carrito?')) {
+        carrito = [];
+        localStorage.setItem('carrito', '[]');
+        actualizarBadge();
+        renderizarCarrito();
+      }
     }
 
     function actualizarBadge() {
-      const badge = document.getElementById('carrito-badge');
-      if (badge) badge.innerText = carrito.length;
+      document.getElementById('carrito-badge').innerText = carrito.length;
     }
 
     function mostrarNotificacion(msg) {
@@ -456,16 +506,16 @@
     }
 
     function renderizarCarrito() {
-      const contenido = document.getElementById('carrito-items');
+      const cont = document.getElementById('carrito-items');
       if (carrito.length === 0) {
-        contenido.innerHTML = '<p style="text-align:center;color:#666;padding:20px;">🛒 Tu carrito está vacío</p>';
+        cont.innerHTML = '<p style="text-align:center;color:#666;padding:20px;">🛒 Tu carrito está vacío</p>';
         return;
       }
-      contenido.innerHTML = carrito.map((item, i) => `
+      cont.innerHTML = carrito.map((item, i) => `
         <div class="item-carrito">
           <div class="item-carrito-info">
             <strong>${i+1}. ${item.titulo}</strong>
-            <small>${item.precio}</small><br>
+            ${item.precio ? `<small>💰 ${item.precio}</small><br>` : ''}
             <a href="${item.link}" target="_blank">🔗 Ver producto</a>
           </div>
           <button class="btn-eliminar" onclick="eliminarDelCarrito(${i})">🗑️</button>
@@ -488,22 +538,7 @@
       window.open(`https://wa.me/${TELEFONO_WHATSAPP}?text=${mensaje}`, '_blank');
     }
 
-    // Crear botón flotante y modal
-    document.body.insertAdjacentHTML('beforeend', `
-      <div class="carrito-flotante" onclick="document.getElementById('modal-carrito').classList.add('activo'); renderizarCarrito();">
-        🛒 Carrito <span class="carrito-badge" id="carrito-badge">0</span>
-      </div>
-      <div class="modal-carrito" id="modal-carrito">
-        <div class="modal-contenido">
-          <h2>🛒 Tu Carrito</h2>
-          <div id="carrito-items"></div>
-          <button class="btn-finalizar" onclick="finalizarCompra()">💬 Finalizar compra por WhatsApp</button>
-          <button class="btn-vaciar" onclick="if(confirm('¿Vaciar carrito?')){carrito=[];guardarCarrito();actualizarBadge();renderizarCarrito();}">🗑️ Vaciar carrito</button>
-          <button class="btn-seguir" onclick="document.getElementById('modal-carrito').classList.remove('activo')">Seguir comprando</button>
-        </div>
-      </div>
-    `);
-
+    // Inicializar badge al cargar
     actualizarBadge();
   </script>
 
