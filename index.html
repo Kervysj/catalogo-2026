@@ -3,40 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo y Carrito</title>
+    <title>Catálogo Web con Carrito y Factura WhatsApp</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f4f4f9; }
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .tab-btn { padding: 10px 15px; border: none; background: #ddd; cursor: pointer; border-radius: 5px; font-weight: bold; }
-        .tab-btn.active { background: #007bff; color: white; }
-        .catalog { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
-        .card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: space-between; }
-        .card img { width: 100%; height: 150px; object-fit: cover; border-radius: 5px; margin-bottom: 10px; }
-        .card h3 { font-size: 16px; margin: 0 0 10px 0; }
-        .card p { margin: 0 0 10px 0; font-weight: bold; color: #28a745; }
-        .card button { padding: 8px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        * { box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 15px; background: #f4f4f9; }
+        h2 { text-align: center; color: #333; margin-bottom: 20px; }
         
-        /* Estilos del Carrito Flotante */
-        .cart-floating { position: fixed; bottom: 20px; right: 20px; background: #007bff; color: white; padding: 12px 20px; border-radius: 30px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-weight: bold; z-index: 1000; }
+        /* Pestañas de Categorías */
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
+        .tab-btn { padding: 10px 15px; border: none; background: #e0e0e0; cursor: pointer; border-radius: 6px; font-weight: bold; white-space: nowrap; transition: 0.2s; }
+        .tab-btn.active { background: #007bff; color: white; }
+
+        /* Catálogo de Productos */
+        .catalog { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .card { background: white; padding: 12px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: space-between; }
+        .card img { width: 100%; height: 140px; object-fit: cover; border-radius: 6px; margin-bottom: 10px; background: #eee; }
+        .card-info { flex-grow: 1; }
+        .card-code { font-size: 11px; color: #666; margin-bottom: 2px; }
+        .card h3 { font-size: 15px; margin: 0 0 5px 0; color: #222; }
+        .card p { margin: 0 0 10px 0; font-weight: bold; color: #28a745; font-size: 16px; }
+        .card button { width: 100%; padding: 9px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .card button:active { background: #218838; }
+
+        /* Carrito Flotante */
+        .cart-floating { position: fixed; bottom: 20px; right: 20px; background: #007bff; color: white; padding: 12px 20px; border-radius: 30px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); font-weight: bold; z-index: 1000; display: flex; align-items: center; gap: 8px; font-size: 15px; }
         
         /* Modal del Carrito */
-        .cart-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1001; }
-        .cart-content { background: white; width: 90%; max-width: 400px; padding: 20px; border-radius: 8px; max-height: 80vh; overflow-y: auto; }
-        .cart-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .cart-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
-        .cart-item-info { flex-grow: 1; font-size: 14px; }
-        .checkout-btn { width: 100%; padding: 12px; background: #25d366; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 15px; }
-        .close-modal { background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; float: right; cursor: pointer; }
+        .cart-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1001; padding: 10px; }
+        .cart-content { background: white; width: 100%; max-width: 420px; padding: 20px; border-radius: 10px; max-height: 85vh; overflow-y: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .cart-header h3 { margin: 0; color: #333; }
+        .close-modal { background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        
+        .cart-item { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; border-bottom: 1px solid #f1f1f1; padding-bottom: 10px; }
+        .cart-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; background: #eee; }
+        .cart-item-info { flex-grow: 1; font-size: 13px; color: #444; }
+        .cart-item-info strong { color: #111; font-size: 14px; }
+        
+        .cart-total-section { font-size: 16px; font-weight: bold; text-align: right; margin: 15px 0; color: #222; }
+        .checkout-btn { width: 100%; padding: 12px; background: #25d366; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; }
+        .checkout-btn:active { background: #1ebe5d; }
     </style>
 </head>
 <body>
 
-    <!-- Pestañas de Categorías -->
+    <h2>Catálogo de Productos</h2>
+
+    <!-- Pestañas de Categorías (Aislando Streaming y Recargas) -->
     <div class="tabs" id="tabsContainer">
         <button class="tab-btn active" onclick="filtrarCategoria('Todos')">Todos</button>
         <button class="tab-btn" onclick="filtrarCategoria('Escolar')">Escolar</button>
         <button class="tab-btn" onclick="filtrarCategoria('Servicios')">Servicios</button>
-        <button class="tab-btn" onclick="filtrarCategoria('Striming')">Striming</button>
+        <button class="tab-btn" onclick="filtrarCategoria('Striming')">Streaming</button>
         <button class="tab-btn" onclick="filtrarCategoria('Recargas')">Recargas</button>
     </div>
 
@@ -48,19 +66,23 @@
         🛒 Carrito (<span id="cartCount">0</span>)
     </div>
 
-    <!-- Modal del Carrito (Factura) -->
+    <!-- Modal del Carrito (Factura de Compra) -->
     <div class="cart-modal" id="cartModal">
         <div class="cart-content">
-            <button class="close-modal" onclick="toggleCart(false)">X</button>
-            <h3>Detalle de Factura</h3>
+            <div class="cart-header">
+                <h3>Detalle de Carrito</h3>
+                <button class="close-modal" onclick="toggleCart(false)">X</button>
+            </div>
             <div id="cartItemsContainer"></div>
-            <h4>Total General: $<span id="cartTotal">0.00</span></h4>
+            <div class="cart-total-section">
+                Total General: $<span id="cartTotal">0.00</span>
+            </div>
             <button class="checkout-btn" onclick="enviarFacturaWhatsApp()">Enviar Factura por WhatsApp</button>
         </div>
     </div>
 
     <script>
-        // Simulación de datos que vienen de Google Sheets (Columnas: Código, Nombre, Precio, Imagen, Categoría)
+        // Array de productos conectado directamente a la estructura de Google Sheets (Código, Nombre, Precio, Imagen, Categoría)
         const productos = [
             { codigo: "1", nombre: "Set de 3 Piezas Escolar", precio: 20.00, imagen: "https://github.com/Kervysj/imccatalog/blob/main/img1.jpg", categoria: "Escolar" },
             { codigo: "2", nombre: "Taza Sublimada", precio: 6.50, imagen: "https://github.com/Kervysj/imccatalog/blob/main/img2.jpg", categoria: "Servicios" },
@@ -78,12 +100,18 @@
             
             const filtrados = cat === "Todos" ? productos : productos.filter(p => p.categoria === cat);
 
+            if (filtrados.length === 0) {
+                container.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: #777;'>No hay productos en esta categoría.</p>";
+                return;
+            }
+
             filtrados.forEach(p => {
                 const card = document.createElement("div");
                 card.className = "card";
                 card.innerHTML = `
-                    <img src="${p.imagen}" alt="${p.nombre}">
-                    <div>
+                    <img src="${p.imagen}" alt="${p.nombre}" onerror="this.src='https://via.placeholder.com/150?text=Sin+Imagen'">
+                    <div class="card-info">
+                        <div class="card-code">Código: ${p.codigo}</div>
                         <h3>${p.nombre}</h3>
                         <p>$${p.precio.toFixed(2)}</p>
                     </div>
@@ -128,7 +156,7 @@
             let totalGeneral = 0;
 
             if (carrito.length === 0) {
-                container.innerHTML = "<p>El carrito está vacío.</p>";
+                container.innerHTML = "<p style='text-align: center; color: #777;'>El carrito está vacío.</p>";
                 document.getElementById("cartTotal").innerText = "0.00";
                 return;
             }
@@ -140,11 +168,11 @@
                 const div = document.createElement("div");
                 div.className = "cart-item";
                 div.innerHTML = `
-                    <img src="${item.imagen}" alt="${item.nombre}">
+                    <img src="${item.imagen}" alt="${item.nombre}" onerror="this.src='https://via.placeholder.com/50?text=Img'">
                     <div class="cart-item-info">
-                        <strong>[${item.codigo}] ${item.nombre}</strong><br>
-                        Cant: ${item.cantidad} x $${item.precio.toFixed(2)}<br>
-                        Subtotal: $${subtotal.toFixed(2)}
+                        <strong>${item.nombre}</strong><br>
+                        Código: ${item.codigo} | Cant: ${item.cantidad}<br>
+                        Precio: $${item.precio.toFixed(2)} | Subtotal: <b>$${subtotal.toFixed(2)}</b>
                     </div>
                 `;
                 container.appendChild(div);
@@ -173,12 +201,12 @@
 
             facturaTexto += `💰 *Total General: $${totalGeneral.toFixed(2)}*\nPor favor confirmar disponibilidad para culminar la compra.`;
 
-            const numeroWhatsApp = "584120000000"; // Reemplaza con tu número de WhatsApp
+            const numeroWhatsApp = "584120000000"; // Reemplaza con tu número de teléfono móvil real
             const url = `https://api.whatsapp.com/send?phone=${numeroWhatsApp}&text=${encodeURIComponent(facturaTexto)}`;
             window.open(url, "_blank");
         }
 
-        // Inicializar vista
+        // Inicializar la vista general al cargar
         renderCatalogo("Todos");
     </script>
 </body>
