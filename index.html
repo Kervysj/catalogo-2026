@@ -50,7 +50,7 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             padding: 20px;
-            padding-bottom: 90px;
+            padding-bottom: 110px;
             opacity: 0;
             animation: fadeInBody 0.5s ease forwards;
         }
@@ -216,7 +216,6 @@
             box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
         }
 
-        /* Estilo especial y color distinto para los botones de Striming y Recarga saldo */
         .filter-btn.special-filter {
             border-color: rgba(147, 51, 234, 0.4);
             color: var(--special-cat-color);
@@ -348,6 +347,33 @@
             margin-bottom: 12px;
         }
 
+        .card-actions-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .btn-add-cart {
+            flex-grow: 1;
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-add-cart:hover {
+            background-color: var(--primary-hover);
+        }
+
         .card-hint {
             font-size: 0.8rem;
             color: var(--text-muted);
@@ -355,11 +381,155 @@
             border-top: 1px solid #f1f5f9;
             padding-top: 10px;
             font-weight: 500;
+            margin-top: 10px;
             transition: color 0.2s;
         }
 
         .card:hover .card-hint {
             color: var(--primary-color);
+        }
+
+        /* Barra flotante de Cotización / Carrito */
+        .cart-float-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #0f172a;
+            color: #fff;
+            padding: 14px 24px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 15px 35px rgba(15, 23, 42, 0.4);
+            z-index: 998;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            max-width: 90%;
+            width: 460px;
+            justify-content: space-between;
+        }
+
+        .cart-float-bar.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .cart-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        .cart-badge-count {
+            background: var(--primary-color);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .cart-send-btn {
+            background-color: #25d366;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition-smooth);
+            text-decoration: none;
+        }
+
+        .cart-send-btn:hover {
+            background-color: #20ba5a;
+            transform: scale(1.05);
+        }
+
+        /* Modal del Carrito / Resumen de Cotización */
+        .cart-items-list {
+            list-style: none;
+            margin-top: 15px;
+            max-height: 260px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-right: 5px;
+        }
+
+        .cart-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            padding: 10px 14px;
+            border-radius: 12px;
+            gap: 10px;
+        }
+
+        .cart-item-details h4 {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .cart-item-details span {
+            font-size: 0.82rem;
+            color: #059669;
+            font-weight: 700;
+        }
+
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cart-qty-btn {
+            background: #e2e8f0;
+            border: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .cart-qty-btn:hover {
+            background: var(--primary-color);
+            color: #fff;
+        }
+
+        .cart-item-remove {
+            background: transparent;
+            border: none;
+            color: var(--danger-color);
+            cursor: pointer;
+            font-size: 0.95rem;
+            padding: 4px;
+            transition: transform 0.2s;
+        }
+
+        .cart-item-remove:hover {
+            transform: scale(1.2);
         }
 
         .modal {
@@ -640,7 +810,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            z-index: 999;
+            z-index: 997;
         }
 
         .social-icon {
@@ -703,6 +873,21 @@
         </div>
     </div>
 
+    <!-- Barra flotante del Carrito de Cotización -->
+    <div id="cart-float-bar" class="cart-float-bar">
+        <div class="cart-info" onclick="abrirModalCarrito()">
+            <div class="cart-badge-count" id="cart-count">0</div>
+            <div>
+                <div style="font-size: 0.85rem; color: #94a3b8;">Cotización actual</div>
+                <div id="cart-total-bar" style="font-weight: 700; color: #34d399;">$0.00</div>
+            </div>
+        </div>
+        <button class="cart-send-btn" onclick="enviarCotizacionWhatsApp()">
+            <i class="fa-brands fa-whatsapp" style="font-size: 1.1rem;"></i> Enviar Pedido
+        </button>
+    </div>
+
+    <!-- Modal para ver Detalles de Producto Individual -->
     <div class="modal" id="product-modal" onclick="if(event.target === this) cerrarModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModal()"><i class="fa-solid fa-xmark"></i></button>
@@ -718,9 +903,9 @@
                 <div id="recharge-alert-container"></div>
                 <p id="modal-desc" class="modal-desc"></p>
                 <div class="modal-actions">
-                    <a id="modal-wa-btn" class="whatsapp-btn" href="#" target="_blank">
-                        <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i> Comprar / Solicitar
-                    </a>
+                    <button id="modal-add-cart-btn" class="whatsapp-btn" style="background-color: var(--primary-color);" onclick="">
+                        <i class="fa-solid fa-cart-plus"></i> Agregar a la Cotización
+                    </button>
                     <button id="modal-share-btn" class="modal-share-btn" title="Compartir producto">
                         <i class="fa-solid fa-share-nodes"></i>
                     </button>
@@ -729,6 +914,35 @@
         </div>
     </div>
 
+    <!-- Modal de Resumen del Carrito / Cotización -->
+    <div class="modal" id="cart-modal" onclick="if(event.target === this) cerrarModalCarrito()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="cerrarModalCarrito()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-body" style="padding-top: 30px;">
+                <h2 class="modal-title" style="color:var(--primary-color); display:flex; align-items:center; gap:10px;">
+                    <i class="fa-solid fa-clipboard-list"></i> Tu Cotización
+                </h2>
+                <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 10px;">Revisa los elementos seleccionados antes de enviar:</p>
+                
+                <ul class="cart-items-list" id="cart-modal-list">
+                    <!-- Dinámico -->
+                </ul>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border-color);">
+                    <span style="font-weight: 600; font-size: 1.05rem;">Total Estimado:</span>
+                    <span id="cart-modal-total" style="font-size: 1.35rem; font-weight: 700; color: #059669;">$0.00</span>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button class="whatsapp-btn" style="width: 100%;" onclick="enviarCotizacionWhatsApp()">
+                        <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i> Enviar Cotización por WhatsApp
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Información General (Pagos / Delivery) -->
     <div class="modal" id="info-modal" onclick="if(event.target === this) cerrarModalInfo()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModalInfo()"><i class="fa-solid fa-xmark"></i></button>
@@ -762,6 +976,7 @@
         let listaProductosGlobal = [];
         let categoriaSeleccionada = 'todos';
         let isZoomed = false;
+        let carrito = []; // Almacena los elementos añadidos para cotizar
 
         function cargarCatalogo(silencioso = false) {
             fetch(urlAPI)
@@ -783,7 +998,6 @@
                 });
         }
 
-        // Validación exacta para "Striming" y "Recarga saldo"
         function esStriming(cat) {
             if (!cat) return false;
             const c = cat.toLowerCase().trim();
@@ -796,7 +1010,6 @@
             return c === 'recarga saldo' || (c.includes('recarga') && c.includes('saldo'));
         }
 
-        // Oculta exclusivamente Striming y Recarga saldo de la vista principal "Todos"
         function debeOcultarseEnPrincipal(cat) {
             return esStriming(cat) || esRecargaSaldo(cat);
         }
@@ -817,7 +1030,6 @@
                 const isActive = categoriaSeleccionada.toLowerCase() === cat.toLowerCase() ? 'active' : '';
                 const esEspecial = debeOcultarseEnPrincipal(cat);
                 const claseEspecial = esEspecial ? 'special-filter' : '';
-                // Icono decorativo para los botones de Striming / Recarga saldo
                 const iconoExtra = esRecargaSaldo(cat) ? '<i class="fa-solid fa-bolt" style="font-size:0.75rem; margin-right:4px;"></i>' : (esStriming(cat) ? '<i class="fa-solid fa-tv" style="font-size:0.75rem; margin-right:4px;"></i>' : '');
                 
                 htmlBotones += `<button class="filter-btn ${claseEspecial} ${isActive}" onclick="cambiarCategoria('${cat}', this)">${iconoExtra}${cat}</button>`;
@@ -849,10 +1061,8 @@
             let listaFiltrada = listaProductosGlobal;
 
             if (categoriaSeleccionada === 'todos') {
-                // Oculta "Striming" y "Recarga saldo" en la principal, manteniendo todo lo demás visible
                 listaFiltrada = listaFiltrada.filter(p => !debeOcultarseEnPrincipal(p.categoria));
             } else {
-                // Al hacer clic en su botón superior, muestra exactamente los elementos de esa categoría
                 listaFiltrada = listaFiltrada.filter(p => {
                     const catProd = p.categoria ? p.categoria.trim().toLowerCase() : 'general';
                     return catProd === categoriaSeleccionada.toLowerCase();
@@ -876,7 +1086,7 @@
         function calcularPrecioFinal(prod) {
             let precioBase = parseFloat(prod.precio) || 0;
             if (esRecargaSaldo(prod.categoria)) {
-                return precioBase * 1.12; // 12% adicional automático para recargas de saldo
+                return precioBase * 1.12; 
             }
             return precioBase;
         }
@@ -911,11 +1121,147 @@
                             <h3 class="card-title">${prod.nombre}</h3>
                             <div class="card-price">$${precioFinal.toFixed(2)}</div>
                         </div>
-                        <div class="card-hint"><i class="fa-solid fa-eye"></i> Ver detalles y solicitar</div>
+                        <div class="card-actions-row">
+                            <button class="btn-add-cart" onclick="event.stopPropagation(); agregarAlCarrito(${JSON.stringify(prod).replace(/"/g, '&quot;')})">
+                                <i class="fa-solid fa-cart-plus"></i> Cotizar
+                            </button>
+                        </div>
+                        <div class="card-hint"><i class="fa-solid fa-eye"></i> Ver detalles completos</div>
                     </div>
                 `;
                 grid.appendChild(card);
             });
+        }
+
+        // Lógica del Carrito / Cotizador Múltiple
+        function agregarAlCarrito(prod) {
+            const idProd = prod.codigo_producto || prod.id || prod.nombre;
+            const existente = carrito.find(item => (item.codigo_producto || item.id || item.nombre) === idProd);
+            
+            if (existente) {
+                existente.cantidad = (existente.cantidad || 1) + 1;
+            } else {
+                let nuevoProd = { ...prod, cantidad: 1 };
+                carrito.push(nuevoProd);
+            }
+
+            actualizarBarraCarrito();
+            
+            // Notificación visual rápida
+            const toast = document.getElementById('toast');
+            toast.innerHTML = `<i class="fa-solid fa-cart-shopping" style="color: #22c55e;"></i> ¡${prod.nombre} agregado a la cotización!`;
+            mostrarToast();
+        }
+
+        function actualizarBarraCarrito() {
+            const barra = document.getElementById('cart-float-bar');
+            const countElem = document.getElementById('cart-count');
+            const totalBarElem = document.getElementById('cart-total-bar');
+
+            let totalItems = 0;
+            let precioTotal = 0;
+
+            carrito.forEach(item => {
+                let cant = item.cantidad || 1;
+                totalItems += cant;
+                precioTotal += calcularPrecioFinal(item) * cant;
+            });
+
+            countElem.innerText = totalItems;
+            totalBarElem.innerText = `$${precioTotal.toFixed(2)}`;
+
+            if (totalItems > 0) {
+                barra.classList.add('show');
+            } else {
+                barra.classList.remove('show');
+                cerrarModalCarrito();
+            }
+        }
+
+        function abrirModalCarrito() {
+            if (carrito.length === 0) return;
+            const listaElem = document.getElementById('cart-modal-list');
+            const totalModalElem = document.getElementById('cart-modal-total');
+            listaElem.innerHTML = '';
+
+            let precioTotal = 0;
+
+            carrito.forEach((item, index) => {
+                let cant = item.cantidad || 1;
+                let subtotal = calcularPrecioFinal(item) * cant;
+                precioTotal += subtotal;
+
+                const li = document.createElement('li');
+                li.className = 'cart-item-row';
+                li.innerHTML = `
+                    <div class="cart-item-details" style="flex-grow: 1;">
+                        <h4>${item.nombre}</h4>
+                        <span>$${calcularPrecioFinal(item).toFixed(2)} c/u</span>
+                    </div>
+                    <div class="cart-item-controls">
+                        <button class="cart-qty-btn" onclick="cambiarCantidadItem(${index}, -1)">-</button>
+                        <span style="font-weight: 600; font-size: 0.9rem; min-width: 20px; text-align: center;">${cant}</span>
+                        <button class="cart-qty-btn" onclick="cambiarCantidadItem(${index}, 1)">+</button>
+                        <button class="cart-item-remove" onclick="removerItemCarrito(${index})" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+                listaElem.appendChild(li);
+            });
+
+            totalModalElem.innerText = `$${precioTotal.toFixed(2)}`;
+            document.getElementById('cart-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarModalCarrito() {
+            document.getElementById('cart-modal').classList.remove('active');
+            if (!document.getElementById('product-modal').classList.contains('active') && !document.getElementById('info-modal').classList.contains('active')) {
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function cambiarCantidadItem(index, delta) {
+            carrito[index].cantidad = (carrito[index].cantidad || 1) + delta;
+            if (carrito[index].cantidad <= 0) {
+                carrito.splice(index, 1);
+            }
+            actualizarBarraCarrito();
+            if (carrito.length > 0) {
+                abrirModalCarrito();
+            } else {
+                cerrarModalCarrito();
+            }
+        }
+
+        function removerItemCarrito(index) {
+            carrito.splice(index, 1);
+            actualizarBarraCarrito();
+            if (carrito.length > 0) {
+                abrirModalCarrito();
+            } else {
+                cerrarModalCarrito();
+            }
+        }
+
+        function enviarCotizacionWhatsApp() {
+            if (carrito.length === 0) return;
+
+            let mensaje = "Hola, vengo de su catálogo web y quiero solicitar la siguiente cotización:\n\n";
+            let precioTotal = 0;
+
+            carrito.forEach((item, idx) => {
+                let cant = item.cantidad || 1;
+                let subtotal = calcularPrecioFinal(item) * cant;
+                precioTotal += subtotal;
+                mensaje += `${idx + 1}. *${item.nombre}*\n   - Código: ${item.codigo_producto || item.id || 'N/A'}\n   - Cantidad: ${cant}\n   - Subtotal: $${subtotal.toFixed(2)}\n\n`;
+            });
+
+            mensaje += `💰 *Total General de la Cotización: $${precioTotal.toFixed(2)}*\n\nPor favor indíquenme los pasos para coordinar el pago y la entrega.`;
+
+            let numeroWa = "584149956831"; // Número base del catálogo
+            const urlWa = `https://wa.me/${numeroWa}?text=${encodeURIComponent(mensaje)}`;
+            
+            window.open(urlWa, '_blank');
         }
 
         function compartirProducto(event, prod) {
@@ -988,18 +1334,13 @@
             }
             document.getElementById('modal-desc').innerHTML = descripcionTexto;
 
-            let numeroWa = prod.whatsapp ? prod.whatsapp.toString().trim() : "584149956831";
-            let mensaje = "";
+            // Botón dentro del modal para agregar al carrito
+            const addCartModalBtn = document.getElementById('modal-add-cart-btn');
+            addCartModalBtn.onclick = () => {
+                agregarAlCarrito(prod);
+                cerrarModal();
+            };
 
-            if (esRecargaSaldo(prod.categoria)) {
-                mensaje = encodeURIComponent(`Hola, quiero procesar la recarga: *${prod.nombre}* (Total: $${precioFinal.toFixed(2)} con 12% incluido).\n\nPor favor indícame los datos para realizar el pago.`);
-            } else if (esStriming(prod.categoria) || esServicioGeneral(prod.categoria)) {
-                mensaje = encodeURIComponent(`Hola, quiero solicitar el servicio de *${prod.nombre}* ($${precioFinal.toFixed(2)}).\n\nPor favor indícame los pasos.`);
-            } else {
-                mensaje = encodeURIComponent(`Hola, me interesa este artículo:\n\n*Código:* ${prod.codigo_producto || prod.id || 'N/A'}\n*Producto:* ${prod.nombre}\n*Precio:* $${precioFinal.toFixed(2)}\n*Foto:* ${prod.imagen}`);
-            }
-            
-            document.getElementById('modal-wa-btn').href = `https://wa.me/${numeroWa}?text=${mensaje}`;
             document.getElementById('modal-share-btn').onclick = () => compartirProducto(null, prod);
 
             document.getElementById('product-modal').classList.add('active');
@@ -1008,7 +1349,9 @@
 
         function cerrarModal() {
             document.getElementById('product-modal').classList.remove('active');
-            document.body.style.overflow = 'auto';
+            if (!document.getElementById('cart-modal').classList.contains('active') && !document.getElementById('info-modal').classList.contains('active')) {
+                document.body.style.overflow = 'auto';
+            }
         }
 
         function abrirModalInfo(tipo) {
@@ -1041,7 +1384,9 @@
 
         function cerrarModalInfo() {
             document.getElementById('info-modal').classList.remove('active');
-            document.body.style.overflow = 'auto';
+            if (!document.getElementById('cart-modal').classList.contains('active') && !document.getElementById('product-modal').classList.contains('active')) {
+                document.body.style.overflow = 'auto';
+            }
         }
 
         function toggleZoom(event) {
@@ -1069,6 +1414,7 @@
         window.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
                 cerrarModal();
+                cerrarModalCarrito();
                 cerrarModalInfo();
             }
         });
