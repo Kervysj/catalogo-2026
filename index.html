@@ -38,6 +38,43 @@
             --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
+        /* Variables de Campaña Dinámica por Temporada (Mes Actual) */
+        body.season-valentines {
+            --primary-color: #e11d48;
+            --primary-hover: #be123c;
+            --danger-color: #f43f5e;
+        }
+        body.season-carnival {
+            --primary-color: #7c3aed;
+            --primary-hover: #6d28d9;
+            --gaming-color: #db2777;
+        }
+        body.season-christmas {
+            --primary-color: #15803d;
+            --primary-hover: #166534;
+            --danger-color: #b91c1c;
+        }
+
+        /* Banner de Temporada */
+        .seasonal-banner {
+            background: linear-gradient(135deg, var(--danger-color), var(--primary-color));
+            color: white;
+            text-align: center;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 100;
+        }
+        .seasonal-banner.show {
+            display: flex;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -854,9 +891,27 @@
             resize: vertical;
             min-height: 80px;
         }
+
+        /* Micro-animación de vuelo al carrito */
+        .flying-item {
+            position: fixed;
+            z-index: 9999;
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 50%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            pointer-events: none;
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
     </style>
 </head>
-<body>
+<body id="main-body">
+
+    <!-- Banner dinámico de temporada -->
+    <div id="seasonal-banner" class="seasonal-banner">
+        <i id="seasonal-icon" class="fa-solid fa-gift"></i> <span id="seasonal-text">¡Bienvenidos a nuestra temporada especial!</span>
+    </div>
 
     <header>
         <h1>Catálogo Digital</h1>
@@ -1005,6 +1060,32 @@
         let isZoomed = false;
         let carritoGlobal = [];
         let productoIndividualPendiente = null; // Para control de compra individual con checkout
+
+        // Inicializar Campaña de Temporada Dinámica según el mes actual
+        function aplicarCampanaTemporada() {
+            const mesActual = new Date().getMonth(); // 0 = Enero, 1 = Febrero, etc.
+            const body = document.getElementById('main-body');
+            const banner = document.getElementById('seasonal-banner');
+            const icon = document.getElementById('seasonal-icon');
+            const text = document.getElementById('seasonal-text');
+
+            if (mesActual === 1) { // Febrero (San Valentín)
+                body.classList.add('season-valentines');
+                icon.className = "fa-solid fa-heart";
+                text.innerHTML = "¡Especial de San Valentín! Sorprende a esa persona especial con nuestros detalles.";
+                banner.classList.add('show');
+            } else if (mesActual === 2) { // Marzo (Carnaval aprox o temporada colorida)
+                body.classList.add('season-carnival');
+                icon.className = "fa-solid fa-masks-theater";
+                text.innerHTML = "¡Disfruta de nuestras ofertas de temporada y novedades!";
+                banner.classList.add('show');
+            } else if (mesActual === 11) { // Diciembre (Navidad)
+                body.classList.add('season-christmas');
+                icon.className = "fa-solid fa-tree";
+                text.innerHTML = "¡Felices Fiestas! Encuentra los mejores regalos y detalles navideños aquí.";
+                banner.classList.add('show');
+            }
+        }
 
         function cargarCatalogo(silencioso = false) {
             // 1. Intentar cargar desde caché local instantáneamente si existe
@@ -1257,13 +1338,48 @@
             document.getElementById('modal-share-btn').onclick = () => compartirProducto(null, prod);
             
             const addCartBtn = document.getElementById('modal-add-cart-btn');
-            addCartBtn.onclick = () => {
+            addCartBtn.onclick = (e) => {
+                // Ejecutar micro-animación de vuelo al carrito
+                lanzarEfectoVueloAlCarrito(e.currentTarget, prod.imagen);
                 agregarAlCarrito(prod);
                 cerrarModal();
             };
 
             document.getElementById('product-modal').classList.add('active');
             document.body.style.overflow = 'hidden';
+        }
+
+        // Lógica de Micro-animación "Efecto Vuelo" hacia el botón flotante del carrito
+        function lanzarEfectoVueloAlCarrito(elementSource, imgSrc) {
+            const cartBtn = document.getElementById('cart-float-btn');
+            const targetRect = cartBtn.getBoundingClientRect();
+            const sourceRect = elementSource.getBoundingClientRect();
+
+            const flyingImg = document.createElement('img');
+            flyingImg.src = imgSrc;
+            flyingImg.className = 'flying-item';
+            
+            // Posicionar inicialmente donde está el botón o la tarjeta
+            flyingImg.style.left = `${sourceRect.left + sourceRect.width / 2 - 25}px`;
+            flyingImg.style.top = `${sourceRect.top + sourceRect.height / 2 - 25}px`;
+            
+            document.body.appendChild(flyingImg);
+
+            setTimeout(() => {
+                flyingImg.style.left = `${targetRect.left + targetRect.width / 2 - 15}px`;
+                flyingImg.style.top = `${targetRect.top + targetRect.height / 2 - 15}px`;
+                flyingImg.style.transform = 'scale(0.3) rotate(360deg)';
+                flyingImg.style.opacity = '0.5';
+            }, 30);
+
+            setTimeout(() => {
+                flyingImg.remove();
+                // Animación de escala pequeña de rebote en el botón del carrito
+                cartBtn.style.transform = 'scale(1.15)';
+                setTimeout(() => {
+                    cartBtn.style.transform = 'scale(1)';
+                }, 200);
+            }, 830);
         }
 
         function cerrarModal() {
@@ -1461,6 +1577,9 @@
                 cerrarModalCheckout();
             }
         });
+
+        // Aplicar campaña dinámica de temporada al iniciar
+        aplicarCampanaTemporada();
 
         // Inicializar catálogo al cargar la página
         cargarCatalogo(false);
