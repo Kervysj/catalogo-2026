@@ -216,7 +216,6 @@
             box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
         }
 
-        /* Estilo especial y color distinto para los botones de Striming y Recarga saldo */
         .filter-btn.special-filter {
             border-color: rgba(147, 51, 234, 0.4);
             color: var(--special-cat-color);
@@ -360,6 +359,56 @@
 
         .card:hover .card-hint {
             color: var(--primary-color);
+        }
+
+        /* Skeleton Loaders (Carga esquelética) */
+        @keyframes pulseSkeleton {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        .skeleton-card {
+            background-color: var(--card-bg);
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            height: 360px;
+            display: flex;
+            flex-direction: column;
+            animation: pulseSkeleton 1.5s infinite ease-in-out;
+        }
+
+        .skeleton-img {
+            width: 100%;
+            height: 210px;
+            background-color: #e2e8f0;
+        }
+
+        .skeleton-body {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-grow: 1;
+        }
+
+        .skeleton-line {
+            height: 14px;
+            background-color: #e2e8f0;
+            border-radius: 4px;
+        }
+
+        .skeleton-line.short {
+            width: 40%;
+        }
+
+        .skeleton-line.medium {
+            width: 70%;
+        }
+
+        .skeleton-line.long {
+            width: 100%;
         }
 
         .modal {
@@ -621,28 +670,6 @@
             font-size: 1.2rem;
         }
 
-        .loader-container {
-            text-align: center;
-            grid-column: 1 / -1;
-            padding: 50px;
-            color: var(--text-muted);
-        }
-
-        .spinner {
-            border: 3px solid rgba(37, 99, 235, 0.1);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border-left-color: var(--primary-color);
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 15px auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
         .toast {
             position: fixed;
             bottom: 30px;
@@ -791,6 +818,42 @@
             margin-bottom: 15px;
             color: #059669;
         }
+
+        /* Estilos del Modal de Checkout / Confirmación de Pedido */
+        .checkout-form-group {
+            margin-bottom: 15px;
+        }
+
+        .checkout-form-group label {
+            display: block;
+            font-size: 0.88rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-main);
+        }
+
+        .checkout-form-input, .checkout-form-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: var(--transition-smooth);
+            background: #f8fafc;
+            color: var(--text-main);
+        }
+
+        .checkout-form-input:focus, .checkout-form-textarea:focus {
+            border-color: var(--primary-color);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .checkout-form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
     </style>
 </head>
 <body>
@@ -822,10 +885,10 @@
     </div>
 
     <div class="grid" id="product-grid">
-        <div class="loader-container">
-            <div class="spinner"></div>
-            <p>Sincronizando catálogo con Google Sheets...</p>
-        </div>
+        <!-- Skeleton Loaders iniciales -->
+        <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div></div>
+        <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div></div>
+        <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div></div>
     </div>
 
     <!-- Botón flotante del carrito -->
@@ -849,9 +912,9 @@
                 <p id="modal-desc" class="modal-desc"></p>
                 <div class="modal-actions">
                     <div class="modal-actions-row">
-                        <a id="modal-wa-btn" class="whatsapp-btn" href="#" target="_blank">
+                        <button id="modal-wa-btn" class="whatsapp-btn">
                             <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i> Comprar Individual
-                        </a>
+                        </button>
                         <button id="modal-share-btn" class="modal-share-btn" title="Compartir producto">
                             <i class="fa-solid fa-share-nodes"></i>
                         </button>
@@ -874,8 +937,33 @@
                     <!-- Elementos del carrito -->
                 </div>
                 <div class="cart-total" id="cart-total-text">Total: $0.00</div>
-                <button class="whatsapp-btn" style="width: 100%;" onclick="enviarCotizacionCarrito()">
-                    <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i> Enviar Cotización por WhatsApp
+                <button class="whatsapp-btn" style="width: 100%;" onclick="abrirModalCheckout()">
+                    <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i> Proceder al Envio por WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nuevo Modal de Confirmación de Pedido (Checkout con Nombre y Dirección) -->
+    <div class="modal" id="checkout-modal" onclick="if(event.target === this) cerrarModalCheckout()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="cerrarModalCheckout()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-body" style="padding-top: 35px;">
+                <h2 class="modal-title" style="color:var(--primary-color); margin-bottom: 8px;"><i class="fa-solid fa-bag-shopping"></i> Finalizar Pedido</h2>
+                <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 20px;">Indícanos tus datos para coordinar tu entrega o servicio:</p>
+                
+                <div class="checkout-form-group">
+                    <label for="client-name">Tu Nombre / Apellido:</label>
+                    <input type="text" id="client-name" class="checkout-form-input" placeholder="Ej. Carlos Pérez">
+                </div>
+                
+                <div class="checkout-form-group">
+                    <label for="client-address">Dirección o Nota de Entrega (Opcional):</label>
+                    <textarea id="client-address" class="checkout-form-textarea" placeholder="Ej. Urbanización La Campiña, calle 4 / O datos para la recarga/streaming"></textarea>
+                </div>
+
+                <button class="whatsapp-btn" style="width: 100%; margin-top: 10px;" onclick="enviarPedidoConfirmado()">
+                    <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i> Enviar Pedido a WhatsApp
                 </button>
             </div>
         </div>
@@ -910,33 +998,54 @@
 
     <script>
         const urlAPI = "https://script.google.com/macros/s/AKfycbyfjv9UscbcmgqeKjx_0j5UxGWK2qpFudgFGcHeCBt252fUfxgkhcQUKH-b8BeZLU8NNg/exec";
+        const CACHE_KEY = 'kervys_catalogo_cache_data';
 
         let listaProductosGlobal = [];
         let categoriaSeleccionada = 'todos';
         let isZoomed = false;
         let carritoGlobal = [];
+        let productoIndividualPendiente = null; // Para control de compra individual con checkout
 
         function cargarCatalogo(silencioso = false) {
+            // 1. Intentar cargar desde caché local instantáneamente si existe
+            if (!silencioso) {
+                const datosGuardados = localStorage.getItem(CACHE_KEY);
+                if (datosGuardados) {
+                    try {
+                        const parsedData = JSON.parse(datosGuardados);
+                        procesarYRenderizarDatos(parsedData);
+                    } catch (e) {
+                        console.error("Error al leer caché local", e);
+                    }
+                }
+            }
+
+            // 2. Sincronizar en segundo plano con Google Sheets
             fetch(urlAPI)
                 .then(response => response.json())
                 .then(data => {
-                    listaProductosGlobal = data.filter(prod => {
-                        if (!prod.status) return false;
-                        return prod.status.toString().trim().toLowerCase() === 'disponible';
-                    });
-
-                    construirBotonesCategorias(listaProductosGlobal);
-                    filtrarCombinado();
+                    // Guardar en localStorage para futuras visitas instantáneas
+                    localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+                    procesarYRenderizarDatos(data);
                 })
                 .catch(error => {
                     console.error('Error al conectar con la API:', error);
-                    if (!silencioso) {
-                        document.getElementById('product-grid').innerHTML = '<p style="text-align:center; grid-column:1/-1; color: var(--danger-color);">Error al cargar los productos. Verifica tu conexión.</p>';
+                    if (!silencioso && !localStorage.getItem(CACHE_KEY)) {
+                        document.getElementById('product-grid').innerHTML = '<p style="text-align:center; grid-column:1/-1; color: var(--danger-color); padding: 40px;">Error al cargar los productos. Verifica tu conexión a internet.</p>';
                     }
                 });
         }
 
-        // Validación exacta para "Striming" y "Recarga saldo"
+        function procesarYRenderizarDatos(data) {
+            listaProductosGlobal = data.filter(prod => {
+                if (!prod.status) return false;
+                return prod.status.toString().trim().toLowerCase() === 'disponible';
+            });
+
+            construirBotonesCategorias(listaProductosGlobal);
+            filtrarCombinado();
+        }
+
         function esStriming(cat) {
             if (!cat) return false;
             const c = cat.toLowerCase().trim();
@@ -949,7 +1058,6 @@
             return c === 'recarga saldo' || (c.includes('recarga') && c.includes('saldo'));
         }
 
-        // Oculta exclusivamente Striming y Recarga saldo de la vista principal "Todos"
         function debeOcultarseEnPrincipal(cat) {
             return esStriming(cat) || esRecargaSaldo(cat);
         }
@@ -1138,21 +1246,16 @@
             }
             document.getElementById('modal-desc').innerHTML = descripcionTexto;
 
-            let numeroWa = prod.whatsapp ? prod.whatsapp.toString().trim() : "584149956831";
-            let mensaje = "";
+            // Configurar botón "Comprar Individual" para abrir el modal de checkout con nombre y dirección
+            const waBtn = document.getElementById('modal-wa-btn');
+            waBtn.onclick = () => {
+                productoIndividualPendiente = { ...prod, precioFinalCalculado: precioFinal };
+                cerrarModal();
+                abrirModalCheckout();
+            };
 
-            if (esRecargaSaldo(prod.categoria)) {
-                mensaje = encodeURIComponent(`Hola, quiero procesar la recarga: *${prod.nombre}* (Total: $${precioFinal.toFixed(2)} con 12% incluido).\n\nPor favor indícame los datos para realizar el pago.`);
-            } else if (esStriming(prod.categoria) || esServicioGeneral(prod.categoria)) {
-                mensaje = encodeURIComponent(`Hola, quiero solicitar el servicio de *${prod.nombre}* ($${precioFinal.toFixed(2)}).\n\nPor favor indícame los pasos.`);
-            } else {
-                mensaje = encodeURIComponent(`Hola, me interesa este artículo:\n\n*Código:* ${prod.codigo_producto || prod.id || 'N/A'}\n*Producto:* ${prod.nombre}\n*Precio:* $${precioFinal.toFixed(2)}\n*Foto:* ${prod.imagen}`);
-            }
-            
-            document.getElementById('modal-wa-btn').href = `https://wa.me/${numeroWa}?text=${mensaje}`;
             document.getElementById('modal-share-btn').onclick = () => compartirProducto(null, prod);
             
-            // Configurar botón para agregar al carrito
             const addCartBtn = document.getElementById('modal-add-cart-btn');
             addCartBtn.onclick = () => {
                 agregarAlCarrito(prod);
@@ -1189,6 +1292,7 @@
         }
 
         function abrirModalCarrito() {
+            productoIndividualPendiente = null; // Limpiamos individual para asegurar carrito múltiple
             const listaContainer = document.getElementById('cart-items-list');
             listaContainer.innerHTML = '';
             let total = 0;
@@ -1227,26 +1331,47 @@
             }
         }
 
-        function enviarCotizacionCarrito() {
-            if (carritoGlobal.length === 0) return;
+        function abrirModalCheckout() {
+            cerrarModalCarrito();
+            document.getElementById('checkout-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarModalCheckout() {
+            document.getElementById('checkout-modal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function enviarPedidoConfirmado() {
+            const nombreCliente = document.getElementById('client-name').value.trim();
+            const direccionCliente = document.getElementById('client-address').value.trim();
+
+            if (!nombreCliente) {
+                alert("Por favor ingresa tu nombre para continuar.");
+                document.getElementById('client-name').focus();
+                return;
+            }
 
             let numeroWa = "584149956831";
             let mensaje = "";
 
-            if (carritoGlobal.length === 1) {
-                // Si es solo 1 artículo, se envía exactamente como funciona originalmente
-                const prod = carritoGlobal[0];
+            // Caso A: Es un producto individual seleccionado desde su modal
+            if (productoIndividualPendiente) {
+                const prod = productoIndividualPendiente;
                 const precioFinal = prod.precioFinalCalculado;
+
                 if (esRecargaSaldo(prod.categoria)) {
-                    mensaje = `Hola, quiero procesar la recarga: *${prod.nombre}* (Total: $${precioFinal.toFixed(2)} con 12% incluido).\n\nPor favor indícame los datos para realizar el pago.`;
+                    mensaje = `Hola, mi nombre es *${nombreCliente}*.\nQuiero procesar la recarga: *${prod.nombre}* (Total: $${precioFinal.toFixed(2)} con 12% incluido).\n\n📍 *Nota / Datos:* ${direccionCliente || 'N/A'}\n\nPor favor indícame los datos para realizar el pago.`;
                 } else if (esStriming(prod.categoria) || esServicioGeneral(prod.categoria)) {
-                    mensaje = `Hola, quiero solicitar el servicio de *${prod.nombre}* ($${precioFinal.toFixed(2)}).\n\nPor favor indícame los pasos.`;
+                    mensaje = `Hola, mi nombre es *${nombreCliente}*.\nQuiero solicitar el servicio de *${prod.nombre}* ($${precioFinal.toFixed(2)}).\n\n📍 *Nota / Datos:* ${direccionCliente || 'N/A'}\n\nPor favor indícame los pasos.`;
                 } else {
-                    mensaje = `Hola, me interesa este artículo:\n\n*Código:* ${prod.codigo_producto || prod.id || 'N/A'}\n*Producto:* ${prod.nombre}\n*Precio:* $${precioFinal.toFixed(2)}\n*Foto:* ${prod.imagen}`;
+                    mensaje = `Hola, mi nombre es *${nombreCliente}* y me interesa este artículo:\n\n*Código:* ${prod.codigo_producto || prod.id || 'N/A'}\n*Producto:* ${prod.nombre}\n*Precio:* $${precioFinal.toFixed(2)}\n*Foto:* ${prod.imagen}\n\n📍 *Dirección / Nota:* ${direccionCliente || 'N/A'}`;
                 }
-            } else {
-                // Si selecciona más de 1 artículo, envía la cotización acumulada detallando producto, precio, código y link de imagen
-                mensaje = "Hola, me interesa solicitar la siguiente cotización con múltiples artículos:\n\n";
+                productoIndividualPendiente = null;
+            } 
+            // Caso B: Es el carrito con múltiples artículos
+            else if (carritoGlobal.length > 0) {
+                mensaje = `Hola, mi nombre es *${nombreCliente}* y quiero solicitar la siguiente cotización:\n\n`;
                 let totalAcumulado = 0;
 
                 carritoGlobal.forEach((item, idx) => {
@@ -1257,11 +1382,20 @@
                                `▪ Imagen: ${item.imagen}\n\n`;
                 });
 
-                mensaje += `💰 *Total General:* $${totalAcumulado.toFixed(2)}\n\nPor favor indícame los pasos para proceder.`;
+                mensaje += `💰 *Total General:* $${totalAcumulado.toFixed(2)}\n` +
+                           `📍 *Dirección / Nota:* ${direccionCliente || 'N/A'}\n\nPor favor indícame los pasos para proceder.`;
+                
+                // Limpiar carrito tras enviar
+                carritoGlobal = [];
+                actualizarBotonFlotanteCarrito();
+            } else {
+                cerrarModalCheckout();
+                return;
             }
 
             const urlWa = `https://wa.me/${numeroWa}?text=${encodeURIComponent(mensaje)}`;
             window.open(urlWa, '_blank');
+            cerrarModalCheckout();
         }
 
         function abrirModalInfo(tipo) {
@@ -1324,14 +1458,17 @@
                 cerrarModal();
                 cerrarModalInfo();
                 cerrarModalCarrito();
+                cerrarModalCheckout();
             }
         });
 
+        // Inicializar catálogo al cargar la página
         cargarCatalogo(false);
 
+        // Sincronización silenciosa en segundo plano cada 20 segundos
         setInterval(() => {
             cargarCatalogo(true);
-        }, 15000);
+        }, 20000);
     </script>
 </body>
 </html>
