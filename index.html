@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo Digital y Servicios</title>
-    <!-- Configuración para PWA (Instalable) -->
     <meta name="theme-color" content="#2563eb">
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,{
         %22name%22: %22Catálogo Digital%22,
@@ -16,15 +15,12 @@
         %22icons%22: [{%22src%22: %22https://cdn-icons-png.flaticon.com/512/1170/1170576.png%22, %22sizes%22: %22512x512%22, %22type%22: %22image/png%22}]
     }">
     
-    <!-- Fuente moderna e iconos -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Librería Leaflet para el Mapa Interactivo -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <!-- Librería jsPDF para descarga de cotizaciones -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
@@ -60,7 +56,7 @@
             --shadow-hover: 0 20px 25px -5px rgb(59 130 246 / 0.15), 0 8px 10px -6px rgb(59 130 246 / 0.1);
         }
 
-        body.dark-mode .info-badge, body.dark-mode .search-input, body.dark-mode .filter-btn, body.dark-mode .modal-content, body.dark-mode .route-info-box, body.dark-mode .assistant-chat-container, body.dark-mode .assistant-chat-header, body.dark-mode .assistant-chat-body, body.dark-mode .assistant-msg-bot {
+        body.dark-mode .info-badge, body.dark-mode .search-input, body.dark-mode .filter-btn, body.dark-mode .modal-content, body.dark-mode .route-info-box, body.dark-mode .assistant-chat-container, body.dark-mode .assistant-chat-header, body.dark-mode .assistant-chat-body {
             background-color: #1e293b;
             color: #f8fafc;
         }
@@ -70,7 +66,7 @@
             color: #c084fc;
         }
 
-        body.dark-mode .card, body.dark-mode .skeleton-card, body.dark-mode .cart-item-row, body.dark-mode .checkout-form-input, body.dark-mode .checkout-form-textarea, body.dark-mode .assistant-msg-user {
+        body.dark-mode .card, body.dark-mode .skeleton-card, body.dark-mode .cart-item-row, body.dark-mode .checkout-form-input, body.dark-mode .checkout-form-textarea {
             border-color: #334155;
             background-color: #1e293b;
         }
@@ -78,11 +74,6 @@
         body.dark-mode .checkout-form-input, body.dark-mode .checkout-form-textarea {
             color: #f8fafc;
             background: #0f172a;
-        }
-
-        body.dark-mode .assistant-msg-user {
-            background-color: #2563eb;
-            color: #fff;
         }
 
         body.dark-mode .skeleton-img, body.dark-mode .skeleton-line, body.dark-mode .modal-img-container {
@@ -802,14 +793,13 @@
             transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Ventana de Chat Interactiva para el Asistente */
+        /* Ventana Emergente del Asistente (Estrategia Mejorada: Saludo + Ofertas + Sugerencias) */
         .assistant-chat-container {
             position: fixed;
             bottom: 95px;
             right: 25px;
-            width: 330px;
+            width: 320px;
             max-width: calc(100vw - 40px);
-            height: 420px;
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 20px;
@@ -833,84 +823,54 @@
         .assistant-chat-header span { display: flex; align-items: center; gap: 8px; }
         .assistant-chat-close { background: none; border: none; color: white; font-size: 1.1rem; cursor: pointer; }
         .assistant-chat-body {
-            padding: 15px;
-            flex-grow: 1;
-            overflow-y: auto;
+            padding: 18px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--text-main);
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             background: var(--bg-color);
         }
-        .assistant-msg {
-            max-width: 85%;
-            padding: 10px 14px;
-            border-radius: 14px;
-            font-size: 0.88rem;
-            line-height: 1.4;
+        .assistant-chat-body p { margin: 0; }
+        .assistant-highlight-box {
+            background: rgba(37, 99, 235, 0.08);
+            border-left: 3px solid var(--primary-color);
+            padding: 10px 12px;
+            border-radius: 0 10px 10px 0;
+            font-size: 0.85rem;
         }
-        .assistant-msg-bot {
-            background: var(--card-bg);
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
-        }
-        .assistant-msg-user {
-            background: var(--primary-color);
+        .assistant-chat-footer-btn {
+            display: block;
+            text-align: center;
+            background: #25d366;
             color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 4px;
-        }
-        .assistant-chat-footer {
             padding: 10px;
-            background: var(--card-bg);
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            gap: 8px;
-        }
-        .assistant-chat-input {
-            flex-grow: 1;
-            padding: 10px 14px;
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            outline: none;
-            font-size: 0.88rem;
-            background: var(--bg-color);
-            color: var(--text-main);
-        }
-        .assistant-chat-send {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            box-shadow: 0 4px 10px rgba(37, 211, 102, 0.25);
             transition: var(--transition-smooth);
+            margin-top: 5px;
         }
-        .assistant-chat-send:hover { transform: scale(1.08); }
+        .assistant-chat-footer-btn:hover { background: #20ba5a; transform: translateY(-1px); }
     </style>
 </head>
 <body id="main-body">
 
-    <!-- Barra Superior de Novedades (Registro Periódico) -->
     <div id="news-banner" class="news-banner-bar">
         <span>¡Hay nuevos productos desde tu última visita! Consúltalos o compártelos directamente.</span>
         <a href="https://wa.me/584149956831?text=Hola,%20quiero%20consultar%20las%20novedades%20recientes" target="_blank" style="background: white; color: var(--primary-color); padding: 2px 8px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.75rem;">Ver por WhatsApp</a>
-        <button onclick="cerrarBarraNovedades()" style="background:none; border:none; color:white; cursor:pointer; font-size:1rem; margin-left:10px;">&times;</button>
+        <button onclick="cerrarBarraNovedades()" style="background:none; border:none; color:white; cursor:pointer; font-size:1rem; margin-left:10px;">×</button>
     </div>
 
-    <!-- Switch de Modo Oscuro / Claro Flotante -->
     <div class="theme-switch-container">
         <button class="theme-switch-btn" id="theme-switch-btn" onclick="toggleTheme()" title="Cambiar Modo Oscuro / Claro">
             <i class="fa-solid fa-moon" id="theme-icon"></i>
         </button>
     </div>
 
-    <!-- Banner dinámico de temporada -->
     <div id="seasonal-banner" class="seasonal-banner">
         <i id="seasonal-icon" class="fa-solid fa-gift"></i> <span id="seasonal-text">¡Bienvenidos a nuestra temporada especial!</span>
     </div>
@@ -938,8 +898,7 @@
     </div>
 
     <div class="filters" id="filters-container">
-        <!-- Contenedor dinámico de categorías -->
-    </div>
+        </div>
 
     <div class="grid" id="product-grid">
         <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div></div>
@@ -947,27 +906,26 @@
         <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div></div>
     </div>
 
-    <!-- Botón flotante del carrito -->
     <button class="cart-float-btn" id="cart-float-btn" onclick="abrirModalCarrito()">
         <i class="fa-solid fa-cart-shopping"></i> Ver Cotización <span class="cart-badge" id="cart-count">0</span>
     </button>
 
-    <!-- Ventana de Chat Interactiva del Asistente (Personita con la que puedes conversar) -->
     <div id="assistant-chat-box" class="assistant-chat-container">
         <div class="assistant-chat-header">
             <span><i class="fa-solid fa-headset"></i> Asistente Virtual</span>
-            <button class="assistant-chat-close" onclick="toggleAsistenteChat()">&times;</button>
+            <button class="assistant-chat-close" onclick="toggleAsistenteChat()">×</button>
         </div>
-        <div class="assistant-chat-body" id="assistant-messages-list">
-            <div class="assistant-msg assistant-msg-bot">¡Hola! Soy tu asistente virtual. ¿Buscas algo en específico, necesitas sugerencias o ayuda para armar un combo? Escríbeme aquí abajo. 👇</div>
-        </div>
-        <div class="assistant-chat-footer">
-            <input type="text" id="assistant-user-input" class="assistant-chat-input" placeholder="Escribe tu consulta..." onkeydown="if(event.key==='Enter') enviarMensajeAsistente()">
-            <button class="assistant-chat-send" onclick="enviarMensajeAsistente()"><i class="fa-solid fa-paper-plane"></i></button>
+        <div class="assistant-chat-body">
+            <p>¡Hola! 👋 Qué gusto saludarte. Te invitamos a explorar nuestras categorías para descubrir las ofertas y novedades disponibles en el catálogo.</p>
+            <div class="assistant-highlight-box">
+                <i class="fa-solid fa-lightbulb" style="color:var(--primary-color);"></i> ¿Tienes alguna duda o sugerencia especial? Puedes dejarnos un mensaje directo por WhatsApp.
+            </div>
+            <a href="https://wa.me/584149956831?text=Hola,%20vengo%20del%20catálogo%20y%20tengo%20una%20duda/sugerencia:" target="_blank" class="assistant-chat-footer-btn">
+                <i class="fa-brands fa-whatsapp" style="font-size: 1rem;"></i> Enviar sugerencia o duda
+            </a>
         </div>
     </div>
 
-    <!-- Modal de Producto -->
     <div class="modal" id="product-modal" onclick="if(event.target === this) cerrarModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModal()"><i class="fa-solid fa-xmark"></i></button>
@@ -999,7 +957,6 @@
         </div>
     </div>
 
-    <!-- Modal del Carrito -->
     <div class="modal" id="cart-modal" onclick="if(event.target === this) cerrarModalCarrito()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModalCarrito()"><i class="fa-solid fa-xmark"></i></button>
@@ -1017,7 +974,6 @@
         </div>
     </div>
 
-    <!-- Modal de Checkout -->
     <div class="modal" id="checkout-modal" onclick="if(event.target === this) cerrarModalCheckout()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModalCheckout()"><i class="fa-solid fa-xmark"></i></button>
@@ -1041,7 +997,6 @@
         </div>
     </div>
 
-    <!-- Modal Info -->
     <div class="modal" id="info-modal" onclick="if(event.target === this) cerrarModalInfo()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModalInfo()"><i class="fa-solid fa-xmark"></i></button>
@@ -1052,7 +1007,6 @@
         </div>
     </div>
 
-    <!-- Modal Ubicación (Centrado en San José de Guanipa) -->
     <div class="modal" id="location-modal" onclick="if(event.target === this) cerrarModalUbicacion()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModalUbicacion()"><i class="fa-solid fa-xmark"></i></button>
@@ -1078,8 +1032,7 @@
         <a href="https://wa.me/584149956831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20quiero%20más%20información" target="_blank" class="social-icon bg-wa" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
         <a href="https://tinyurl.com/pageimc" target="_blank" class="social-icon bg-fb" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
         <div class="social-icon bg-maps" onclick="abrirModalUbicacion()" title="Ubicación Interactiva"><i class="fa-solid fa-location-dot"></i></div>
-        <!-- Botón del Asistente Interactiva con icono de persona -->
-        <div class="social-icon bg-assistant" onclick="toggleAsistenteChat()" title="Abrir Asistente Virtual"><i class="fa-solid fa-headset"></i></div>
+        <div class="social-icon bg-assistant" onclick="toggleAsistenteChat()" title="Asistente Virtual"><i class="fa-solid fa-headset"></i></div>
     </div>
 
     <script>
@@ -1151,59 +1104,10 @@
             document.getElementById('news-banner').classList.remove('show');
         }
 
-        // Asistente Inteligente de Compras Interactivo (Chat flotante)
+        // Control del Panel del Asistente Virtual
         function toggleAsistenteChat() {
             const chatBox = document.getElementById('assistant-chat-box');
             chatBox.classList.toggle('active');
-            if (chatBox.classList.contains('active')) {
-                document.getElementById('assistant-user-input').focus();
-            }
-        }
-
-        function enviarMensajeAsistente() {
-            const input = document.getElementById('assistant-user-input');
-            const texto = input.value.trim();
-            if (!texto) return;
-
-            const list = document.getElementById('assistant-messages-list');
-            
-            // Mensaje usuario
-            list.innerHTML += `<div class="assistant-msg assistant-msg-user">${texto}</div>`;
-            input.value = '';
-            list.scrollTop = list.scrollHeight;
-
-            // Simular respuesta inteligente o derivación humana a WhatsApp
-            setTimeout(() => {
-                let respuestaBot = "";
-                const tLower = texto.toLowerCase();
-
-                if (tLower.includes('hola') || tLower.includes('buenos') || tLower.includes('buenas')) {
-                    respuestaBot = "¡Hola! ¿Qué producto o servicio estás buscando hoy en nuestro catálogo?";
-                } else if (tLower.includes('combo') || tLower.includes('armar')) {
-                    respuestaBot = "¡Claro! Puedes revisar las pestañas superiores o decirme qué tienes en mente para armar tu combo ideal.";
-                } else if (tLower.includes('pago') || tLower.includes('pagar')) {
-                    respuestaBot = "Aceptamos Pago Móvil, transferencias bancarias y Binance Pay. Puedes ver los detalles arriba en la burbuja de 'Métodos de Pago'.";
-                } else if (tLower.includes('delivery') || tLower.includes('envio') || tLower.includes('enviar')) {
-                    respuestaBot = "¡Sí tenemos servicio de delivery disponible hasta la puerta de tu hogar!";
-                } else {
-                    // Derivación humana automática con enlace a WhatsApp con el mensaje acordado
-                    const waLink = `https://wa.me/584149956831?text=Hola,%20estoy%20consultando%20con%20el%20asistente%20virtual%20y%20quiero%20atención%20personalizada%20sobre:%20${encodeURIComponent(texto)}`;
-                    respuestaBot = `Para darte una atención más personalizada con este detalle, <a href="${waLink}" target="_blank" style="color: #25d366; font-weight:600;">escríbenos directamente por WhatsApp con el encargado</a>.`;
-                }
-
-                list.innerHTML += `<div class="assistant-msg assistant-msg-bot">${respuestaBot}</div>`;
-                list.scrollTop = list.scrollHeight;
-            }, 600);
-        }
-
-        function verificarAsistenciaVacia(resultadosCount) {
-            if (resultadosCount === 0) {
-                const list = document.getElementById('assistant-messages-list');
-                const waLink = `https://wa.me/584149956831?text=Hola,%20estoy%20buscando%20un%20producto%20específico%20y%20no%20lo%20encontré%20en%20el%20catálogo`;
-                list.innerHTML += `<div class="assistant-msg assistant-msg-bot">No encontré resultados exactos en el catálogo. Para darte una atención más personalizada con este detalle, <a href="${waLink}" target="_blank" style="color: #25d366; font-weight:600;">escríbenos directamente por WhatsApp con el encargado</a>.</div>`;
-                document.getElementById('assistant-chat-box').classList.add('active');
-                list.scrollTop = list.scrollHeight;
-            }
         }
 
         // Fetch Data
@@ -1273,7 +1177,6 @@
                 lista = lista.filter(p => [p.nombre, p.descripcion, p.mas_detalles, p.codigo_producto, p.id].join(' ').toLowerCase().includes(txt));
             }
             
-            verificarAsistenciaVacia(lista.length);
             mostrarProductos(lista);
         }
 
@@ -1298,8 +1201,8 @@
                     <div class="card-img-container">
                         <img src="${prod.imagen}" alt="${prod.nombre}" loading="lazy">
                         <div class="card-top-actions">
-                            <button class="card-action-icon-btn ${isFav ? 'fav-active' : ''}" onclick="toggleFavorito(event, ${JSON.stringify(prod).replace(/"/g, '&quot;')})"><i class="fa-${isFav ? 'solid' : 'regular'} fa-star"></i></button>
-                            <button class="card-action-icon-btn" onclick="event.stopPropagation(); compartirProducto(event, ${JSON.stringify(prod).replace(/"/g, '&quot;')})"><i class="fa-solid fa-share-nodes"></i></button>
+                            <button class="card-action-icon-btn ${isFav ? 'fav-active' : ''}" onclick="toggleFavorito(event, ${JSON.stringify(prod).replace(/"/g, '"')})"><i class="fa-${isFav ? 'solid' : 'regular'} fa-star"></i></button>
+                            <button class="card-action-icon-btn" onclick="event.stopPropagation(); compartirProducto(event, ${JSON.stringify(prod).replace(/"/g, '"')})"><i class="fa-solid fa-share-nodes"></i></button>
                         </div>
                     </div>
                     <div class="card-body">
