@@ -382,6 +382,18 @@
             border-color: var(--special-cat-color);
         }
 
+        .filter-btn.fav-filter {
+            border-color: rgba(245, 158, 11, 0.4);
+            color: #d97706;
+            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(245, 158, 11, 0.1) 100%);
+        }
+
+        .filter-btn.fav-filter.active {
+            background-color: #d97706;
+            color: #ffffff;
+            border-color: #d97706;
+        }
+
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -434,10 +446,16 @@
             transform: scale(1.07);
         }
 
-        .card-share-btn {
+        .card-top-actions {
             position: absolute;
             top: 12px;
             right: 12px;
+            display: flex;
+            gap: 6px;
+            z-index: 5;
+        }
+
+        .card-action-icon-btn {
             background: rgba(15, 23, 42, 0.7);
             color: #ffffff;
             border: none;
@@ -449,13 +467,16 @@
             justify-content: center;
             cursor: pointer;
             transition: var(--transition-smooth);
-            z-index: 5;
             backdrop-filter: blur(4px);
         }
 
-        .card-share-btn:hover {
+        .card-action-icon-btn:hover {
             background: var(--primary-color);
             transform: scale(1.1);
+        }
+
+        .card-action-icon-btn.fav-active {
+            color: #f59e0b;
         }
 
         .card-body {
@@ -1011,6 +1032,7 @@
 
     <div class="filters" id="filters-container">
         <button class="filter-btn active" onclick="cambiarCategoria('todos', this)">Todos</button>
+        <button class="filter-btn fav-filter" onclick="cambiarCategoria('favoritos', this)"><i class="fa-solid fa-star" style="font-size:0.75rem; margin-right:4px;"></i> Favoritos</button>
     </div>
 
     <div class="grid" id="product-grid">
@@ -1127,12 +1149,14 @@
     <script>
         const urlAPI = "https://script.google.com/macros/s/AKfycbyfjv9UscbcmgqeKjx_0j5UxGWK2qpFudgFGcHeCBt252fUfxgkhcQUKH-b8BeZLU8NNg/exec";
         const CACHE_KEY = 'kervys_catalogo_cache_data';
+        const FAVS_KEY = 'kervys_catalogo_favoritos';
 
         let listaProductosGlobal = [];
         let categoriaSeleccionada = 'todos';
         let isZoomed = false;
         let carritoGlobal = [];
         let productoIndividualPendiente = null;
+        let favoritosGlobal = [];
 
         // --- Gestión de Modo Oscuro ---
         function inicializarTema() {
@@ -1159,6 +1183,45 @@
                 localStorage.setItem('kervys_theme_mode', 'light');
                 icon.className = "fa-solid fa-moon";
             }
+        }
+
+        // --- Gestión de Favoritos ---
+        function cargarFavoritosStorage() {
+            try {
+                const favs = localStorage.getItem(FAVS_KEY);
+                favoritosGlobal = favs ? JSON.parse(favs) : [];
+            } catch (e) {
+                favoritosGlobal = [];
+            }
+        }
+
+        function guardarFavoritosStorage() {
+            localStorage.setItem(FAVS_KEY, JSON.stringify(favoritosGlobal));
+        }
+
+        function obtenerIdentificadorProducto(prod) {
+            return prod.codigo_producto || prod.id || prod.nombre;
+        }
+
+        function esFavorito(prod) {
+            const id = obtenerIdentificadorProducto(prod);
+            return favoritosGlobal.includes(id);
+        }
+
+        function toggleFavorito(event, prod) {
+            event.stopPropagation();
+            const id = obtenerIdentificadorProducto(prod);
+            const index = favoritosGlobal.indexOf(id);
+            
+            if (index > -1) {
+                favoritosGlobal.splice(index, 1);
+            } else {
+                favoritosGlobal.push(id);
+            }
+            guardarFavoritosStorage();
+            
+            // Refrescar vista actual para reflejar cambios inmediatos
+            filtrarCombinado();
         }
 
         // Inicializar Campaña de Temporada Dinámica según el mes actual
@@ -1188,6 +1251,7 @@
         }
 
         function cargarCatalogo(silencioso = false) {
+            cargarFavoritosStorage();
             if (!silencioso) {
                 const datosGuardados = localStorage.getItem(CACHE_KEY);
                 if (datosGuardados) {
@@ -1250,7 +1314,10 @@
             const filtrosContainer = document.getElementById('filters-container');
             const categoriasUnicas = [...new Set(productos.map(p => p.categoria ? p.categoria.trim() : 'General'))];
             
-            let htmlBotones = `<button class="filter-btn ${categoriaSeleccionada === 'todos' ? 'active' : ''}" onclick="cambiarCategoria('todos', this)">Todos</button>`;
+            let htmlBotones = `
+                <button class="filter-btn ${categoriaSeleccionada === 'todos' ? 'active' : ''}" onclick="cambiarCategoria('todos', this)">Todos</button>
+                <button class="filter-btn fav-filter ${categoriaSeleccionada === 'favoritos' ? 'active' : ''}" onclick="cambiarCategoria('favoritos', this)"><i class="fa-solid fa-star" style="font-size:0.75rem; margin-right:4px;"></i> Favoritos</button>
+            `;
             
             categoriasUnicas.forEach(cat => {
                 const isActive = categoriaSeleccionada.toLowerCase() === cat.toLowerCase() ? 'active' : '';
@@ -1288,6 +1355,8 @@
 
             if (categoriaSeleccionada === 'todos') {
                 listaFiltrada = listaFiltrada.filter(p => !debeOcultarseEnPrincipal(p.categoria));
+            } else if (categoriaSeleccionada === 'favoritos') {
+                listaFiltrada = listaFiltrada.filter(p => esFavorito(p));
             } else {
                 listaFiltrada = listaFiltrada.filter(p => {
                     const catProd = p.categoria ? p.categoria.trim().toLowerCase() : 'general';
@@ -1322,7 +1391,11 @@
             grid.innerHTML = '';
 
             if (lista.length === 0) {
-                grid.innerHTML = '<p style="text-align:center; grid-column:1/-1; color: var(--text-muted); padding: 40px;">No se encontraron elementos en esta sección.</p>';
+                let mensajeVacio = 'No se encontraron elementos en esta sección.';
+                if (categoriaSeleccionada === 'favoritos') {
+                    mensajeVacio = 'No tienes productos en favoritos. Haz clic en la estrella de cualquier producto para guardarlo y compararlo aquí.';
+                }
+                grid.innerHTML = `<p style="text-align:center; grid-column:1/-1; color: var(--text-muted); padding: 40px;">${mensajeVacio}</p>`;
                 return;
             }
 
@@ -1333,13 +1406,19 @@
                 card.onclick = () => abrirModal(prod);
 
                 const precioFinal = calcularPrecioFinal(prod);
+                const isFav = esFavorito(prod);
 
                 card.innerHTML = `
                     <div class="card-img-container">
                         <img src="${prod.imagen}" alt="${prod.nombre}" loading="lazy">
-                        <button class="card-share-btn" onclick="event.stopPropagation(); compartirProducto(event, ${JSON.stringify(prod).replace(/"/g, '"')})" title="Compartir">
-                            <i class="fa-solid fa-share-nodes"></i>
-                        </button>
+                        <div class="card-top-actions">
+                            <button class="card-action-icon-btn ${isFav ? 'fav-active' : ''}" onclick="toggleFavorito(event, ${JSON.stringify(prod).replace(/"/g, '&quot;')})" title="${isFav ? 'Quitar de favoritos' : 'Guardar en favoritos'}">
+                                <i class="fa-${isFav ? 'solid' : 'regular'} fa-star"></i>
+                            </button>
+                            <button class="card-action-icon-btn" onclick="event.stopPropagation(); compartirProducto(event, ${JSON.stringify(prod).replace(/"/g, '&quot;')})" title="Compartir">
+                                <i class="fa-solid fa-share-nodes"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div>
