@@ -38,7 +38,6 @@
             --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Variables de Modo Oscuro */
         body.dark-mode {
             --bg-color: #0f172a;
             --card-bg: #1e293b;
@@ -70,7 +69,6 @@
             color: var(--text-muted);
         }
 
-        /* Variables de Campaña Dinámica por Temporada */
         body.season-valentines {
             --primary-color: #e11d48;
             --primary-hover: #be123c;
@@ -150,7 +148,6 @@
             font-size: 0.98rem;
         }
 
-        /* Botón de Modo Oscuro Flotante en Cabecera */
         .dark-mode-toggle {
             position: absolute;
             top: 10px;
@@ -339,7 +336,6 @@
             position: relative;
             border: 1px solid var(--border-color);
             animation: cardEntrance 0.4s ease forwards;
-            /* Efecto Glare (Brillo diagonal único en tarjetas) */
             isolation: isolate;
         }
 
@@ -831,12 +827,13 @@
         }
 
         .cart-items-container {
-            max-height: 250px;
+            max-height: 260px;
             overflow-y: auto;
             margin-bottom: 15px;
             display: flex;
             flex-direction: column;
             gap: 10px;
+            padding-right: 4px;
         }
 
         .cart-item-row {
@@ -844,21 +841,43 @@
             justify-content: space-between;
             align-items: center;
             background: var(--bg-color);
-            padding: 10px;
-            border-radius: 10px;
+            padding: 8px 12px;
+            border-radius: 12px;
             border: 1px solid var(--border-color);
-            font-size: 0.9rem;
+            gap: 12px;
+        }
+
+        .cart-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            overflow: hidden;
+        }
+
+        .cart-item-thumb {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid var(--border-color);
+            flex-shrink: 0;
+            background: #fff;
         }
 
         .cart-item-info {
             display: flex;
             flex-direction: column;
             gap: 2px;
+            overflow: hidden;
         }
 
         .cart-item-title {
             font-weight: 600;
             color: var(--text-main);
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .cart-item-details {
@@ -872,7 +891,13 @@
             color: var(--danger-color);
             cursor: pointer;
             font-size: 1rem;
-            padding: 5px;
+            padding: 6px;
+            flex-shrink: 0;
+            transition: transform 0.2s;
+        }
+
+        .cart-item-remove:hover {
+            transform: scale(1.2);
         }
 
         .cart-total {
@@ -931,7 +956,6 @@
             transition: all 1.9s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Efecto de partículas / confeti en botones */
         @keyframes particleBurst {
             0% { transform: scale(0); opacity: 1; }
             100% { transform: scale(2.5); opacity: 0; }
@@ -955,7 +979,6 @@
     </div>
 
     <header>
-        <!-- Botón de Modo Oscuro -->
         <button class="dark-mode-toggle" id="dark-mode-btn" onclick="toggleDarkMode()" title="Cambiar modo claro / oscuro">
             <i class="fa-solid fa-moon" id="dark-mode-icon"></i>
         </button>
@@ -985,8 +1008,6 @@
     </div>
 
     <div class="grid" id="product-grid">
-        <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div></div>
-        <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div></div>
         <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div></div>
     </div>
 
@@ -1102,7 +1123,6 @@
         let carritoGlobal = [];
         let productoIndividualPendiente = null;
 
-        // --- GESTIÓN DE MODO OSCURO ---
         function inicializarDarkMode() {
             const isDark = localStorage.getItem(DARK_MODE_KEY) === 'true';
             if (isDark) {
@@ -1121,7 +1141,6 @@
             reproducirSonidoPop();
         }
 
-        // --- EFECTO DE AUDIO SUTIL (Web Audio API) ---
         function reproducirSonidoPop() {
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1140,12 +1159,9 @@
                 
                 osc.start();
                 osc.stop(audioCtx.currentTime + 0.08);
-            } catch (e) {
-                // Silenciar si el navegador bloquea audio antes de la primera interacción
-            }
+            } catch (e) {}
         }
 
-        // --- EFECTO DE PARTÍCULAS / CONFETI EN BOTÓN ---
         function dispararParticulas(event) {
             const btn = event.currentTarget;
             const rect = btn.getBoundingClientRect();
@@ -1190,16 +1206,13 @@
             }
         }
 
-        // --- CARGAR CARRITO PERSISTENTE DESDE LOCALSTORAGE ---
         function cargarCarritoPersistente() {
             const savedCart = localStorage.getItem(CART_CACHE_KEY);
             if (savedCart) {
                 try {
                     carritoGlobal = JSON.parse(savedCart);
                     actualizarBotonFlotanteCarrito();
-                } catch (e) {
-                    console.error("Error al cargar carrito persistente", e);
-                }
+                } catch (e) {}
             }
         }
 
@@ -1214,9 +1227,7 @@
                     try {
                         const parsedData = JSON.parse(datosGuardados);
                         procesarYRenderizarDatos(parsedData);
-                    } catch (e) {
-                        console.error("Error al leer caché local", e);
-                    }
+                    } catch (e) {}
                 }
             }
 
@@ -1227,7 +1238,6 @@
                     procesarYRenderizarDatos(data);
                 })
                 .catch(error => {
-                    console.error('Error al conectar con la API:', error);
                     if (!silencioso && !localStorage.getItem(CACHE_KEY)) {
                         document.getElementById('product-grid').innerHTML = '<p style="text-align:center; grid-column:1/-1; color: var(--danger-color); padding: 40px;">Error al cargar los productos. Verifica tu conexión a internet.</p>';
                     }
@@ -1468,7 +1478,6 @@
             document.body.style.overflow = 'hidden';
         }
 
-        // Micro-animación de vuelo al carrito (Tiempo intermedio de 1.9s)
         function lanzarEfectoVueloAlCarrito(elementSource, imgSrc) {
             const cartBtn = document.getElementById('cart-float-btn');
             const targetRect = cartBtn.getBoundingClientRect();
@@ -1536,11 +1545,14 @@
                 const row = document.createElement('div');
                 row.className = 'cart-item-row';
                 row.innerHTML = `
-                    <div class="cart-item-info">
-                        <span class="cart-item-title">${item.nombre}</span>
-                        <span class="cart-item-details">Código: ${item.codigo_producto || item.id || 'N/A'} | $${item.precioFinalCalculado.toFixed(2)}</span>
+                    <div class="cart-item-left">
+                        <img src="${item.imagen}" alt="${item.nombre}" class="cart-item-thumb">
+                        <div class="cart-item-info">
+                            <span class="cart-item-title">${item.nombre}</span>
+                            <span class="cart-item-details">Cód: ${item.codigo_producto || item.id || 'N/A'} | $${item.precioFinalCalculado.toFixed(2)}</span>
+                        </div>
                     </div>
-                    <button class="cart-item-remove" onclick="removerDelCarrito(${index})"><i class="fa-solid fa-trash"></i></button>
+                    <button class="cart-item-remove" onclick="removerDelCarrito(${index})" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
                 `;
                 listaContainer.appendChild(row);
             });
@@ -1694,7 +1706,6 @@
             }
         });
 
-        // Inicializaciones al cargar la página
         inicializarDarkMode();
         aplicarCampanaTemporada();
         cargarCarritoPersistente();
