@@ -1202,7 +1202,8 @@
             if (listaProductosGlobal.length === 0) return;
             actualizarItemMarquesina();
             if (!intervaloMarquesina) {
-                intervaloMarquesina = setInterval(actualizarItemMarquesina, 1000); // Rota cada 4 segundos
+                // Configurado a 12 segundos (12000 milisegundos) para que pase más lento
+                intervaloMarquesina = setInterval(actualizarItemMarquesina, 12000); 
             }
         }
 
@@ -1560,7 +1561,7 @@
                         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)), dist = R * c;
                         const tiempo = Math.round((dist / 25) * 60);
                         document.getElementById('route-distance-label').innerHTML = `Estás a <b>${dist.toFixed(1)} km</b> aprox. (~${tiempo > 0 ? tiempo : 1} min en vehículo).`;
-                        leafletMap.fitBounds(L.latLngBounds([[localLat, localLng], [userLat, userLng]]), { padding: [40, 40] });
+                        leafletMap.fitBounds(L.latLngBounds([[localLat, localLat], [userLat, userLng]]), { padding: [40, 40] });
                     }, () => document.getElementById('route-distance-label').textContent = "Activa tu GPS para calcular la ruta exacta.");
                 }
             }, 300);
