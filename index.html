@@ -27,7 +27,7 @@
             --danger-color: #dc2626;        
             --danger-hover: #b91c1c;
             --gaming-color: #06b6d4;        
-            --special-cat-color: #9333ea;   /* Morado vibrante para Streaming y Recarga saldo */
+            --special-cat-color: #9333ea;   
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
             --text-main: #0f172a;
@@ -38,7 +38,39 @@
             --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Variables de Campaña Dinámica por Temporada (Mes Actual) */
+        /* Variables de Modo Oscuro */
+        body.dark-mode {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --shadow-subtle: 0 4px 6px -1px rgb(0 0 0 / 0.2);
+            --shadow-hover: 0 20px 25px -5px rgb(0 0 0 / 0.4);
+        }
+
+        body.dark-mode .info-badge, 
+        body.dark-mode .search-input, 
+        body.dark-mode .filter-btn,
+        body.dark-mode .modal-content,
+        body.dark-mode .cart-item-row,
+        body.dark-mode .checkout-form-input,
+        body.dark-mode .checkout-form-textarea {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border-color: var(--border-color);
+        }
+
+        body.dark-mode .card {
+            background-color: var(--card-bg);
+            border-color: var(--border-color);
+        }
+
+        body.dark-mode .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Variables de Campaña Dinámica por Temporada */
         body.season-valentines {
             --primary-color: #e11d48;
             --primary-hover: #be123c;
@@ -55,7 +87,6 @@
             --danger-color: #b91c1c;
         }
 
-        /* Banner de Temporada */
         .seasonal-banner {
             background: linear-gradient(135deg, var(--danger-color), var(--primary-color));
             color: white;
@@ -90,6 +121,7 @@
             padding-bottom: 90px;
             opacity: 0;
             animation: fadeInBody 0.5s ease forwards;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         @keyframes fadeInBody {
@@ -100,6 +132,7 @@
             text-align: center;
             margin-bottom: 25px;
             padding-top: 15px;
+            position: relative;
         }
 
         header h1 {
@@ -117,6 +150,31 @@
             font-size: 0.98rem;
         }
 
+        /* Botón de Modo Oscuro Flotante en Cabecera */
+        .dark-mode-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            color: var(--text-main);
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-subtle);
+            transition: var(--transition-smooth);
+            font-size: 1.1rem;
+        }
+
+        .dark-mode-toggle:hover {
+            border-color: var(--primary-color);
+            transform: scale(1.1);
+        }
+
         .info-badges-container {
             max-width: 800px;
             margin: 0 auto 25px auto;
@@ -128,7 +186,7 @@
         }
 
         .info-badge {
-            background: #ffffff;
+            background: var(--card-bg);
             border: 1px solid var(--border-color);
             padding: 10px 18px;
             border-radius: 14px;
@@ -161,16 +219,11 @@
 
         .info-badge.gaming-badge {
             border-color: rgba(6, 182, 212, 0.4);
-            background: linear-gradient(135deg, #ffffff 0%, #ecfeff 100%);
+            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(6, 182, 212, 0.05) 100%);
         }
 
         .info-badge.gaming-badge i {
             color: #0891b2;
-        }
-
-        .info-badge.gaming-badge:hover {
-            border-color: #0891b2;
-            box-shadow: 0 6px 16px rgba(6, 182, 212, 0.25);
         }
 
         .search-container {
@@ -192,7 +245,7 @@
             font-size: 1rem;
             outline: none;
             transition: var(--transition-smooth);
-            background-color: #ffffff;
+            background-color: var(--card-bg);
             box-shadow: var(--shadow-subtle);
             color: var(--text-main);
         }
@@ -212,11 +265,6 @@
             transition: var(--transition-smooth);
         }
 
-        .search-input:focus ~ .search-icon {
-            color: var(--primary-color);
-            transform: translateY(-50%) scale(1.1);
-        }
-
         .filters {
             display: flex;
             justify-content: center;
@@ -227,7 +275,7 @@
         }
 
         .filter-btn {
-            background-color: #ffffff;
+            background-color: var(--card-bg);
             border: 2px solid var(--border-color);
             padding: 10px 22px;
             border-radius: 30px;
@@ -256,13 +304,7 @@
         .filter-btn.special-filter {
             border-color: rgba(147, 51, 234, 0.4);
             color: var(--special-cat-color);
-            background: linear-gradient(135deg, #ffffff 0%, #f3e8ff 100%);
-        }
-
-        .filter-btn.special-filter:hover {
-            border-color: var(--special-cat-color);
-            color: var(--special-cat-color);
-            box-shadow: 0 6px 16px rgba(147, 51, 234, 0.2);
+            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(147, 51, 234, 0.08) 100%);
         }
 
         .filter-btn.special-filter.active {
@@ -295,8 +337,33 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            border: 1px solid #f1f5f9;
+            border: 1px solid var(--border-color);
             animation: cardEntrance 0.4s ease forwards;
+            /* Efecto Glare (Brillo diagonal único en tarjetas) */
+            isolation: isolate;
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 45%,
+                rgba(255, 255, 255, 0.15) 50%,
+                transparent 55%
+            );
+            transform: rotate(35deg) translateX(-100%);
+            transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .card:hover::after {
+            transform: rotate(35deg) translateX(100%);
         }
 
         .card:hover {
@@ -311,6 +378,10 @@
             overflow: hidden;
             background: #f1f5f9;
             position: relative;
+        }
+
+        body.dark-mode .card-img-container {
+            background: #0f172a;
         }
 
         .card img {
@@ -388,7 +459,7 @@
             font-size: 0.8rem;
             color: var(--text-muted);
             text-align: center;
-            border-top: 1px solid #f1f5f9;
+            border-top: 1px solid var(--border-color);
             padding-top: 10px;
             font-weight: 500;
             transition: color 0.2s;
@@ -396,56 +467,6 @@
 
         .card:hover .card-hint {
             color: var(--primary-color);
-        }
-
-        /* Skeleton Loaders (Carga esquelética) */
-        @keyframes pulseSkeleton {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
-        }
-
-        .skeleton-card {
-            background-color: var(--card-bg);
-            border-radius: 18px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-            height: 360px;
-            display: flex;
-            flex-direction: column;
-            animation: pulseSkeleton 1.5s infinite ease-in-out;
-        }
-
-        .skeleton-img {
-            width: 100%;
-            height: 210px;
-            background-color: #e2e8f0;
-        }
-
-        .skeleton-body {
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            flex-grow: 1;
-        }
-
-        .skeleton-line {
-            height: 14px;
-            background-color: #e2e8f0;
-            border-radius: 4px;
-        }
-
-        .skeleton-line.short {
-            width: 40%;
-        }
-
-        .skeleton-line.medium {
-            width: 70%;
-        }
-
-        .skeleton-line.long {
-            width: 100%;
         }
 
         .modal {
@@ -471,7 +492,7 @@
         }
 
         .modal-content {
-            background-color: #ffffff;
+            background-color: var(--card-bg);
             border-radius: 22px;
             max-width: 480px;
             width: 100%;
@@ -480,6 +501,7 @@
             transform: scale(0.92) translateY(15px);
             transition: var(--transition-smooth);
             position: relative;
+            border: 1px solid var(--border-color);
         }
 
         .modal.active .modal-content {
@@ -495,8 +517,8 @@
             cursor: zoom-in;
         }
 
-        .modal-img-container.zoomed {
-            cursor: zoom-out;
+        body.dark-mode .modal-img-container {
+            background: #0f172a;
         }
 
         .modal-img {
@@ -595,6 +617,12 @@
             align-items: flex-start;
         }
 
+        body.dark-mode .recharge-alert-box {
+            background-color: rgba(217, 119, 6, 0.15);
+            border-color: rgba(217, 119, 6, 0.3);
+            color: #fcd34d;
+        }
+
         .recharge-alert-box i {
             color: #d97706;
             font-size: 1.1rem;
@@ -630,6 +658,8 @@
             box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
             border: none;
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
 
         .whatsapp-btn:hover {
@@ -655,6 +685,8 @@
             box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
             border: none;
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
 
         .cart-add-btn:hover {
@@ -691,7 +723,7 @@
         }
 
         .info-modal-list li {
-            background: #f8fafc;
+            background: var(--bg-color);
             border: 1px solid var(--border-color);
             padding: 12px 16px;
             border-radius: 12px;
@@ -724,10 +756,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-        }
-
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .social-float {
@@ -764,7 +793,6 @@
         .bg-maps { background-color: var(--danger-color); }
         .bg-sug { background-color: #9333ea; }
 
-        /* Estilos del Carrito Flotante */
         .cart-float-btn {
             position: fixed;
             bottom: 25px;
@@ -802,7 +830,6 @@
             font-size: 0.8rem;
         }
 
-        /* Estilos del Modal del Carrito */
         .cart-items-container {
             max-height: 250px;
             overflow-y: auto;
@@ -816,7 +843,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #f8fafc;
+            background: var(--bg-color);
             padding: 10px;
             border-radius: 10px;
             border: 1px solid var(--border-color);
@@ -856,7 +883,6 @@
             color: #059669;
         }
 
-        /* Estilos del Modal de Checkout / Confirmación de Pedido */
         .checkout-form-group {
             margin-bottom: 15px;
         }
@@ -877,13 +903,13 @@
             font-size: 0.95rem;
             outline: none;
             transition: var(--transition-smooth);
-            background: #f8fafc;
+            background: var(--bg-color);
             color: var(--text-main);
         }
 
         .checkout-form-input:focus, .checkout-form-textarea:focus {
             border-color: var(--primary-color);
-            background: #fff;
+            background: var(--card-bg);
             box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
         }
 
@@ -892,7 +918,7 @@
             min-height: 80px;
         }
 
-        /* Micro-animación de vuelo al carrito */
+        /* Micro-animación de vuelo al carrito (Tiempo intermedio 1.9s) */
         .flying-item {
             position: fixed;
             z-index: 9999;
@@ -902,18 +928,37 @@
             border-radius: 50%;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             pointer-events: none;
-            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 1.9s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Efecto de partículas / confeti en botones */
+        @keyframes particleBurst {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(2.5); opacity: 0; }
+        }
+
+        .particle-effect {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #60a5fa;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleBurst 0.6s ease-out forwards;
         }
     </style>
 </head>
 <body id="main-body">
 
-    <!-- Banner dinámico de temporada -->
     <div id="seasonal-banner" class="seasonal-banner">
         <i id="seasonal-icon" class="fa-solid fa-gift"></i> <span id="seasonal-text">¡Bienvenidos a nuestra temporada especial!</span>
     </div>
 
     <header>
+        <!-- Botón de Modo Oscuro -->
+        <button class="dark-mode-toggle" id="dark-mode-btn" onclick="toggleDarkMode()" title="Cambiar modo claro / oscuro">
+            <i class="fa-solid fa-moon" id="dark-mode-icon"></i>
+        </button>
         <h1>Catálogo Digital</h1>
         <p>Explora nuestros productos y servicios disponibles</p>
     </header>
@@ -940,13 +985,11 @@
     </div>
 
     <div class="grid" id="product-grid">
-        <!-- Skeleton Loaders iniciales -->
         <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div></div>
         <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div></div>
         <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div></div>
     </div>
 
-    <!-- Botón flotante del carrito -->
     <button class="cart-float-btn" id="cart-float-btn" onclick="abrirModalCarrito()">
         <i class="fa-solid fa-cart-shopping"></i> Ver Cotización <span class="cart-badge" id="cart-count">0</span>
     </button>
@@ -982,15 +1025,12 @@
         </div>
     </div>
 
-    <!-- Modal del Carrito / Cotización múltiple -->
     <div class="modal" id="cart-modal" onclick="if(event.target === this) cerrarModalCarrito()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModalCarrito()"><i class="fa-solid fa-xmark"></i></button>
             <div class="modal-body" style="padding-top: 35px;">
                 <h2 class="modal-title" style="color:var(--primary-color); margin-bottom: 15px;"><i class="fa-solid fa-cart-shopping"></i> Cotización de Artículos</h2>
-                <div class="cart-items-container" id="cart-items-list">
-                    <!-- Elementos del carrito -->
-                </div>
+                <div class="cart-items-container" id="cart-items-list"></div>
                 <div class="cart-total" id="cart-total-text">Total: $0.00</div>
                 <button class="whatsapp-btn" style="width: 100%;" onclick="abrirModalCheckout()">
                     <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i> Proceder al Envio por WhatsApp
@@ -999,7 +1039,6 @@
         </div>
     </div>
 
-    <!-- Nuevo Modal de Confirmación de Pedido (Checkout con Nombre y Dirección) -->
     <div class="modal" id="checkout-modal" onclick="if(event.target === this) cerrarModalCheckout()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModalCheckout()"><i class="fa-solid fa-xmark"></i></button>
@@ -1054,32 +1093,96 @@
     <script>
         const urlAPI = "https://script.google.com/macros/s/AKfycbyfjv9UscbcmgqeKjx_0j5UxGWK2qpFudgFGcHeCBt252fUfxgkhcQUKH-b8BeZLU8NNg/exec";
         const CACHE_KEY = 'kervys_catalogo_cache_data';
+        const CART_CACHE_KEY = 'kervys_catalogo_cart_persistent';
+        const DARK_MODE_KEY = 'kervys_catalogo_dark_mode';
 
         let listaProductosGlobal = [];
         let categoriaSeleccionada = 'todos';
         let isZoomed = false;
         let carritoGlobal = [];
-        let productoIndividualPendiente = null; // Para control de compra individual con checkout
+        let productoIndividualPendiente = null;
 
-        // Inicializar Campaña de Temporada Dinámica según el mes actual
+        // --- GESTIÓN DE MODO OSCURO ---
+        function inicializarDarkMode() {
+            const isDark = localStorage.getItem(DARK_MODE_KEY) === 'true';
+            if (isDark) {
+                document.body.classList.add('dark-mode');
+                document.getElementById('dark-mode-icon').className = 'fa-solid fa-sun';
+            }
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem(DARK_MODE_KEY, isDark);
+            
+            const icon = document.getElementById('dark-mode-icon');
+            icon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            reproducirSonidoPop();
+        }
+
+        // --- EFECTO DE AUDIO SUTIL (Web Audio API) ---
+        function reproducirSonidoPop() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(450, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.08);
+                
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.08);
+            } catch (e) {
+                // Silenciar si el navegador bloquea audio antes de la primera interacción
+            }
+        }
+
+        // --- EFECTO DE PARTÍCULAS / CONFETI EN BOTÓN ---
+        function dispararParticulas(event) {
+            const btn = event.currentTarget;
+            const rect = btn.getBoundingClientRect();
+            
+            for (let i = 0; i < 6; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle-effect';
+                
+                const offsetX = (Math.random() - 0.5) * 60;
+                const offsetY = (Math.random() - 0.5) * 40;
+                
+                particle.style.left = `${event.clientX - rect.left + offsetX}px`;
+                particle.style.top = `${event.clientY - rect.top + offsetY}px`;
+                
+                btn.appendChild(particle);
+                setTimeout(() => particle.remove(), 600);
+            }
+        }
+
         function aplicarCampanaTemporada() {
-            const mesActual = new Date().getMonth(); // 0 = Enero, 1 = Febrero, etc.
+            const mesActual = new Date().getMonth();
             const body = document.getElementById('main-body');
             const banner = document.getElementById('seasonal-banner');
             const icon = document.getElementById('seasonal-icon');
             const text = document.getElementById('seasonal-text');
 
-            if (mesActual === 1) { // Febrero (San Valentín)
+            if (mesActual === 1) {
                 body.classList.add('season-valentines');
                 icon.className = "fa-solid fa-heart";
                 text.innerHTML = "¡Especial de San Valentín! Sorprende a esa persona especial con nuestros detalles.";
                 banner.classList.add('show');
-            } else if (mesActual === 2) { // Marzo (Carnaval aprox o temporada colorida)
+            } else if (mesActual === 2) {
                 body.classList.add('season-carnival');
                 icon.className = "fa-solid fa-masks-theater";
                 text.innerHTML = "¡Disfruta de nuestras ofertas de temporada y novedades!";
                 banner.classList.add('show');
-            } else if (mesActual === 11) { // Diciembre (Navidad)
+            } else if (mesActual === 11) {
                 body.classList.add('season-christmas');
                 icon.className = "fa-solid fa-tree";
                 text.innerHTML = "¡Felices Fiestas! Encuentra los mejores regalos y detalles navideños aquí.";
@@ -1087,8 +1190,24 @@
             }
         }
 
+        // --- CARGAR CARRITO PERSISTENTE DESDE LOCALSTORAGE ---
+        function cargarCarritoPersistente() {
+            const savedCart = localStorage.getItem(CART_CACHE_KEY);
+            if (savedCart) {
+                try {
+                    carritoGlobal = JSON.parse(savedCart);
+                    actualizarBotonFlotanteCarrito();
+                } catch (e) {
+                    console.error("Error al cargar carrito persistente", e);
+                }
+            }
+        }
+
+        function guardarCarritoPersistente() {
+            localStorage.setItem(CART_CACHE_KEY, JSON.stringify(carritoGlobal));
+        }
+
         function cargarCatalogo(silencioso = false) {
-            // 1. Intentar cargar desde caché local instantáneamente si existe
             if (!silencioso) {
                 const datosGuardados = localStorage.getItem(CACHE_KEY);
                 if (datosGuardados) {
@@ -1101,11 +1220,9 @@
                 }
             }
 
-            // 2. Sincronizar en segundo plano con Google Sheets
             fetch(urlAPI)
                 .then(response => response.json())
                 .then(data => {
-                    // Guardar en localStorage para futuras visitas instantáneas
                     localStorage.setItem(CACHE_KEY, JSON.stringify(data));
                     procesarYRenderizarDatos(data);
                 })
@@ -1327,9 +1444,10 @@
             }
             document.getElementById('modal-desc').innerHTML = descripcionTexto;
 
-            // Configurar botón "Comprar Individual" para abrir el modal de checkout con nombre y dirección
             const waBtn = document.getElementById('modal-wa-btn');
-            waBtn.onclick = () => {
+            waBtn.onclick = (e) => {
+                dispararParticulas(e);
+                reproducirSonidoPop();
                 productoIndividualPendiente = { ...prod, precioFinalCalculado: precioFinal };
                 cerrarModal();
                 abrirModalCheckout();
@@ -1339,7 +1457,8 @@
             
             const addCartBtn = document.getElementById('modal-add-cart-btn');
             addCartBtn.onclick = (e) => {
-                // Ejecutar micro-animación de vuelo al carrito
+                dispararParticulas(e);
+                reproducirSonidoPop();
                 lanzarEfectoVueloAlCarrito(e.currentTarget, prod.imagen);
                 agregarAlCarrito(prod);
                 cerrarModal();
@@ -1349,7 +1468,7 @@
             document.body.style.overflow = 'hidden';
         }
 
-        // Lógica de Micro-animación "Efecto Vuelo" hacia el botón flotante del carrito
+        // Micro-animación de vuelo al carrito (Tiempo intermedio de 1.9s)
         function lanzarEfectoVueloAlCarrito(elementSource, imgSrc) {
             const cartBtn = document.getElementById('cart-float-btn');
             const targetRect = cartBtn.getBoundingClientRect();
@@ -1359,7 +1478,6 @@
             flyingImg.src = imgSrc;
             flyingImg.className = 'flying-item';
             
-            // Posicionar inicialmente donde está el botón o la tarjeta
             flyingImg.style.left = `${sourceRect.left + sourceRect.width / 2 - 25}px`;
             flyingImg.style.top = `${sourceRect.top + sourceRect.height / 2 - 25}px`;
             
@@ -1370,16 +1488,15 @@
                 flyingImg.style.top = `${targetRect.top + targetRect.height / 2 - 15}px`;
                 flyingImg.style.transform = 'scale(0.3) rotate(360deg)';
                 flyingImg.style.opacity = '0.5';
-            }, 30);
+            }, 50);
 
             setTimeout(() => {
                 flyingImg.remove();
-                // Animación de escala pequeña de rebote en el botón del carrito
                 cartBtn.style.transform = 'scale(1.15)';
                 setTimeout(() => {
                     cartBtn.style.transform = 'scale(1)';
                 }, 200);
-            }, 830);
+            }, 1950);
         }
 
         function cerrarModal() {
@@ -1393,6 +1510,7 @@
                 ...prod,
                 precioFinalCalculado: precioFinal
             });
+            guardarCarritoPersistente();
             actualizarBotonFlotanteCarrito();
         }
 
@@ -1408,7 +1526,7 @@
         }
 
         function abrirModalCarrito() {
-            productoIndividualPendiente = null; // Limpiamos individual para asegurar carrito múltiple
+            productoIndividualPendiente = null;
             const listaContainer = document.getElementById('cart-items-list');
             listaContainer.innerHTML = '';
             let total = 0;
@@ -1439,6 +1557,7 @@
 
         function removerDelCarrito(index) {
             carritoGlobal.splice(index, 1);
+            guardarCarritoPersistente();
             actualizarBotonFlotanteCarrito();
             if (carritoGlobal.length === 0) {
                 cerrarModalCarrito();
@@ -1471,7 +1590,6 @@
             let numeroWa = "584149956831";
             let mensaje = "";
 
-            // Caso A: Es un producto individual seleccionado desde su modal
             if (productoIndividualPendiente) {
                 const prod = productoIndividualPendiente;
                 const precioFinal = prod.precioFinalCalculado;
@@ -1484,9 +1602,7 @@
                     mensaje = `Hola, mi nombre es *${nombreCliente}* y me interesa este artículo:\n\n*Código:* ${prod.codigo_producto || prod.id || 'N/A'}\n*Producto:* ${prod.nombre}\n*Precio:* $${precioFinal.toFixed(2)}\n*Foto:* ${prod.imagen}\n\n📍 *Dirección / Nota:* ${direccionCliente || 'N/A'}`;
                 }
                 productoIndividualPendiente = null;
-            } 
-            // Caso B: Es el carrito con múltiples artículos
-            else if (carritoGlobal.length > 0) {
+            } else if (carritoGlobal.length > 0) {
                 mensaje = `Hola, mi nombre es *${nombreCliente}* y quiero solicitar la siguiente cotización:\n\n`;
                 let totalAcumulado = 0;
 
@@ -1501,8 +1617,8 @@
                 mensaje += `💰 *Total General:* $${totalAcumulado.toFixed(2)}\n` +
                            `📍 *Dirección / Nota:* ${direccionCliente || 'N/A'}\n\nPor favor indícame los pasos para proceder.`;
                 
-                // Limpiar carrito tras enviar
                 carritoGlobal = [];
+                guardarCarritoPersistente();
                 actualizarBotonFlotanteCarrito();
             } else {
                 cerrarModalCheckout();
@@ -1531,7 +1647,7 @@
             } else if (tipo === 'delivery') {
                 headerElem.innerHTML = `<h2 class="modal-title" style="color:var(--danger-color);"><i class="fa-solid fa-motorcycle"></i> Servicio de Delivery</h2><p style="color:var(--text-muted); font-size:0.9rem; margin-top:5px;">Llevamos tu pedido hasta la puerta de tu casa:</p>`;
                 bodyElem.innerHTML = `
-                    <div style="background:#f8fafc; border:1px solid var(--border-color); padding:18px; border-radius:14px; margin-top:15px; text-align:center;">
+                    <div style="background:var(--bg-color); border:1px solid var(--border-color); padding:18px; border-radius:14px; margin-top:15px; text-align:center;">
                         <p style="color:var(--text-main); font-weight:600; font-size:1rem; line-height:1.5;">🚀 Contamos con servicio de delivery disponible.</p>
                         <p style="color:var(--text-muted); font-size:0.9rem; margin-top:10px;">El costo del envío varía según tu ubicación.</p>
                     </div>
@@ -1578,13 +1694,12 @@
             }
         });
 
-        // Aplicar campaña dinámica de temporada al iniciar
+        // Inicializaciones al cargar la página
+        inicializarDarkMode();
         aplicarCampanaTemporada();
-
-        // Inicializar catálogo al cargar la página
+        cargarCarritoPersistente();
         cargarCatalogo(false);
 
-        // Sincronización silenciosa en segundo plano cada 20 segundos
         setInterval(() => {
             cargarCatalogo(true);
         }, 20000);
