@@ -35,6 +35,7 @@
             --border-color: #e2e8f0;
             --shadow-subtle: 0 4px 6px -1px rgb(0 0 0 / 0.04), 0 2px 4px -2px rgb(0 0 0 / 0.04);
             --shadow-hover: 0 20px 25px -5px rgb(37 99 235 / 0.12), 0 8px 10px -6px rgb(37 99 235 / 0.08);
+            --shadow-selected: 0 10px 25px -5px rgb(37 99 235 / 0.18), 0 4px 6px -2px rgb(37 99 235 / 0.1);
             --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -46,6 +47,7 @@
             --border-color: #334155;
             --shadow-subtle: 0 4px 6px -1px rgb(0 0 0 / 0.2);
             --shadow-hover: 0 20px 25px -5px rgb(0 0 0 / 0.4);
+            --shadow-selected: 0 10px 25px -5px rgb(37 99 235 / 0.35);
         }
 
         body.dark-mode .info-badge, 
@@ -54,7 +56,8 @@
         body.dark-mode .modal-content,
         body.dark-mode .cart-item-row,
         body.dark-mode .checkout-form-input,
-        body.dark-mode .checkout-form-textarea {
+        body.dark-mode .checkout-form-textarea,
+        body.dark-mode .modal-related-item {
             background-color: var(--card-bg);
             color: var(--text-main);
             border-color: var(--border-color);
@@ -63,10 +66,6 @@
         body.dark-mode .card {
             background-color: var(--card-bg);
             border-color: var(--border-color);
-        }
-
-        body.dark-mode .search-input::placeholder {
-            color: var(--text-muted);
         }
 
         body.season-valentines {
@@ -230,10 +229,6 @@
             transition: var(--transition-smooth);
         }
 
-        .search-container:focus-within {
-            transform: scale(1.01);
-        }
-
         .search-input {
             width: 100%;
             padding: 15px 20px 15px 50px;
@@ -259,7 +254,6 @@
             transform: translateY(-50%);
             color: var(--danger-color);
             font-size: 1.1rem;
-            transition: var(--transition-smooth);
         }
 
         .filters {
@@ -337,6 +331,13 @@
             border: 1px solid var(--border-color);
             animation: cardEntrance 0.4s ease forwards;
             isolation: isolate;
+        }
+
+        /* Sombra sutil y elegante cuando el tarjetón está seleccionado / activo */
+        .card.selected {
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-selected);
+            transform: translateY(-3px);
         }
 
         .card::after {
@@ -492,7 +493,8 @@
             border-radius: 22px;
             max-width: 480px;
             width: 100%;
-            overflow: hidden;
+            max-height: 90vh;
+            overflow-y: auto;
             box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.35);
             transform: scale(0.92) translateY(15px);
             transition: var(--transition-smooth);
@@ -506,11 +508,12 @@
 
         .modal-img-container {
             width: 100%;
-            height: 280px;
+            height: 250px;
             background: #f1f5f9;
             overflow: hidden;
             position: relative;
             cursor: zoom-in;
+            flex-shrink: 0;
         }
 
         body.dark-mode .modal-img-container {
@@ -543,7 +546,7 @@
         }
 
         .modal-body {
-            padding: 25px;
+            padding: 22px;
         }
 
         .modal-close {
@@ -571,32 +574,32 @@
         }
 
         .modal-title {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 700;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             color: var(--text-main);
         }
 
         .modal-code {
             font-size: 0.85rem;
             color: var(--text-muted);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-weight: 600;
         }
 
         .modal-price {
-            font-size: 1.35rem;
+            font-size: 1.3rem;
             color: #059669;
             font-weight: 700;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         .modal-desc {
             color: var(--text-muted);
-            font-size: 0.93rem;
-            margin-bottom: 22px;
-            line-height: 1.6;
-            max-height: 130px;
+            font-size: 0.9rem;
+            margin-bottom: 18px;
+            line-height: 1.5;
+            max-height: 100px;
             overflow-y: auto;
         }
 
@@ -604,9 +607,9 @@
             background-color: #fffbeb;
             border: 1px solid #fde68a;
             border-radius: 12px;
-            padding: 12px 16px;
-            margin-bottom: 20px;
-            font-size: 0.88rem;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            font-size: 0.85rem;
             color: #92400e;
             display: flex;
             gap: 10px;
@@ -621,7 +624,7 @@
 
         .recharge-alert-box i {
             color: #d97706;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             margin-top: 2px;
         }
 
@@ -629,6 +632,7 @@
             display: flex;
             gap: 10px;
             flex-direction: column;
+            margin-bottom: 20px;
         }
 
         .modal-actions-row {
@@ -645,17 +649,15 @@
             background-color: #25d366;
             color: white;
             text-align: center;
-            padding: 14px;
+            padding: 13px;
             border-radius: 14px;
             text-decoration: none;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.95rem;
             transition: var(--transition-smooth);
             box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
             border: none;
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
         }
 
         .whatsapp-btn:hover {
@@ -672,17 +674,15 @@
             background-color: var(--primary-color);
             color: white;
             text-align: center;
-            padding: 14px;
+            padding: 13px;
             border-radius: 14px;
             text-decoration: none;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.95rem;
             transition: var(--transition-smooth);
             box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
             border: none;
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
         }
 
         .cart-add-btn:hover {
@@ -705,9 +705,62 @@
             box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
         }
 
-        .modal-share-btn:hover {
-            background-color: var(--primary-hover);
+        /* Sección de productos relacionados dentro del modal (Descubrimiento fluido) */
+        .modal-related-container {
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+        }
+
+        .modal-related-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .modal-related-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .modal-related-item {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 6px;
+            cursor: pointer;
+            text-align: center;
+            transition: var(--transition-smooth);
+        }
+
+        .modal-related-item:hover {
+            border-color: var(--primary-color);
             transform: translateY(-2px);
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .modal-related-item img {
+            width: 100%;
+            height: 55px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 4px;
+        }
+
+        .modal-related-item span {
+            font-size: 0.72rem;
+            font-weight: 600;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-main);
         }
 
         .info-modal-list {
@@ -753,6 +806,10 @@
             align-items: center;
             gap: 8px;
             border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
         }
 
         .social-float {
@@ -943,7 +1000,7 @@
             min-height: 80px;
         }
 
-        /* Micro-animación de vuelo al carrito (Tiempo intermedio 1.9s) */
+        /* Micro-animación de vuelo al carrito (1.9s) */
         .flying-item {
             position: fixed;
             z-index: 9999;
@@ -1007,9 +1064,7 @@
         <button class="filter-btn active" onclick="cambiarCategoria('todos', this)">Todos</button>
     </div>
 
-    <div class="grid" id="product-grid">
-        <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div></div>
-    </div>
+    <div class="grid" id="product-grid"></div>
 
     <button class="cart-float-btn" id="cart-float-btn" onclick="abrirModalCarrito()">
         <i class="fa-solid fa-cart-shopping"></i> Ver Cotización <span class="cart-badge" id="cart-count">0</span>
@@ -1029,6 +1084,7 @@
                 <div id="modal-price" class="modal-price"></div>
                 <div id="recharge-alert-container"></div>
                 <p id="modal-desc" class="modal-desc"></p>
+                
                 <div class="modal-actions">
                     <div class="modal-actions-row">
                         <button id="modal-wa-btn" class="whatsapp-btn">
@@ -1041,6 +1097,12 @@
                     <button class="cart-add-btn" id="modal-add-cart-btn">
                         <i class="fa-solid fa-cart-plus"></i> Agregar al Carrito
                     </button>
+                </div>
+
+                <!-- Sección inteligente de productos relacionados para mantener al usuario viendo más cosas -->
+                <div class="modal-related-container" id="modal-related-section" style="display: none;">
+                    <div class="modal-related-title"><i class="fa-solid fa-sparkles"></i> Te podría interesar también</div>
+                    <div class="modal-related-grid" id="modal-related-grid"></div>
                 </div>
             </div>
         </div>
@@ -1122,6 +1184,7 @@
         let isZoomed = false;
         let carritoGlobal = [];
         let productoIndividualPendiente = null;
+        let tarjetaSeleccionadaActual = null;
 
         function inicializarDarkMode() {
             const isDark = localStorage.getItem(DARK_MODE_KEY) === 'true';
@@ -1360,7 +1423,14 @@
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.style.animationDelay = `${index * 0.03}s`;
-                card.onclick = () => abrirModal(prod);
+                
+                card.onclick = () => {
+                    // Limpiar selección previa y marcar este tarjetón con sombra sutil
+                    document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    tarjetaSeleccionadaActual = card;
+                    abrirModal(prod);
+                };
 
                 const precioFinal = calcularPrecioFinal(prod);
 
@@ -1454,6 +1524,9 @@
             }
             document.getElementById('modal-desc').innerHTML = descripcionTexto;
 
+            // Renderizar sección de productos relacionados de la misma categoría desde caché
+            renderizarProductosRelacionados(prod);
+
             const waBtn = document.getElementById('modal-wa-btn');
             waBtn.onclick = (e) => {
                 dispararParticulas(e);
@@ -1476,6 +1549,41 @@
 
             document.getElementById('product-modal').classList.add('active');
             document.body.style.overflow = 'hidden';
+        }
+
+        function renderizarProductosRelacionados(prodActual) {
+            const container = document.getElementById('modal-related-section');
+            const grid = document.getElementById('modal-related-grid');
+            
+            // Buscar productos de la misma categoría que no sean el actual
+            const mismaCategoria = listaProductosGlobal.filter(p => {
+                const mismaCat = (p.categoria || '').trim().toLowerCase() === (prodActual.categoria || '').trim().toLowerCase();
+                const noEsMismo = (p.codigo_producto || p.id || p.nombre) !== (prodActual.codigo_producto || prodActual.id || prodActual.nombre);
+                return mismaCat && noEsMismo && p.status && p.status.toString().trim().toLowerCase() === 'disponible';
+            });
+
+            if (mismaCategoria.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+
+            // Seleccionar hasta 3 aleatorios de forma inteligente
+            const aleatorios = mismaCategoria.sort(() => 0.5 - Math.random()).slice(0, 3);
+            
+            let htmlRelacionados = '';
+            aleatorios.forEach(rel => {
+                const pFinal = calcularPrecioFinal(rel);
+                htmlRelacionados += `
+                    <div class="modal-related-item" onclick="abrirModal(${JSON.stringify(rel).replace(/"/g, '&quot;')})">
+                        <img src="${rel.imagen}" alt="${rel.nombre}" loading="lazy">
+                        <span>${rel.nombre}</span>
+                        <span style="color:#059669; font-size:0.68rem;">$${pFinal.toFixed(2)}</span>
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = htmlRelacionados;
+            container.style.display = 'block';
         }
 
         function lanzarEfectoVueloAlCarrito(elementSource, imgSrc) {
@@ -1511,6 +1619,11 @@
         function cerrarModal() {
             document.getElementById('product-modal').classList.remove('active');
             document.body.style.overflow = 'auto';
+            // Remover selección visual del tarjetón si se desea limpiar al cerrar
+            if (tarjetaSeleccionadaActual) {
+                tarjetaSeleccionadaActual.classList.remove('selected');
+                tarjetaSeleccionadaActual = null;
+            }
         }
 
         function agregarAlCarrito(prod) {
