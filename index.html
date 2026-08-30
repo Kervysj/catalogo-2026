@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo Digital y Servicios</title>
-    <!-- Configuración para PWA (Instalable) -->
     <meta name="theme-color" content="#2563eb">
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,{
         %22name%22: %22Catálogo Digital%22,
@@ -16,7 +15,6 @@
         %22icons%22: [{%22src%22: %22https://cdn-icons-png.flaticon.com/512/1170/1170576.png%22, %22sizes%22: %22512x512%22, %22type%22: %22image/png%22}]
     }">
     
-    <!-- Fuente moderna e iconos -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -27,7 +25,7 @@
             --danger-color: #dc2626;        
             --danger-hover: #b91c1c;
             --gaming-color: #06b6d4;        
-            --special-cat-color: #9333ea;   /* Morado vibrante para Streaming y Recarga saldo */
+            --special-cat-color: #9333ea;   
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
             --text-main: #0f172a;
@@ -36,6 +34,127 @@
             --shadow-subtle: 0 4px 6px -1px rgb(0 0 0 / 0.04), 0 2px 4px -2px rgb(0 0 0 / 0.04);
             --shadow-hover: 0 20px 25px -5px rgb(37 99 235 / 0.12), 0 8px 10px -6px rgb(37 99 235 / 0.08);
             --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Variables para el Modo Oscuro */
+        body.dark-mode {
+            --primary-color: #3b82f6;
+            --primary-hover: #60a5fa;
+            --danger-color: #ef4444;
+            --danger-hover: #f87171;
+            --special-cat-color: #a855f7;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --shadow-subtle: 0 4px 6px -1px rgb(0 0 0 / 0.2), 0 2px 4px -2px rgb(0 0 0 / 0.2);
+            --shadow-hover: 0 20px 25px -5px rgb(59 130 246 / 0.15), 0 8px 10px -6px rgb(59 130 246 / 0.1);
+        }
+
+        body.dark-mode .info-badge {
+            background: #1e293b;
+            color: #f8fafc;
+        }
+
+        body.dark-mode .search-input {
+            background-color: #1e293b;
+            color: #f8fafc;
+        }
+
+        body.dark-mode .filter-btn {
+            background-color: #1e293b;
+            color: #94a3b8;
+        }
+
+        body.dark-mode .filter-btn.special-filter {
+            background: linear-gradient(135deg, #1e293b 0%, #2e1065 100%);
+            color: #c084fc;
+        }
+
+        body.dark-mode .card {
+            border-color: #334155;
+        }
+
+        body.dark-mode .card-hint {
+            border-top-color: #334155;
+        }
+
+        body.dark-mode .skeleton-card {
+            background-color: #1e293b;
+            border-color: #334155;
+        }
+
+        body.dark-mode .skeleton-img, 
+        body.dark-mode .skeleton-line {
+            background-color: #334155;
+        }
+
+        body.dark-mode .modal-content {
+            background-color: #1e293b;
+            color: #f8fafc;
+        }
+
+        body.dark-mode .modal-img-container {
+            background: #0f172a;
+        }
+
+        body.dark-mode .recharge-alert-box {
+            background-color: #451a03;
+            border-color: #78350f;
+            color: #fde68a;
+        }
+
+        body.dark-mode .cart-item-row {
+            background: #0f172a;
+            border-color: #334155;
+        }
+
+        body.dark-mode .cart-item-title {
+            color: #f8fafc;
+        }
+
+        body.dark-mode .checkout-form-input, 
+        body.dark-mode .checkout-form-textarea {
+            background: #0f172a;
+            color: #f8fafc;
+            border-color: #334155;
+        }
+
+        body.dark-mode .info-modal-list li {
+            background: #0f172a;
+            border-color: #334155;
+            color: #f8fafc;
+        }
+
+        /* Botón Switch Modo Oscuro flotante superior */
+        .theme-switch-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+        }
+
+        .theme-switch-btn {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            color: var(--text-main);
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-subtle);
+            transition: var(--transition-smooth);
+            font-size: 1.2rem;
+        }
+
+        .theme-switch-btn:hover {
+            transform: scale(1.1) rotate(15deg);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
         }
 
         /* Variables de Campaña Dinámica por Temporada (Mes Actual) */
@@ -90,6 +209,7 @@
             padding-bottom: 90px;
             opacity: 0;
             animation: fadeInBody 0.5s ease forwards;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         @keyframes fadeInBody {
@@ -128,7 +248,7 @@
         }
 
         .info-badge {
-            background: #ffffff;
+            background: var(--card-bg);
             border: 1px solid var(--border-color);
             padding: 10px 18px;
             border-radius: 14px;
@@ -161,16 +281,11 @@
 
         .info-badge.gaming-badge {
             border-color: rgba(6, 182, 212, 0.4);
-            background: linear-gradient(135deg, #ffffff 0%, #ecfeff 100%);
+            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(6, 182, 212, 0.08) 100%);
         }
 
         .info-badge.gaming-badge i {
             color: #0891b2;
-        }
-
-        .info-badge.gaming-badge:hover {
-            border-color: #0891b2;
-            box-shadow: 0 6px 16px rgba(6, 182, 212, 0.25);
         }
 
         .search-container {
@@ -192,7 +307,7 @@
             font-size: 1rem;
             outline: none;
             transition: var(--transition-smooth);
-            background-color: #ffffff;
+            background-color: var(--card-bg);
             box-shadow: var(--shadow-subtle);
             color: var(--text-main);
         }
@@ -227,7 +342,7 @@
         }
 
         .filter-btn {
-            background-color: #ffffff;
+            background-color: var(--card-bg);
             border: 2px solid var(--border-color);
             padding: 10px 22px;
             border-radius: 30px;
@@ -256,20 +371,13 @@
         .filter-btn.special-filter {
             border-color: rgba(147, 51, 234, 0.4);
             color: var(--special-cat-color);
-            background: linear-gradient(135deg, #ffffff 0%, #f3e8ff 100%);
-        }
-
-        .filter-btn.special-filter:hover {
-            border-color: var(--special-cat-color);
-            color: var(--special-cat-color);
-            box-shadow: 0 6px 16px rgba(147, 51, 234, 0.2);
+            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(147, 51, 234, 0.1) 100%);
         }
 
         .filter-btn.special-filter.active {
             background-color: var(--special-cat-color);
             color: #ffffff;
             border-color: var(--special-cat-color);
-            box-shadow: 0 6px 16px rgba(147, 51, 234, 0.35);
         }
 
         .grid {
@@ -295,7 +403,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            border: 1px solid #f1f5f9;
+            border: 1px solid var(--border-color);
             animation: cardEntrance 0.4s ease forwards;
         }
 
@@ -309,7 +417,7 @@
             width: 100%;
             height: 210px;
             overflow: hidden;
-            background: #f1f5f9;
+            background: var(--border-color);
             position: relative;
         }
 
@@ -388,7 +496,7 @@
             font-size: 0.8rem;
             color: var(--text-muted);
             text-align: center;
-            border-top: 1px solid #f1f5f9;
+            border-top: 1px solid var(--border-color);
             padding-top: 10px;
             font-weight: 500;
             transition: color 0.2s;
@@ -398,7 +506,7 @@
             color: var(--primary-color);
         }
 
-        /* Skeleton Loaders (Carga esquelética) */
+        /* Skeleton Loaders */
         @keyframes pulseSkeleton {
             0% { opacity: 0.6; }
             50% { opacity: 1; }
@@ -419,7 +527,7 @@
         .skeleton-img {
             width: 100%;
             height: 210px;
-            background-color: #e2e8f0;
+            background-color: var(--border-color);
         }
 
         .skeleton-body {
@@ -432,21 +540,13 @@
 
         .skeleton-line {
             height: 14px;
-            background-color: #e2e8f0;
+            background-color: var(--border-color);
             border-radius: 4px;
         }
 
-        .skeleton-line.short {
-            width: 40%;
-        }
-
-        .skeleton-line.medium {
-            width: 70%;
-        }
-
-        .skeleton-line.long {
-            width: 100%;
-        }
+        .skeleton-line.short { width: 40%; }
+        .skeleton-line.medium { width: 70%; }
+        .skeleton-line.long { width: 100%; }
 
         .modal {
             display: none;
@@ -471,7 +571,8 @@
         }
 
         .modal-content {
-            background-color: #ffffff;
+            background-color: var(--card-bg);
+            color: var(--text-main);
             border-radius: 22px;
             max-width: 480px;
             width: 100%;
@@ -489,15 +590,13 @@
         .modal-img-container {
             width: 100%;
             height: 280px;
-            background: #f1f5f9;
+            background: var(--border-color);
             overflow: hidden;
             position: relative;
             cursor: zoom-in;
         }
 
-        .modal-img-container.zoomed {
-            cursor: zoom-out;
-        }
+        .modal-img-container.zoomed { cursor: zoom-out; }
 
         .modal-img {
             width: 100%;
@@ -524,9 +623,7 @@
             backdrop-filter: blur(4px);
         }
 
-        .modal-body {
-            padding: 25px;
-        }
+        .modal-body { padding: 25px; }
 
         .modal-close {
             position: absolute;
@@ -607,10 +704,7 @@
             flex-direction: column;
         }
 
-        .modal-actions-row {
-            display: flex;
-            gap: 10px;
-        }
+        .modal-actions-row { display: flex; gap: 10px; }
 
         .whatsapp-btn {
             display: flex;
@@ -691,7 +785,7 @@
         }
 
         .info-modal-list li {
-            background: #f8fafc;
+            background: var(--bg-color);
             border: 1px solid var(--border-color);
             padding: 12px 16px;
             border-radius: 12px;
@@ -726,9 +820,7 @@
             gap: 8px;
         }
 
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
 
         .social-float {
             position: fixed;
@@ -785,14 +877,8 @@
             transition: var(--transition-smooth);
         }
 
-        .cart-float-btn.show {
-            display: flex;
-        }
-
-        .cart-float-btn:hover {
-            transform: scale(1.05);
-            background: var(--primary-hover);
-        }
+        .cart-float-btn.show { display: flex; }
+        .cart-float-btn:hover { transform: scale(1.05); background: var(--primary-hover); }
 
         .cart-badge {
             background: var(--danger-color);
@@ -802,7 +888,6 @@
             font-size: 0.8rem;
         }
 
-        /* Estilos del Modal del Carrito */
         .cart-items-container {
             max-height: 250px;
             overflow-y: auto;
@@ -816,28 +901,16 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #f8fafc;
+            background: var(--bg-color);
             padding: 10px;
             border-radius: 10px;
             border: 1px solid var(--border-color);
             font-size: 0.9rem;
         }
 
-        .cart-item-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .cart-item-title {
-            font-weight: 600;
-            color: var(--text-main);
-        }
-
-        .cart-item-details {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-        }
+        .cart-item-info { display: flex; flex-direction: column; gap: 2px; }
+        .cart-item-title { font-weight: 600; color: var(--text-main); }
+        .cart-item-details { font-size: 0.78rem; color: var(--text-muted); }
 
         .cart-item-remove {
             background: none;
@@ -856,10 +929,7 @@
             color: #059669;
         }
 
-        /* Estilos del Modal de Checkout / Confirmación de Pedido */
-        .checkout-form-group {
-            margin-bottom: 15px;
-        }
+        .checkout-form-group { margin-bottom: 15px; }
 
         .checkout-form-group label {
             display: block;
@@ -877,22 +947,17 @@
             font-size: 0.95rem;
             outline: none;
             transition: var(--transition-smooth);
-            background: #f8fafc;
+            background: var(--bg-color);
             color: var(--text-main);
         }
 
         .checkout-form-input:focus, .checkout-form-textarea:focus {
             border-color: var(--primary-color);
-            background: #fff;
             box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
         }
 
-        .checkout-form-textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
+        .checkout-form-textarea { resize: vertical; min-height: 80px; }
 
-        /* Micro-animación de vuelo al carrito */
         .flying-item {
             position: fixed;
             z-index: 9999;
@@ -908,7 +973,12 @@
 </head>
 <body id="main-body">
 
-    <!-- Banner dinámico de temporada -->
+    <div class="theme-switch-container">
+        <button class="theme-switch-btn" id="theme-switch-btn" onclick="toggleTheme()" title="Cambiar Modo Oscuro / Claro">
+            <i class="fa-solid fa-moon" id="theme-icon"></i>
+        </button>
+    </div>
+
     <div id="seasonal-banner" class="seasonal-banner">
         <i id="seasonal-icon" class="fa-solid fa-gift"></i> <span id="seasonal-text">¡Bienvenidos a nuestra temporada especial!</span>
     </div>
@@ -940,13 +1010,11 @@
     </div>
 
     <div class="grid" id="product-grid">
-        <!-- Skeleton Loaders iniciales -->
         <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div></div>
         <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div></div>
         <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div></div>
     </div>
 
-    <!-- Botón flotante del carrito -->
     <button class="cart-float-btn" id="cart-float-btn" onclick="abrirModalCarrito()">
         <i class="fa-solid fa-cart-shopping"></i> Ver Cotización <span class="cart-badge" id="cart-count">0</span>
     </button>
@@ -982,15 +1050,12 @@
         </div>
     </div>
 
-    <!-- Modal del Carrito / Cotización múltiple -->
     <div class="modal" id="cart-modal" onclick="if(event.target === this) cerrarModalCarrito()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModalCarrito()"><i class="fa-solid fa-xmark"></i></button>
             <div class="modal-body" style="padding-top: 35px;">
                 <h2 class="modal-title" style="color:var(--primary-color); margin-bottom: 15px;"><i class="fa-solid fa-cart-shopping"></i> Cotización de Artículos</h2>
-                <div class="cart-items-container" id="cart-items-list">
-                    <!-- Elementos del carrito -->
-                </div>
+                <div class="cart-items-container" id="cart-items-list"></div>
                 <div class="cart-total" id="cart-total-text">Total: $0.00</div>
                 <button class="whatsapp-btn" style="width: 100%;" onclick="abrirModalCheckout()">
                     <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i> Proceder al Envio por WhatsApp
@@ -999,7 +1064,6 @@
         </div>
     </div>
 
-    <!-- Nuevo Modal de Confirmación de Pedido (Checkout con Nombre y Dirección) -->
     <div class="modal" id="checkout-modal" onclick="if(event.target === this) cerrarModalCheckout()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModalCheckout()"><i class="fa-solid fa-xmark"></i></button>
@@ -1046,7 +1110,7 @@
         <a href="https://tinyurl.com/pageimc" target="_blank" class="social-icon bg-fb" title="Facebook">
             <i class="fa-brands fa-facebook-f"></i>
         </a>
-        <a href="https://maps.app.goo.gl/guVQ4JRGzRMVjUUy9" target="_blank" class="social-icon bg-maps" title="Ubicación">
+        <a href="https://www.google.com/maps/search/?api=1&query=Tigrito+calle+Zea+frente+plaza+bolivar+el+tigrito+al+lado+del+comercio+Mi+Plazita" target="_blank" class="social-icon bg-maps" title="Ubicación: Tigrito, calle Zea, frente plaza Bolívar El Tigrito, al lado del comercio Mi Plazita">
             <i class="fa-solid fa-location-dot"></i>
         </a>
     </div>
@@ -1059,27 +1123,54 @@
         let categoriaSeleccionada = 'todos';
         let isZoomed = false;
         let carritoGlobal = [];
-        let productoIndividualPendiente = null; // Para control de compra individual con checkout
+        let productoIndividualPendiente = null;
+
+        // --- Gestión de Modo Oscuro ---
+        function inicializarTema() {
+            const savedTheme = localStorage.getItem('kervys_theme_mode');
+            const icon = document.getElementById('theme-icon');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                icon.className = "fa-solid fa-sun";
+            } else {
+                document.body.classList.remove('dark-mode');
+                icon.className = "fa-solid fa-moon";
+            }
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const icon = document.getElementById('theme-icon');
+            body.classList.toggle('dark-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('kervys_theme_mode', 'dark');
+                icon.className = "fa-solid fa-sun";
+            } else {
+                localStorage.setItem('kervys_theme_mode', 'light');
+                icon.className = "fa-solid fa-moon";
+            }
+        }
 
         // Inicializar Campaña de Temporada Dinámica según el mes actual
         function aplicarCampanaTemporada() {
-            const mesActual = new Date().getMonth(); // 0 = Enero, 1 = Febrero, etc.
+            const mesActual = new Date().getMonth();
             const body = document.getElementById('main-body');
             const banner = document.getElementById('seasonal-banner');
             const icon = document.getElementById('seasonal-icon');
             const text = document.getElementById('seasonal-text');
 
-            if (mesActual === 1) { // Febrero (San Valentín)
+            if (mesActual === 1) {
                 body.classList.add('season-valentines');
                 icon.className = "fa-solid fa-heart";
                 text.innerHTML = "¡Especial de San Valentín! Sorprende a esa persona especial con nuestros detalles.";
                 banner.classList.add('show');
-            } else if (mesActual === 2) { // Marzo (Carnaval aprox o temporada colorida)
+            } else if (mesActual === 2) {
                 body.classList.add('season-carnival');
                 icon.className = "fa-solid fa-masks-theater";
                 text.innerHTML = "¡Disfruta de nuestras ofertas de temporada y novedades!";
                 banner.classList.add('show');
-            } else if (mesActual === 11) { // Diciembre (Navidad)
+            } else if (mesActual === 11) {
                 body.classList.add('season-christmas');
                 icon.className = "fa-solid fa-tree";
                 text.innerHTML = "¡Felices Fiestas! Encuentra los mejores regalos y detalles navideños aquí.";
@@ -1088,7 +1179,6 @@
         }
 
         function cargarCatalogo(silencioso = false) {
-            // 1. Intentar cargar desde caché local instantáneamente si existe
             if (!silencioso) {
                 const datosGuardados = localStorage.getItem(CACHE_KEY);
                 if (datosGuardados) {
@@ -1101,11 +1191,9 @@
                 }
             }
 
-            // 2. Sincronizar en segundo plano con Google Sheets
             fetch(urlAPI)
                 .then(response => response.json())
                 .then(data => {
-                    // Guardar en localStorage para futuras visitas instantáneas
                     localStorage.setItem(CACHE_KEY, JSON.stringify(data));
                     procesarYRenderizarDatos(data);
                 })
@@ -1240,7 +1328,7 @@
                 card.innerHTML = `
                     <div class="card-img-container">
                         <img src="${prod.imagen}" alt="${prod.nombre}" loading="lazy">
-                        <button class="card-share-btn" onclick="event.stopPropagation(); compartirProducto(event, ${JSON.stringify(prod).replace(/"/g, '&quot;')})" title="Compartir">
+                        <button class="card-share-btn" onclick="event.stopPropagation(); compartirProducto(event, ${JSON.stringify(prod).replace(/"/g, '"')})" title="Compartir">
                             <i class="fa-solid fa-share-nodes"></i>
                         </button>
                     </div>
@@ -1327,7 +1415,6 @@
             }
             document.getElementById('modal-desc').innerHTML = descripcionTexto;
 
-            // Configurar botón "Comprar Individual" para abrir el modal de checkout con nombre y dirección
             const waBtn = document.getElementById('modal-wa-btn');
             waBtn.onclick = () => {
                 productoIndividualPendiente = { ...prod, precioFinalCalculado: precioFinal };
@@ -1339,7 +1426,6 @@
             
             const addCartBtn = document.getElementById('modal-add-cart-btn');
             addCartBtn.onclick = (e) => {
-                // Ejecutar micro-animación de vuelo al carrito
                 lanzarEfectoVueloAlCarrito(e.currentTarget, prod.imagen);
                 agregarAlCarrito(prod);
                 cerrarModal();
@@ -1349,7 +1435,6 @@
             document.body.style.overflow = 'hidden';
         }
 
-        // Lógica de Micro-animación "Efecto Vuelo" hacia el botón flotante del carrito
         function lanzarEfectoVueloAlCarrito(elementSource, imgSrc) {
             const cartBtn = document.getElementById('cart-float-btn');
             const targetRect = cartBtn.getBoundingClientRect();
@@ -1359,7 +1444,6 @@
             flyingImg.src = imgSrc;
             flyingImg.className = 'flying-item';
             
-            // Posicionar inicialmente donde está el botón o la tarjeta
             flyingImg.style.left = `${sourceRect.left + sourceRect.width / 2 - 25}px`;
             flyingImg.style.top = `${sourceRect.top + sourceRect.height / 2 - 25}px`;
             
@@ -1374,7 +1458,6 @@
 
             setTimeout(() => {
                 flyingImg.remove();
-                // Animación de escala pequeña de rebote en el botón del carrito
                 cartBtn.style.transform = 'scale(1.15)';
                 setTimeout(() => {
                     cartBtn.style.transform = 'scale(1)';
@@ -1408,7 +1491,7 @@
         }
 
         function abrirModalCarrito() {
-            productoIndividualPendiente = null; // Limpiamos individual para asegurar carrito múltiple
+            productoIndividualPendiente = null;
             const listaContainer = document.getElementById('cart-items-list');
             listaContainer.innerHTML = '';
             let total = 0;
@@ -1471,7 +1554,6 @@
             let numeroWa = "584149956831";
             let mensaje = "";
 
-            // Caso A: Es un producto individual seleccionado desde su modal
             if (productoIndividualPendiente) {
                 const prod = productoIndividualPendiente;
                 const precioFinal = prod.precioFinalCalculado;
@@ -1484,9 +1566,7 @@
                     mensaje = `Hola, mi nombre es *${nombreCliente}* y me interesa este artículo:\n\n*Código:* ${prod.codigo_producto || prod.id || 'N/A'}\n*Producto:* ${prod.nombre}\n*Precio:* $${precioFinal.toFixed(2)}\n*Foto:* ${prod.imagen}\n\n📍 *Dirección / Nota:* ${direccionCliente || 'N/A'}`;
                 }
                 productoIndividualPendiente = null;
-            } 
-            // Caso B: Es el carrito con múltiples artículos
-            else if (carritoGlobal.length > 0) {
+            } else if (carritoGlobal.length > 0) {
                 mensaje = `Hola, mi nombre es *${nombreCliente}* y quiero solicitar la siguiente cotización:\n\n`;
                 let totalAcumulado = 0;
 
@@ -1501,7 +1581,6 @@
                 mensaje += `💰 *Total General:* $${totalAcumulado.toFixed(2)}\n` +
                            `📍 *Dirección / Nota:* ${direccionCliente || 'N/A'}\n\nPor favor indícame los pasos para proceder.`;
                 
-                // Limpiar carrito tras enviar
                 carritoGlobal = [];
                 actualizarBotonFlotanteCarrito();
             } else {
@@ -1531,7 +1610,7 @@
             } else if (tipo === 'delivery') {
                 headerElem.innerHTML = `<h2 class="modal-title" style="color:var(--danger-color);"><i class="fa-solid fa-motorcycle"></i> Servicio de Delivery</h2><p style="color:var(--text-muted); font-size:0.9rem; margin-top:5px;">Llevamos tu pedido hasta la puerta de tu casa:</p>`;
                 bodyElem.innerHTML = `
-                    <div style="background:#f8fafc; border:1px solid var(--border-color); padding:18px; border-radius:14px; margin-top:15px; text-align:center;">
+                    <div style="background:var(--bg-color); border:1px solid var(--border-color); padding:18px; border-radius:14px; margin-top:15px; text-align:center;">
                         <p style="color:var(--text-main); font-weight:600; font-size:1rem; line-height:1.5;">🚀 Contamos con servicio de delivery disponible.</p>
                         <p style="color:var(--text-muted); font-size:0.9rem; margin-top:10px;">El costo del envío varía según tu ubicación.</p>
                     </div>
@@ -1577,6 +1656,9 @@
                 cerrarModalCheckout();
             }
         });
+
+        // Inicializar Tema preferido
+        inicializarTema();
 
         // Aplicar campaña dinámica de temporada al iniciar
         aplicarCampanaTemporada();
