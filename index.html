@@ -20,6 +20,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Librería Leaflet para el Mapa Interactivo -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <style>
         :root {
             --primary-color: #2563eb;       
@@ -124,6 +128,12 @@
         }
 
         body.dark-mode .info-modal-list li {
+            background: #0f172a;
+            border-color: #334155;
+            color: #f8fafc;
+        }
+
+        body.dark-mode .route-info-box {
             background: #0f172a;
             border-color: #334155;
             color: #f8fafc;
@@ -824,6 +834,34 @@
             font-size: 1.2rem;
         }
 
+        /* Estilos específicos para el Modal de Ubicación Interactiva */
+        .map-modal-container {
+            width: 100%;
+            height: 240px;
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            z-index: 10;
+        }
+        .route-info-box {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 12px 15px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .route-info-box i {
+            color: var(--danger-color);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
         .toast {
             position: fixed;
             bottom: 30px;
@@ -867,6 +905,7 @@
             box-shadow: 0 6px 16px rgba(0,0,0,0.2);
             transition: var(--transition-smooth);
             text-decoration: none;
+            cursor: pointer;
         }
 
         .social-icon:hover {
@@ -1128,6 +1167,29 @@
         </div>
     </div>
 
+    <!-- Modal de Ubicación Interactiva -->
+    <div class="modal" id="location-modal" onclick="if(event.target === this) cerrarModalUbicacion()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="cerrarModalUbicacion()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-body" style="padding-top: 35px;">
+                <h2 class="modal-title" style="color:var(--danger-color); margin-bottom: 5px;"><i class="fa-solid fa-location-dot"></i> Nuestra Ubicación</h2>
+                <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom: 15px;">Calle Zea entre Unión y Democracia, frente a la Plaza Bolívar, al lado de Mi Plazita, San José de Guanipa[cite: 1].</p>
+                
+                <!-- Contenedor del Mapa -->
+                <div id="interactive-map" class="map-modal-container"></div>
+                
+                <div class="route-info-box" id="route-text-status">
+                    <i class="fa-solid fa-compass"></i>
+                    <span id="route-distance-label">Calculando tu distancia hasta el local...</span>
+                </div>
+
+                <a href="https://maps.app.goo.gl/scvfNGbCY3UAANLKA" target="_blank" class="whatsapp-btn" style="background: var(--danger-color); width: 100%; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);">
+                    <i class="fa-solid fa-diamond-turn-right" style="font-size: 1.1rem;"></i> Abrir Ruta en Google Maps / Waze
+                </a>
+            </div>
+        </div>
+    </div>
+
     <div id="toast" class="toast"><i class="fa-solid fa-check-circle" style="color: #22c55e;"></i> ¡Enlace copiado al portapapeles!</div>
 
     <div class="social-float">
@@ -1140,10 +1202,10 @@
         <a href="https://tinyurl.com/pageimc" target="_blank" class="social-icon bg-fb" title="Facebook">
             <i class="fa-brands fa-facebook-f"></i>
         </a>
-        <!-- Ubicación mejorada con el enlace exacto proporcionado y pistas claras para llegar -->
-        <a href="https://maps.app.goo.gl/scvfNGbCY3UAANLKA" target="_blank" class="social-icon bg-maps" title="Ubicación: Calle Zea entre Unión y Democracia, frente a la Plaza Bolívar, al lado del comercio Mi Plazita, San José de Guanipa">
+        <!-- Ubicación interactiva mejorada -->
+        <div class="social-icon bg-maps" onclick="abrirModalUbicacion()" title="Ubicación Interactiva">
             <i class="fa-solid fa-location-dot"></i>
-        </a>
+        </div>
     </div>
 
     <script>
@@ -1157,6 +1219,7 @@
         let carritoGlobal = [];
         let productoIndividualPendiente = null;
         let favoritosGlobal = [];
+        let leafletMap = null;
 
         // --- Gestión de Modo Oscuro ---
         function inicializarTema() {
@@ -1220,7 +1283,6 @@
             }
             guardarFavoritosStorage();
             
-            // Refrescar vista actual para reflejar cambios inmediatos
             filtrarCombinado();
         }
 
@@ -1714,6 +1776,68 @@
             document.body.style.overflow = 'auto';
         }
 
+        // --- Funciones para el Modal de Ubicación Interactiva ---
+        function abrirModalUbicacion() {
+            document.getElementById('location-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            // Coordenadas de referencia en San José de Guanipa (Zona Plaza Bolívar / Calle Zea)
+            const localLat = 8.8864;
+            const localLng = -64.1532;
+
+            setTimeout(() => {
+                if (!leafletMap) {
+                    leafletMap = L.map('interactive-map').setView([localLat, localLng], 15);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                        attribution: '© OpenStreetMap'
+                    }).addTo(leafletMap);
+
+                    L.marker([localLat, localLng]).addTo(leafletMap)
+                        .bindPopup('<b>¡Aquí estamos!</b><br>San José de Guanipa')
+                        .openPopup();
+                } else {
+                    leafletMap.invalidateSize();
+                }
+
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(position => {
+                        const userLat = position.coords.latitude;
+                        const userLng = position.coords.longitude;
+
+                        L.marker([userLat, userLng]).addTo(leafletMap)
+                            .bindPopup('Tu ubicación actual');
+
+                        const R = 6371; // Radio de la tierra en km
+                        const dLat = (localLat - userLat) * Math.PI / 180;
+                        const dLon = (localLng - userLng) * Math.PI / 180;
+                        const a = 
+                            Math.sin(dLat/2) * Math.sin(dLat/2) +
+                            Math.cos(userLat * Math.PI / 180) * Math.cos(localLat * Math.PI / 180) * 
+                            Math.sin(dLon/2) * Math.sin(dLon/2);
+                        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                        const distancia = R * c; 
+
+                        const tiempoMinutos = Math.round((distancia / 25) * 60);
+
+                        document.getElementById('route-distance-label').innerHTML = 
+                            `Estás a <b>${distancia.toFixed(1)} km</b> aprox. (~${tiempoMinutos > 0 ? tiempoMinutos : 1} min en vehículo).`;
+
+                        const bounds = L.latLngBounds([[localLat, localLng], [userLat, userLng]]);
+                        leafletMap.fitBounds(bounds, { padding: [40, 40] });
+
+                    }, () => {
+                        document.getElementById('route-distance-label').textContent = "Activa tu GPS para calcular la ruta exacta hasta el local.";
+                    }, { timeout: 10000 });
+                }
+            }, 300);
+        }
+
+        function cerrarModalUbicacion() {
+            document.getElementById('location-modal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
         function toggleZoom(event) {
             const container = event.currentTarget;
             const img = container.querySelector('.modal-img');
@@ -1742,6 +1866,7 @@
                 cerrarModalInfo();
                 cerrarModalCarrito();
                 cerrarModalCheckout();
+                cerrarModalUbicacion();
             }
         });
 
