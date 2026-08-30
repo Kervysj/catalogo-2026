@@ -60,7 +60,7 @@
             --shadow-hover: 0 20px 25px -5px rgb(59 130 246 / 0.15), 0 8px 10px -6px rgb(59 130 246 / 0.1);
         }
 
-        body.dark-mode .info-badge, body.dark-mode .search-input, body.dark-mode .filter-btn, body.dark-mode .modal-content, body.dark-mode .route-info-box, body.dark-mode #assistant-bubble {
+        body.dark-mode .info-badge, body.dark-mode .search-input, body.dark-mode .filter-btn, body.dark-mode .modal-content, body.dark-mode .route-info-box, body.dark-mode .assistant-chat-container, body.dark-mode .assistant-chat-header, body.dark-mode .assistant-chat-body, body.dark-mode .assistant-msg-bot {
             background-color: #1e293b;
             color: #f8fafc;
         }
@@ -70,7 +70,7 @@
             color: #c084fc;
         }
 
-        body.dark-mode .card, body.dark-mode .skeleton-card, body.dark-mode .cart-item-row, body.dark-mode .checkout-form-input, body.dark-mode .checkout-form-textarea {
+        body.dark-mode .card, body.dark-mode .skeleton-card, body.dark-mode .cart-item-row, body.dark-mode .checkout-form-input, body.dark-mode .checkout-form-textarea, body.dark-mode .assistant-msg-user {
             border-color: #334155;
             background-color: #1e293b;
         }
@@ -78,6 +78,11 @@
         body.dark-mode .checkout-form-input, body.dark-mode .checkout-form-textarea {
             color: #f8fafc;
             background: #0f172a;
+        }
+
+        body.dark-mode .assistant-msg-user {
+            background-color: #2563eb;
+            color: #fff;
         }
 
         body.dark-mode .skeleton-img, body.dark-mode .skeleton-line, body.dark-mode .modal-img-container {
@@ -735,6 +740,7 @@
         .bg-fb { background-color: #1877f2; }
         .bg-maps { background-color: var(--danger-color); }
         .bg-sug { background-color: #9333ea; }
+        .bg-assistant { background-color: #3b82f6; }
 
         .cart-float-btn {
             position: fixed;
@@ -759,10 +765,11 @@
         .cart-float-btn:hover { transform: scale(1.05); background: var(--primary-hover); }
         .cart-badge { background: var(--danger-color); color: white; border-radius: 50%; padding: 2px 8px; font-size: 0.8rem; }
 
-        .cart-items-container { max-height: 250px; overflow-y: auto; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .cart-item-row { display: flex; justify-content: space-between; align-items: center; background: var(--bg-color); padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); font-size: 0.9rem; }
-        .cart-item-info { display: flex; flex-direction: column; gap: 2px; }
-        .cart-item-title { font-weight: 600; color: var(--text-main); }
+        .cart-items-container { max-height: 280px; overflow-y: auto; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .cart-item-row { display: flex; justify-content: space-between; align-items: center; background: var(--bg-color); padding: 10px; border-radius: 12px; border: 1px solid var(--border-color); font-size: 0.9rem; gap: 10px; }
+        .cart-item-thumb { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: var(--border-color); }
+        .cart-item-info { display: flex; flex-direction: column; gap: 2px; flex-grow: 1; }
+        .cart-item-title { font-weight: 600; color: var(--text-main); font-size: 0.9rem; }
         .cart-item-details { font-size: 0.78rem; color: var(--text-muted); }
         .cart-item-remove { background: none; border: none; color: var(--danger-color); cursor: pointer; font-size: 1rem; padding: 5px; }
         .cart-total { font-size: 1.1rem; font-weight: 700; text-align: right; margin-bottom: 15px; color: #059669; }
@@ -795,29 +802,96 @@
             transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Asistente Inteligente de Compras (Widget Flotante) */
-        #smart-assistant {
+        /* Ventana de Chat Interactiva para el Asistente */
+        .assistant-chat-container {
             position: fixed;
             bottom: 95px;
             right: 25px;
-            z-index: 997;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-        #assistant-bubble {
+            width: 330px;
+            max-width: calc(100vw - 40px);
+            height: 420px;
             background: var(--card-bg);
             border: 1px solid var(--border-color);
-            padding: 12px 16px;
-            border-radius: 16px;
-            box-shadow: var(--shadow-subtle);
-            max-width: 250px;
-            font-size: 0.85rem;
-            margin-bottom: 8px;
-            position: relative;
+            border-radius: 20px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+            z-index: 997;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
             animation: fadeInBody 0.3s ease;
+        }
+        .assistant-chat-container.active { display: flex; }
+        .assistant-chat-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 600;
+        }
+        .assistant-chat-header span { display: flex; align-items: center; gap: 8px; }
+        .assistant-chat-close { background: none; border: none; color: white; font-size: 1.1rem; cursor: pointer; }
+        .assistant-chat-body {
+            padding: 15px;
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: var(--bg-color);
+        }
+        .assistant-msg {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 0.88rem;
+            line-height: 1.4;
+        }
+        .assistant-msg-bot {
+            background: var(--card-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+        .assistant-msg-user {
+            background: var(--primary-color);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        .assistant-chat-footer {
+            padding: 10px;
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 8px;
+        }
+        .assistant-chat-input {
+            flex-grow: 1;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            outline: none;
+            font-size: 0.88rem;
+            background: var(--bg-color);
             color: var(--text-main);
         }
+        .assistant-chat-send {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-smooth);
+        }
+        .assistant-chat-send:hover { transform: scale(1.08); }
     </style>
 </head>
 <body id="main-body">
@@ -864,7 +938,7 @@
     </div>
 
     <div class="filters" id="filters-container">
-        <!-- Contenedor dinámico de categorías (Mantiene filtro aislado para Streaming y Recargas) -->
+        <!-- Contenedor dinámico de categorías -->
     </div>
 
     <div class="grid" id="product-grid">
@@ -878,12 +952,18 @@
         <i class="fa-solid fa-cart-shopping"></i> Ver Cotización <span class="cart-badge" id="cart-count">0</span>
     </button>
 
-    <!-- Widget del Asistente Inteligente de Compras -->
-    <div id="smart-assistant">
-        <div id="assistant-bubble">
-            <span style="font-weight: 600; color: var(--primary-color); display: block; margin-bottom: 2px;">Asistente Virtual</span>
-            <span id="assistant-text">¡Hola! ¿Buscas algo en especial o necesitas ayuda para armar un combo?</span>
-            <button onclick="cerrarBocadilloAsistente()" style="position: absolute; top: 4px; right: 6px; background: none; border: none; font-size: 0.8rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+    <!-- Ventana de Chat Interactiva del Asistente (Personita con la que puedes conversar) -->
+    <div id="assistant-chat-box" class="assistant-chat-container">
+        <div class="assistant-chat-header">
+            <span><i class="fa-solid fa-headset"></i> Asistente Virtual</span>
+            <button class="assistant-chat-close" onclick="toggleAsistenteChat()">&times;</button>
+        </div>
+        <div class="assistant-chat-body" id="assistant-messages-list">
+            <div class="assistant-msg assistant-msg-bot">¡Hola! Soy tu asistente virtual. ¿Buscas algo en específico, necesitas sugerencias o ayuda para armar un combo? Escríbeme aquí abajo. 👇</div>
+        </div>
+        <div class="assistant-chat-footer">
+            <input type="text" id="assistant-user-input" class="assistant-chat-input" placeholder="Escribe tu consulta..." onkeydown="if(event.key==='Enter') enviarMensajeAsistente()">
+            <button class="assistant-chat-send" onclick="enviarMensajeAsistente()"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
     </div>
 
@@ -998,6 +1078,8 @@
         <a href="https://wa.me/584149956831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20quiero%20más%20información" target="_blank" class="social-icon bg-wa" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
         <a href="https://tinyurl.com/pageimc" target="_blank" class="social-icon bg-fb" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
         <div class="social-icon bg-maps" onclick="abrirModalUbicacion()" title="Ubicación Interactiva"><i class="fa-solid fa-location-dot"></i></div>
+        <!-- Botón del Asistente Interactiva con icono de persona -->
+        <div class="social-icon bg-assistant" onclick="toggleAsistenteChat()" title="Abrir Asistente Virtual"><i class="fa-solid fa-headset"></i></div>
     </div>
 
     <script>
@@ -1069,16 +1151,58 @@
             document.getElementById('news-banner').classList.remove('show');
         }
 
-        // Asistente Inteligente de Compras
-        function cerrarBocadilloAsistente() {
-            document.getElementById('assistant-bubble').style.display = 'none';
+        // Asistente Inteligente de Compras Interactivo (Chat flotante)
+        function toggleAsistenteChat() {
+            const chatBox = document.getElementById('assistant-chat-box');
+            chatBox.classList.toggle('active');
+            if (chatBox.classList.contains('active')) {
+                document.getElementById('assistant-user-input').focus();
+            }
         }
+
+        function enviarMensajeAsistente() {
+            const input = document.getElementById('assistant-user-input');
+            const texto = input.value.trim();
+            if (!texto) return;
+
+            const list = document.getElementById('assistant-messages-list');
+            
+            // Mensaje usuario
+            list.innerHTML += `<div class="assistant-msg assistant-msg-user">${texto}</div>`;
+            input.value = '';
+            list.scrollTop = list.scrollHeight;
+
+            // Simular respuesta inteligente o derivación humana a WhatsApp
+            setTimeout(() => {
+                let respuestaBot = "";
+                const tLower = texto.toLowerCase();
+
+                if (tLower.includes('hola') || tLower.includes('buenos') || tLower.includes('buenas')) {
+                    respuestaBot = "¡Hola! ¿Qué producto o servicio estás buscando hoy en nuestro catálogo?";
+                } else if (tLower.includes('combo') || tLower.includes('armar')) {
+                    respuestaBot = "¡Claro! Puedes revisar las pestañas superiores o decirme qué tienes en mente para armar tu combo ideal.";
+                } else if (tLower.includes('pago') || tLower.includes('pagar')) {
+                    respuestaBot = "Aceptamos Pago Móvil, transferencias bancarias y Binance Pay. Puedes ver los detalles arriba en la burbuja de 'Métodos de Pago'.";
+                } else if (tLower.includes('delivery') || tLower.includes('envio') || tLower.includes('enviar')) {
+                    respuestaBot = "¡Sí tenemos servicio de delivery disponible hasta la puerta de tu hogar!";
+                } else {
+                    // Derivación humana automática con enlace a WhatsApp con el mensaje acordado
+                    const waLink = `https://wa.me/584149956831?text=Hola,%20estoy%20consultando%20con%20el%20asistente%20virtual%20y%20quiero%20atención%20personalizada%20sobre:%20${encodeURIComponent(texto)}`;
+                    respuestaBot = `Para darte una atención más personalizada con este detalle, <a href="${waLink}" target="_blank" style="color: #25d366; font-weight:600;">escríbenos directamente por WhatsApp con el encargado</a>.`;
+                }
+
+                list.innerHTML += `<div class="assistant-msg assistant-msg-bot">${respuestaBot}</div>`;
+                list.scrollTop = list.scrollHeight;
+            }, 600);
+        }
+
         function verificarAsistenciaVacia(resultadosCount) {
             if (resultadosCount === 0) {
-                document.getElementById('assistant-text').innerHTML = `Para darte una atención más personalizada con este detalle, <a href="https://wa.me/584149956831?text=Hola,%20estoy%20buscando%20un%20producto%20específico%20y%20no%20lo%20encontré%20en%20el%20catálogo" target="_blank" style="color: #25d366; font-weight:600;">escríbenos por WhatsApp</a> con el encargado.`;
-                document.getElementById('assistant-bubble').style.display = 'block';
-            } else {
-                document.getElementById('assistant-text').innerHTML = `¡Hola! ¿Buscas algo en especial o necesitas ayuda para armar un combo?`;
+                const list = document.getElementById('assistant-messages-list');
+                const waLink = `https://wa.me/584149956831?text=Hola,%20estoy%20buscando%20un%20producto%20específico%20y%20no%20lo%20encontré%20en%20el%20catálogo`;
+                list.innerHTML += `<div class="assistant-msg assistant-msg-bot">No encontré resultados exactos en el catálogo. Para darte una atención más personalizada con este detalle, <a href="${waLink}" target="_blank" style="color: #25d366; font-weight:600;">escríbenos directamente por WhatsApp con el encargado</a>.</div>`;
+                document.getElementById('assistant-chat-box').classList.add('active');
+                list.scrollTop = list.scrollHeight;
             }
         }
 
@@ -1236,13 +1360,22 @@
             carritoGlobal.length > 0 ? document.getElementById('cart-float-btn').classList.add('show') : document.getElementById('cart-float-btn').classList.remove('show');
         }
 
+        // Modal de Carrito con miniaturas de imágenes antes de adquirir los productos
         function abrirModalCarrito() {
             productoIndividualPendiente = null;
             const container = document.getElementById('cart-items-list'); container.innerHTML = '';
             let total = 0;
             carritoGlobal.forEach((item, idx) => {
                 total += item.precioFinalCalculado;
-                container.innerHTML += `<div class="cart-item-row"><div class="cart-item-info"><span class="cart-item-title">${item.nombre}</span><span class="cart-item-details">Cód: ${item.codigo_producto || item.id || 'N/A'} | $${item.precioFinalCalculado.toFixed(2)}</span></div><button class="cart-item-remove" onclick="removerDelCarrito(${idx})"><i class="fa-solid fa-trash"></i></button></div>`;
+                container.innerHTML += `
+                    <div class="cart-item-row">
+                        <img src="${item.imagen}" alt="${item.nombre}" class="cart-item-thumb">
+                        <div class="cart-item-info">
+                            <span class="cart-item-title">${item.nombre}</span>
+                            <span class="cart-item-details">Cód: ${item.codigo_producto || item.id || 'N/A'} | $${item.precioFinalCalculado.toFixed(2)}</span>
+                        </div>
+                        <button class="cart-item-remove" onclick="removerDelCarrito(${idx})" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                    </div>`;
             });
             document.getElementById('cart-total-text').innerText = `Total: $${total.toFixed(2)}`;
             document.getElementById('cart-modal').classList.add('active');
@@ -1365,9 +1498,9 @@
             } else { img.style.transform = 'scale(1)'; img.style.transformOrigin = 'center center'; container.classList.remove('zoomed'); }
         }
 
-        window.addEventListener('keydown', e => { if (e.key === 'Escape') { cerrarModal(); cerrarModalInfo(); cerrarModalCarrito(); cerrarModalCheckout(); cerrarModalUbicacion(); } });
+        window.addEventListener('keydown', e => { if (e.key === 'Escape') { cerrarModal(); cerrarModalInfo(); cerrarModalCarrito(); cerrarModalCheckout(); cerrarModalUbicacion(); document.getElementById('assistant-chat-box').classList.remove('active'); } });
 
-        // Inicialización y Registro Service Worker
+        // Inicialización
         inicializarTema(); aplicarCampanaTemporada(); verificarNovedadesVisita(); cargarCatalogo(false); setInterval(() => cargarCatalogo(true), 20000);
         
         if ('serviceWorker' in navigator) {
