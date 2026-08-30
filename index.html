@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo Digital y Servicios</title>
+    <!-- Configuración para PWA (Instalable) -->
     <meta name="theme-color" content="#2563eb">
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,{
         %22name%22: %22Catálogo Digital%22,
@@ -15,12 +16,15 @@
         %22icons%22: [{%22src%22: %22https://cdn-icons-png.flaticon.com/512/1170/1170576.png%22, %22sizes%22: %22512x512%22, %22type%22: %22image/png%22}]
     }">
     
+    <!-- Fuente moderna e iconos -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Librería Leaflet para el Mapa Interactivo -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+    <!-- Librería jsPDF para descarga de cotizaciones -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
@@ -56,7 +60,7 @@
             --shadow-hover: 0 20px 25px -5px rgb(59 130 246 / 0.15), 0 8px 10px -6px rgb(59 130 246 / 0.1);
         }
 
-        body.dark-mode .info-badge, body.dark-mode .search-input, body.dark-mode .filter-btn, body.dark-mode .modal-content, body.dark-mode .route-info-box, body.dark-mode .assistant-chat-container, body.dark-mode .assistant-chat-header, body.dark-mode .assistant-chat-body {
+        body.dark-mode .info-badge, body.dark-mode .search-input, body.dark-mode .filter-btn, body.dark-mode .modal-content, body.dark-mode .route-info-box, body.dark-mode .assistant-chat-container, body.dark-mode .assistant-chat-header, body.dark-mode .assistant-chat-body, body.dark-mode .assistant-product-card {
             background-color: #1e293b;
             color: #f8fafc;
         }
@@ -793,12 +797,12 @@
             transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Ventana Emergente del Asistente (Estrategia Mejorada: Saludo + Ofertas + Sugerencias) */
+        /* Ventana Emergente del Asistente con Marquesina Dinámica y Accesos Aleatorios */
         .assistant-chat-container {
             position: fixed;
             bottom: 95px;
             right: 25px;
-            width: 320px;
+            width: 330px;
             max-width: calc(100vw - 40px);
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -823,25 +827,74 @@
         .assistant-chat-header span { display: flex; align-items: center; gap: 8px; }
         .assistant-chat-close { background: none; border: none; color: white; font-size: 1.1rem; cursor: pointer; }
         .assistant-chat-body {
-            padding: 18px;
-            font-size: 0.9rem;
-            line-height: 1.5;
+            padding: 16px;
+            font-size: 0.88rem;
+            line-height: 1.4;
             color: var(--text-main);
             display: flex;
             flex-direction: column;
             gap: 12px;
             background: var(--bg-color);
         }
-        .assistant-chat-body p { margin: 0; }
-        .assistant-highlight-box {
-            background: rgba(37, 99, 235, 0.08);
-            border-left: 3px solid var(--primary-color);
-            padding: 10px 12px;
-            border-radius: 0 10px 10px 0;
-            font-size: 0.85rem;
+        
+        /* Tarjeta Marquesina Rotativa del Asistente */
+        .assistant-product-card {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
         }
+        .assistant-product-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        .assistant-product-card.offer-highlight {
+            border-color: var(--danger-color);
+            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(220, 38, 38, 0.08) 100%);
+            box-shadow: 0 0 15px rgba(220, 38, 38, 0.2);
+        }
+        .assistant-prod-img {
+            width: 55px;
+            height: 55px;
+            border-radius: 10px;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: var(--border-color);
+        }
+        .assistant-prod-info { display: flex; flex-direction: column; gap: 3px; flex-grow: 1; }
+        .assistant-prod-tag { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; color: var(--danger-color); }
+        .assistant-prod-title { font-weight: 600; font-size: 0.9rem; color: var(--text-main); display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+        .assistant-prod-price { font-weight: 700; color: #059669; font-size: 0.95rem; }
+        
+        .assistant-actions-row { display: flex; gap: 8px; }
+        .assistant-btn-random {
+            flex: 1;
+            background: var(--special-cat-color);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 10px rgba(147, 51, 234, 0.25);
+        }
+        .assistant-btn-random:hover { opacity: 0.9; transform: translateY(-1px); }
+        
         .assistant-chat-footer-btn {
-            display: block;
+            flex: 1;
             text-align: center;
             background: #25d366;
             color: white;
@@ -849,28 +902,34 @@
             border-radius: 12px;
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             box-shadow: 0 4px 10px rgba(37, 211, 102, 0.25);
             transition: var(--transition-smooth);
-            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
         .assistant-chat-footer-btn:hover { background: #20ba5a; transform: translateY(-1px); }
     </style>
 </head>
 <body id="main-body">
 
+    <!-- Barra Superior de Novedades -->
     <div id="news-banner" class="news-banner-bar">
         <span>¡Hay nuevos productos desde tu última visita! Consúltalos o compártelos directamente.</span>
         <a href="https://wa.me/584149956831?text=Hola,%20quiero%20consultar%20las%20novedades%20recientes" target="_blank" style="background: white; color: var(--primary-color); padding: 2px 8px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.75rem;">Ver por WhatsApp</a>
         <button onclick="cerrarBarraNovedades()" style="background:none; border:none; color:white; cursor:pointer; font-size:1rem; margin-left:10px;">×</button>
     </div>
 
+    <!-- Switch de Modo Oscuro / Claro Flotante -->
     <div class="theme-switch-container">
         <button class="theme-switch-btn" id="theme-switch-btn" onclick="toggleTheme()" title="Cambiar Modo Oscuro / Claro">
             <i class="fa-solid fa-moon" id="theme-icon"></i>
         </button>
     </div>
 
+    <!-- Banner dinámico de temporada -->
     <div id="seasonal-banner" class="seasonal-banner">
         <i id="seasonal-icon" class="fa-solid fa-gift"></i> <span id="seasonal-text">¡Bienvenidos a nuestra temporada especial!</span>
     </div>
@@ -898,7 +957,8 @@
     </div>
 
     <div class="filters" id="filters-container">
-        </div>
+        <!-- Contenedor dinámico de categorías -->
+    </div>
 
     <div class="grid" id="product-grid">
         <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div></div>
@@ -906,26 +966,42 @@
         <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div></div>
     </div>
 
+    <!-- Botón flotante del carrito -->
     <button class="cart-float-btn" id="cart-float-btn" onclick="abrirModalCarrito()">
         <i class="fa-solid fa-cart-shopping"></i> Ver Cotización <span class="cart-badge" id="cart-count">0</span>
     </button>
 
+    <!-- Ventana Emergente del Asistente con Marquesina Rotativa -->
     <div id="assistant-chat-box" class="assistant-chat-container">
         <div class="assistant-chat-header">
             <span><i class="fa-solid fa-headset"></i> Asistente Virtual</span>
             <button class="assistant-chat-close" onclick="toggleAsistenteChat()">×</button>
         </div>
         <div class="assistant-chat-body">
-            <p>¡Hola! 👋 Qué gusto saludarte. Te invitamos a explorar nuestras categorías para descubrir las ofertas y novedades disponibles en el catálogo.</p>
-            <div class="assistant-highlight-box">
-                <i class="fa-solid fa-lightbulb" style="color:var(--primary-color);"></i> ¿Tienes alguna duda o sugerencia especial? Puedes dejarnos un mensaje directo por WhatsApp.
+            <p id="assistant-welcome-msg">¡Hola! 👋 Te recomiendo este artículo destacado:</p>
+            
+            <!-- Marquesina Rotativa de Producto -->
+            <div id="assistant-marquee-card" class="assistant-product-card" onclick="abrirProductoDesdeMarquesina()">
+                <img id="assistant-prod-img" class="assistant-prod-img" src="" alt="Producto">
+                <div class="assistant-prod-info">
+                    <span id="assistant-prod-tag" class="assistant-prod-tag">Destacado</span>
+                    <span id="assistant-prod-title" class="assistant-prod-title">Cargando...</span>
+                    <span id="assistant-prod-price" class="assistant-prod-price">$0.00</span>
+                </div>
             </div>
-            <a href="https://wa.me/584149956831?text=Hola,%20vengo%20del%20catálogo%20y%20tengo%20una%20duda/sugerencia:" target="_blank" class="assistant-chat-footer-btn">
-                <i class="fa-brands fa-whatsapp" style="font-size: 1rem;"></i> Enviar sugerencia o duda
-            </a>
+
+            <div class="assistant-actions-row">
+                <button class="assistant-btn-random" onclick="seleccionarCategoriaORecursoAleatorio()" title="Ir a categoría aleatoria">
+                    <i class="fa-solid fa-dice"></i> Sorpréndeme
+                </button>
+                <a href="https://wa.me/584149956831?text=Hola,%20vengo%20del%20catálogo%20y%20tengo%20una%20duda/sugerencia:" target="_blank" class="assistant-chat-footer-btn">
+                    <i class="fa-brands fa-whatsapp"></i> Sugerencia
+                </a>
+            </div>
         </div>
     </div>
 
+    <!-- Modal de Producto -->
     <div class="modal" id="product-modal" onclick="if(event.target === this) cerrarModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModal()"><i class="fa-solid fa-xmark"></i></button>
@@ -957,6 +1033,7 @@
         </div>
     </div>
 
+    <!-- Modal del Carrito -->
     <div class="modal" id="cart-modal" onclick="if(event.target === this) cerrarModalCarrito()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModalCarrito()"><i class="fa-solid fa-xmark"></i></button>
@@ -974,6 +1051,7 @@
         </div>
     </div>
 
+    <!-- Modal de Checkout -->
     <div class="modal" id="checkout-modal" onclick="if(event.target === this) cerrarModalCheckout()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModalCheckout()"><i class="fa-solid fa-xmark"></i></button>
@@ -997,6 +1075,7 @@
         </div>
     </div>
 
+    <!-- Modal Info -->
     <div class="modal" id="info-modal" onclick="if(event.target === this) cerrarModalInfo()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModalInfo()"><i class="fa-solid fa-xmark"></i></button>
@@ -1007,6 +1086,7 @@
         </div>
     </div>
 
+    <!-- Modal Ubicación -->
     <div class="modal" id="location-modal" onclick="if(event.target === this) cerrarModalUbicacion()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModalUbicacion()"><i class="fa-solid fa-xmark"></i></button>
@@ -1032,6 +1112,7 @@
         <a href="https://wa.me/584149956831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20quiero%20más%20información" target="_blank" class="social-icon bg-wa" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
         <a href="https://tinyurl.com/pageimc" target="_blank" class="social-icon bg-fb" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
         <div class="social-icon bg-maps" onclick="abrirModalUbicacion()" title="Ubicación Interactiva"><i class="fa-solid fa-location-dot"></i></div>
+        <!-- Botón del Asistente -->
         <div class="social-icon bg-assistant" onclick="toggleAsistenteChat()" title="Asistente Virtual"><i class="fa-solid fa-headset"></i></div>
     </div>
 
@@ -1047,6 +1128,8 @@
         let productoIndividualPendiente = null;
         let favoritosGlobal = [];
         let leafletMap = null;
+        let productoActualMarquesina = null;
+        let intervaloMarquesina = null;
 
         // Tema Oscuro
         function inicializarTema() {
@@ -1091,7 +1174,7 @@
             else if (mesActual === 11) { body.classList.add('season-christmas'); icon.className = "fa-solid fa-tree"; text.innerHTML = "¡Felices Fiestas!"; banner.classList.add('show'); }
         }
 
-        // Recordatorios de Novedades (localStorage)
+        // Recordatorios de Novedades
         function verificarNovedadesVisita() {
             const ultimaVisita = localStorage.getItem('kervys_ultima_visita');
             const hoy = new Date().toDateString();
@@ -1104,10 +1187,102 @@
             document.getElementById('news-banner').classList.remove('show');
         }
 
-        // Control del Panel del Asistente Virtual
+        // Control del Asistente y Marquesina Rotativa
         function toggleAsistenteChat() {
             const chatBox = document.getElementById('assistant-chat-box');
             chatBox.classList.toggle('active');
+            if (chatBox.classList.contains('active')) {
+                iniciarMarquesinaAsistente();
+            } else {
+                detenerMarquesinaAsistente();
+            }
+        }
+
+        function iniciarMarquesinaAsistente() {
+            if (listaProductosGlobal.length === 0) return;
+            actualizarItemMarquesina();
+            if (!intervaloMarquesina) {
+                intervaloMarquesina = setInterval(actualizarItemMarquesina, 4000); // Rota cada 4 segundos
+            }
+        }
+
+        function detenerMarquesinaAsistente() {
+            if (intervaloMarquesina) {
+                clearInterval(intervaloMarquesina);
+                intervaloMarquesina = null;
+            }
+        }
+
+        function actualizarItemMarquesina() {
+            if (listaProductosGlobal.length === 0) return;
+
+            // Priorizar productos de ofertas o categorías especiales si existen
+            let pool = listaProductosGlobal;
+            const ofertas = listaProductosGlobal.filter(p => {
+                const cat = (p.categoria || '').toLowerCase();
+                const nom = (p.nombre || '').toLowerCase();
+                return cat.includes('oferta') || cat.includes('descuento') || nom.includes('oferta');
+            });
+
+            // 60% de probabilidad de mostrar una oferta si las hay, de lo contrario aleatorio general
+            let prodSeleccionado;
+            if (ofertas.length > 0 && Math.random() < 0.6) {
+                prodSeleccionado = ofertas[Math.floor(Math.random() * ofertas.length)];
+            } else {
+                prodSeleccionado = pool[Math.floor(Math.random() * pool.length)];
+            }
+
+            productoActualMarquesina = prodSeleccionado;
+            const cardEl = document.getElementById('assistant-marquee-card');
+            const imgEl = document.getElementById('assistant-prod-img');
+            const tagEl = document.getElementById('assistant-prod-tag');
+            const titleEl = document.getElementById('assistant-prod-title');
+            const priceEl = document.getElementById('assistant-prod-price');
+            const welcomeMsg = document.getElementById('assistant-welcome-msg');
+
+            // Efecto de fundido suave
+            cardEl.style.opacity = '0.3';
+            setTimeout(() => {
+                imgEl.src = prodSeleccionado.imagen;
+                titleEl.textContent = prodSeleccionado.nombre;
+                priceEl.textContent = `$${calcularPrecioFinal(prodSeleccionado).toFixed(2)}`;
+                
+                const cat = (prodSeleccionado.categoria || 'General').toUpperCase();
+                if (cat.includes('OFERTA') || cat.includes('DESCUENTO')) {
+                    tagEl.textContent = "🔥 ¡OFERTA ESPECIAL!";
+                    cardEl.classList.add('offer-highlight');
+                    welcomeMsg.textContent = "¡Atención! No te pierdas esta súper oferta:";
+                } else {
+                    tagEl.textContent = cat;
+                    cardEl.classList.remove('offer-highlight');
+                    welcomeMsg.textContent = "¡Hola! 👋 Te recomiendo este artículo destacado:";
+                }
+                cardEl.style.opacity = '1';
+            }, 200);
+        }
+
+        function abrirProductoDesdeMarquesina() {
+            if (productoActualMarquesina) {
+                abrirModal(productoActualMarquesina);
+            }
+        }
+
+        function seleccionarCategoriaORecursoAleatorio() {
+            if (listaProductosGlobal.length === 0) return;
+            // Elegir un producto al azar y enfocar su categoría automáticamente
+            const randomProd = listaProductosGlobal[Math.floor(Math.random() * listaProductosGlobal.length)];
+            const cat = randomProd.categoria ? randomProd.categoria.trim() : 'todos';
+            
+            // Buscar el botón de filtro correspondiente y activarlo
+            const botonesFiltro = document.querySelectorAll('.filter-btn');
+            botonesFiltro.forEach(btn => {
+                if (btn.textContent.trim().toLowerCase().includes(cat.toLowerCase())) {
+                    btn.click();
+                }
+            });
+            
+            // Cerrar el asistente para ver el resultado
+            toggleAsistenteChat();
         }
 
         // Fetch Data
@@ -1130,6 +1305,10 @@
             listaProductosGlobal = data.filter(prod => prod.status && prod.status.toString().trim().toLowerCase() === 'disponible');
             construirBotonesCategorias(listaProductosGlobal);
             filtrarCombinado();
+            // Si el asistente está abierto, refrescar marquesina
+            if (document.getElementById('assistant-chat-box').classList.contains('active')) {
+                iniciarMarquesinaAsistente();
+            }
         }
 
         // Reglas de Catálogo Aislado
@@ -1263,7 +1442,6 @@
             carritoGlobal.length > 0 ? document.getElementById('cart-float-btn').classList.add('show') : document.getElementById('cart-float-btn').classList.remove('show');
         }
 
-        // Modal de Carrito con miniaturas de imágenes antes de adquirir los productos
         function abrirModalCarrito() {
             productoIndividualPendiente = null;
             const container = document.getElementById('cart-items-list'); container.innerHTML = '';
@@ -1287,7 +1465,6 @@
         function cerrarModalCarrito() { document.getElementById('cart-modal').classList.remove('active'); document.body.style.overflow = 'auto'; }
         function removerDelCarrito(idx) { carritoGlobal.splice(idx, 1); actualizarBtnCarrito(); carritoGlobal.length === 0 ? cerrarModalCarrito() : abrirModalCarrito(); }
 
-        // Descarga de Resumen / Cotización en PDF (jsPDF con marca de agua)
         function descargarCotizacionPDF() {
             if (carritoGlobal.length === 0) { alert("El carrito está vacío."); return; }
             const { jsPDF } = window.jspdf;
@@ -1301,7 +1478,6 @@
             doc.setFont("Helvetica", "normal");
             doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 14, 28);
 
-            // Marca de agua diagonal semitransparente
             doc.setTextColor(210, 210, 210);
             doc.setFontSize(36);
             doc.text("PRESUPUESTO INFORMATIVO", 15, 150, { angle: 45 });
@@ -1401,7 +1577,7 @@
             } else { img.style.transform = 'scale(1)'; img.style.transformOrigin = 'center center'; container.classList.remove('zoomed'); }
         }
 
-        window.addEventListener('keydown', e => { if (e.key === 'Escape') { cerrarModal(); cerrarModalInfo(); cerrarModalCarrito(); cerrarModalCheckout(); cerrarModalUbicacion(); document.getElementById('assistant-chat-box').classList.remove('active'); } });
+        window.addEventListener('keydown', e => { if (e.key === 'Escape') { cerrarModal(); cerrarModalInfo(); cerrarModalCarrito(); cerrarModalCheckout(); cerrarModalUbicacion(); document.getElementById('assistant-chat-box').classList.remove('active'); detenerMarquesinaAsistente(); } });
 
         // Inicialización
         inicializarTema(); aplicarCampanaTemporada(); verificarNovedadesVisita(); cargarCatalogo(false); setInterval(() => cargarCatalogo(true), 20000);
