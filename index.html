@@ -24,6 +24,9 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+    <!-- Librería jsPDF para descarga de cotizaciones -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <style>
         :root {
             --primary-color: #2563eb;       
@@ -57,7 +60,7 @@
             --shadow-hover: 0 20px 25px -5px rgb(59 130 246 / 0.15), 0 8px 10px -6px rgb(59 130 246 / 0.1);
         }
 
-        body.dark-mode .info-badge, body.dark-mode .search-input, body.dark-mode .filter-btn, body.dark-mode .modal-content, body.dark-mode .route-info-box {
+        body.dark-mode .info-badge, body.dark-mode .search-input, body.dark-mode .filter-btn, body.dark-mode .modal-content, body.dark-mode .route-info-box, body.dark-mode #assistant-bubble {
             background-color: #1e293b;
             color: #f8fafc;
         }
@@ -136,6 +139,22 @@
             z-index: 100;
         }
         .seasonal-banner.show { display: flex; }
+
+        .news-banner-bar {
+            background: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 8px 15px;
+            font-size: 0.85rem;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            z-index: 1002;
+            font-weight: 500;
+        }
+        .news-banner-bar.show { display: flex; }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
 
@@ -587,7 +606,7 @@
         .modal-actions { display: flex; gap: 10px; flex-direction: column; }
         .modal-actions-row { display: flex; gap: 10px; }
 
-        .whatsapp-btn, .cart-add-btn {
+        .whatsapp-btn, .cart-add-btn, .pdf-btn {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -610,6 +629,9 @@
 
         .cart-add-btn { background-color: var(--primary-color); box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35); }
         .cart-add-btn:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
+
+        .pdf-btn { background-color: var(--danger-color); box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35); margin-top: 8px; }
+        .pdf-btn:hover { background-color: var(--danger-hover); transform: translateY(-2px); }
 
         .modal-share-btn {
             background-color: var(--primary-color);
@@ -772,9 +794,40 @@
             pointer-events: none;
             transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
+
+        /* Asistente Inteligente de Compras (Widget Flotante) */
+        #smart-assistant {
+            position: fixed;
+            bottom: 95px;
+            right: 25px;
+            z-index: 997;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        #assistant-bubble {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-subtle);
+            max-width: 250px;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            position: relative;
+            animation: fadeInBody 0.3s ease;
+            color: var(--text-main);
+        }
     </style>
 </head>
 <body id="main-body">
+
+    <!-- Barra Superior de Novedades (Registro Periódico) -->
+    <div id="news-banner" class="news-banner-bar">
+        <span>¡Hay nuevos productos desde tu última visita! Consúltalos o compártelos directamente.</span>
+        <a href="https://wa.me/584149956831?text=Hola,%20quiero%20consultar%20las%20novedades%20recientes" target="_blank" style="background: white; color: var(--primary-color); padding: 2px 8px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.75rem;">Ver por WhatsApp</a>
+        <button onclick="cerrarBarraNovedades()" style="background:none; border:none; color:white; cursor:pointer; font-size:1rem; margin-left:10px;">&times;</button>
+    </div>
 
     <!-- Switch de Modo Oscuro / Claro Flotante -->
     <div class="theme-switch-container">
@@ -825,6 +878,15 @@
         <i class="fa-solid fa-cart-shopping"></i> Ver Cotización <span class="cart-badge" id="cart-count">0</span>
     </button>
 
+    <!-- Widget del Asistente Inteligente de Compras -->
+    <div id="smart-assistant">
+        <div id="assistant-bubble">
+            <span style="font-weight: 600; color: var(--primary-color); display: block; margin-bottom: 2px;">Asistente Virtual</span>
+            <span id="assistant-text">¡Hola! ¿Buscas algo en especial o necesitas ayuda para armar un combo?</span>
+            <button onclick="cerrarBocadilloAsistente()" style="position: absolute; top: 4px; right: 6px; background: none; border: none; font-size: 0.8rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+        </div>
+    </div>
+
     <!-- Modal de Producto -->
     <div class="modal" id="product-modal" onclick="if(event.target === this) cerrarModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
@@ -865,8 +927,11 @@
                 <h2 class="modal-title" style="color:var(--primary-color); margin-bottom: 15px;"><i class="fa-solid fa-cart-shopping"></i> Cotización</h2>
                 <div class="cart-items-container" id="cart-items-list"></div>
                 <div class="cart-total" id="cart-total-text">Total: $0.00</div>
-                <button class="whatsapp-btn" style="width: 100%;" onclick="abrirModalCheckout()">
+                <button class="whatsapp-btn" style="width: 100%; margin-bottom: 8px;" onclick="abrirModalCheckout()">
                     <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i> Proceder al Envío
+                </button>
+                <button class="pdf-btn" style="width: 100%;" onclick="descargarCotizacionPDF()">
+                    <i class="fa-solid fa-file-pdf" style="font-size: 1.2rem;"></i> Descargar Resumen (PDF)
                 </button>
             </div>
         </div>
@@ -991,6 +1056,32 @@
             else if (mesActual === 11) { body.classList.add('season-christmas'); icon.className = "fa-solid fa-tree"; text.innerHTML = "¡Felices Fiestas!"; banner.classList.add('show'); }
         }
 
+        // Recordatorios de Novedades (localStorage)
+        function verificarNovedadesVisita() {
+            const ultimaVisita = localStorage.getItem('kervys_ultima_visita');
+            const hoy = new Date().toDateString();
+            if (ultimaVisita && ultimaVisita !== hoy) {
+                document.getElementById('news-banner').classList.add('show');
+            }
+            localStorage.setItem('kervys_ultima_visita', hoy);
+        }
+        function cerrarBarraNovedades() {
+            document.getElementById('news-banner').classList.remove('show');
+        }
+
+        // Asistente Inteligente de Compras
+        function cerrarBocadilloAsistente() {
+            document.getElementById('assistant-bubble').style.display = 'none';
+        }
+        function verificarAsistenciaVacia(resultadosCount) {
+            if (resultadosCount === 0) {
+                document.getElementById('assistant-text').innerHTML = `Para darte una atención más personalizada con este detalle, <a href="https://wa.me/584149956831?text=Hola,%20estoy%20buscando%20un%20producto%20específico%20y%20no%20lo%20encontré%20en%20el%20catálogo" target="_blank" style="color: #25d366; font-weight:600;">escríbenos por WhatsApp</a> con el encargado.`;
+                document.getElementById('assistant-bubble').style.display = 'block';
+            } else {
+                document.getElementById('assistant-text').innerHTML = `¡Hola! ¿Buscas algo en especial o necesitas ayuda para armar un combo?`;
+            }
+        }
+
         // Fetch Data
         function cargarCatalogo(silencioso = false) {
             cargarFavoritosStorage();
@@ -1013,7 +1104,7 @@
             filtrarCombinado();
         }
 
-        // Reglas de Catálogo Aislado (Mantiene la separación solicitada)
+        // Reglas de Catálogo Aislado
         function esStriming(cat) { return cat && (cat.toLowerCase().trim() === 'striming' || cat.toLowerCase().includes('streaming')); }
         function esRecargaSaldo(cat) { return cat && (cat.toLowerCase().trim() === 'recarga saldo' || (cat.toLowerCase().includes('recarga') && cat.toLowerCase().includes('saldo'))); }
         function debeOcultarseEnPrincipal(cat) { return esStriming(cat) || esRecargaSaldo(cat); }
@@ -1057,6 +1148,8 @@
             if (txt) {
                 lista = lista.filter(p => [p.nombre, p.descripcion, p.mas_detalles, p.codigo_producto, p.id].join(' ').toLowerCase().includes(txt));
             }
+            
+            verificarAsistenciaVacia(lista.length);
             mostrarProductos(lista);
         }
 
@@ -1158,6 +1251,42 @@
         function cerrarModalCarrito() { document.getElementById('cart-modal').classList.remove('active'); document.body.style.overflow = 'auto'; }
         function removerDelCarrito(idx) { carritoGlobal.splice(idx, 1); actualizarBtnCarrito(); carritoGlobal.length === 0 ? cerrarModalCarrito() : abrirModalCarrito(); }
 
+        // Descarga de Resumen / Cotización en PDF (jsPDF con marca de agua)
+        function descargarCotizacionPDF() {
+            if (carritoGlobal.length === 0) { alert("El carrito está vacío."); return; }
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(18);
+            doc.text("Resumen de Pedido / Cotización", 14, 20);
+            
+            doc.setFontSize(10);
+            doc.setFont("Helvetica", "normal");
+            doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 14, 28);
+
+            // Marca de agua diagonal semitransparente
+            doc.setTextColor(210, 210, 210);
+            doc.setFontSize(36);
+            doc.text("PRESUPUESTO INFORMATIVO", 15, 150, { angle: 45 });
+
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(11);
+            let y = 40;
+            let total = 0;
+
+            carritoGlobal.forEach((item, index) => {
+                doc.text(`${index + 1}. ${item.nombre} - $${item.precioFinalCalculado.toFixed(2)}`, 14, y);
+                total += item.precioFinalCalculado;
+                y += 10;
+            });
+
+            doc.setFont("Helvetica", "bold");
+            doc.text(`Total Estimado: $${total.toFixed(2)}`, 14, y + 10);
+            
+            doc.save("Cotización_Catálogo.pdf");
+        }
+
         function abrirModalCheckout() { cerrarModalCarrito(); document.getElementById('checkout-modal').classList.add('active'); document.body.style.overflow = 'hidden'; }
         function cerrarModalCheckout() { document.getElementById('checkout-modal').classList.remove('active'); document.body.style.overflow = 'auto'; }
 
@@ -1239,11 +1368,10 @@
         window.addEventListener('keydown', e => { if (e.key === 'Escape') { cerrarModal(); cerrarModalInfo(); cerrarModalCarrito(); cerrarModalCheckout(); cerrarModalUbicacion(); } });
 
         // Inicialización y Registro Service Worker
-        inicializarTema(); aplicarCampanaTemporada(); cargarCatalogo(false); setInterval(() => cargarCatalogo(true), 20000);
+        inicializarTema(); aplicarCampanaTemporada(); verificarNovedadesVisita(); cargarCatalogo(false); setInterval(() => cargarCatalogo(true), 20000);
         
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // Requiere crear un archivo sw.js vacío o básico en la raíz para habilitar PWA
                 navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW falló: ', err));
             });
         }
