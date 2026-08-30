@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo Digital y Servicios</title>
+    <!-- Configuración para PWA (Instalable) -->
     <meta name="theme-color" content="#2563eb">
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,{
         %22name%22: %22Catálogo Digital%22,
@@ -15,6 +16,7 @@
         %22icons%22: [{%22src%22: %22https://cdn-icons-png.flaticon.com/512/1170/1170576.png%22, %22sizes%22: %22512x512%22, %22type%22: %22image/png%22}]
     }">
     
+    <!-- Fuente moderna e iconos -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -973,12 +975,14 @@
 </head>
 <body id="main-body">
 
+    <!-- Switch de Modo Oscuro / Claro Flotante -->
     <div class="theme-switch-container">
         <button class="theme-switch-btn" id="theme-switch-btn" onclick="toggleTheme()" title="Cambiar Modo Oscuro / Claro">
             <i class="fa-solid fa-moon" id="theme-icon"></i>
         </button>
     </div>
 
+    <!-- Banner dinámico de temporada -->
     <div id="seasonal-banner" class="seasonal-banner">
         <i id="seasonal-icon" class="fa-solid fa-gift"></i> <span id="seasonal-text">¡Bienvenidos a nuestra temporada especial!</span>
     </div>
@@ -1010,11 +1014,13 @@
     </div>
 
     <div class="grid" id="product-grid">
+        <!-- Skeleton Loaders iniciales -->
         <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div></div>
         <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div></div>
         <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div></div>
     </div>
 
+    <!-- Botón flotante del carrito -->
     <button class="cart-float-btn" id="cart-float-btn" onclick="abrirModalCarrito()">
         <i class="fa-solid fa-cart-shopping"></i> Ver Cotización <span class="cart-badge" id="cart-count">0</span>
     </button>
@@ -1050,6 +1056,7 @@
         </div>
     </div>
 
+    <!-- Modal del Carrito -->
     <div class="modal" id="cart-modal" onclick="if(event.target === this) cerrarModalCarrito()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModalCarrito()"><i class="fa-solid fa-xmark"></i></button>
@@ -1064,6 +1071,7 @@
         </div>
     </div>
 
+    <!-- Modal de Checkout -->
     <div class="modal" id="checkout-modal" onclick="if(event.target === this) cerrarModalCheckout()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModalCheckout()"><i class="fa-solid fa-xmark"></i></button>
@@ -1110,7 +1118,8 @@
         <a href="https://tinyurl.com/pageimc" target="_blank" class="social-icon bg-fb" title="Facebook">
             <i class="fa-brands fa-facebook-f"></i>
         </a>
-        <a href="https://www.google.com/maps/search/?api=1&query=Tigrito+calle+Zea+frente+plaza+bolivar+el+tigrito+al+lado+del+comercio+Mi+Plazita" target="_blank" class="social-icon bg-maps" title="Ubicación: Tigrito, calle Zea, frente plaza Bolívar El Tigrito, al lado del comercio Mi Plazita">
+        <!-- Ubicación mejorada con el enlace exacto proporcionado y pistas claras para llegar -->
+        <a href="https://maps.app.goo.gl/scvfNGbCY3UAANLKA" target="_blank" class="social-icon bg-maps" title="Ubicación: Calle Zea entre Unión y Democracia, frente a la Plaza Bolívar, al lado del comercio Mi Plazita, San José de Guanipa">
             <i class="fa-solid fa-location-dot"></i>
         </a>
     </div>
