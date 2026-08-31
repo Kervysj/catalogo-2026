@@ -690,6 +690,22 @@
         }
         .modal-share-btn:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
 
+        .modal-fav-btn {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border: 2px solid var(--border-color);
+            padding: 0 16px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-fav-btn:hover { border-color: #f59e0b; transform: translateY(-2px); }
+        .modal-fav-btn.fav-active { color: #f59e0b; border-color: #f59e0b; }
+
         .modal-related-container { margin-top: 20px; }
         .modal-related-title {
             font-size: 0.78rem;
@@ -1018,7 +1034,7 @@
     </div>
 
     <header>
-        <h1>BRIDIGI MARKET</h1>
+        <h1>CATALO</h1>
         <p>Catálogo Digital de Productos y Servicios en San José de Guanipa</p>
     </header>
 
@@ -1103,6 +1119,9 @@
                     <div class="modal-actions-row">
                         <button id="modal-wa-btn" class="whatsapp-btn">
                             <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i> Comprar Individual
+                        </button>
+                        <button id="modal-fav-btn" class="modal-fav-btn" title="Favorito" aria-label="Agregar o quitar de favoritos">
+                            <i class="fa-regular fa-star"></i>
                         </button>
                         <button id="modal-share-btn" class="modal-share-btn" title="Compartir producto" aria-label="Compartir producto">
                             <i class="fa-solid fa-share-nodes"></i>
@@ -1189,7 +1208,7 @@
         </div>
     </div>
 
-    <div id="toast" class="toast"><i class="fa-solid fa-check-circle" style="color: #22c55e;"></i> ¡Enlace copiado al portapapeles!</div>
+    <div id="toast" class="toast"><i id="toast-icon" class="fa-solid fa-check-circle" style="color: #22c55e;"></i> <span id="toast-text">¡Enlace copiado al portapapeles!</span></div>
 
     <div class="social-float">
         <a href="https://wa.me/584149956831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20tengo%20la%20siguiente%20sugerencia:" target="_blank" class="social-icon bg-sug" title="Enviar sugerencia" aria-label="Enviar sugerencia por WhatsApp"><i class="fa-solid fa-lightbulb"></i></a>
@@ -1254,6 +1273,14 @@
         // Búsqueda segura de un producto por su identificador (evita pasar objetos completos en atributos onclick)
         function buscarProductoPorId(id) {
             return listaProductosGlobal.find(p => obtenerIdentificadorProducto(p) === id);
+        }
+        function actualizarBotonFavoritoModal(prod) {
+            const btn = document.getElementById('modal-fav-btn');
+            if (!btn) return;
+            const isFav = esFavorito(prod);
+            btn.classList.toggle('fav-active', isFav);
+            btn.innerHTML = `<i class="fa-${isFav ? 'solid' : 'regular'} fa-star"></i>`;
+            btn.setAttribute('aria-label', isFav ? 'Quitar de favoritos' : 'Agregar a favoritos');
         }
         function toggleFavoritoPorId(event, encodedId) {
             const prod = buscarProductoPorId(decodeURIComponent(encodedId));
@@ -1545,10 +1572,21 @@
             });
         }
 
+        function mostrarToast(mensaje, icono = 'fa-solid fa-check-circle', color = '#22c55e', duracionMs = 4500) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-text').textContent = mensaje;
+            const iconEl = document.getElementById('toast-icon');
+            iconEl.className = icono;
+            iconEl.style.color = color;
+            toast.classList.add('show');
+            clearTimeout(toast._timeoutId);
+            toast._timeoutId = setTimeout(() => toast.classList.remove('show'), duracionMs);
+        }
+
         function compartirProducto(evt, prod) {
             const txt = `📌 *${prod.nombre}*\n💰 Precio: $${calcularPrecioFinal(prod).toFixed(2)}\n\n¡Consíguelo aquí!`;
             if (navigator.share) navigator.share({ title: prod.nombre, text: txt, url: window.location.href }).catch(() => {});
-            else { navigator.clipboard.writeText(txt + "\n" + window.location.href); document.getElementById('toast').classList.add('show'); setTimeout(() => document.getElementById('toast').classList.remove('show'), 3000); }
+            else { navigator.clipboard.writeText(txt + "\n" + window.location.href); mostrarToast('¡Enlace copiado al portapapeles!', 'fa-solid fa-check-circle', '#22c55e', 3000); }
         }
 
         function abrirModal(prod) {
@@ -1571,6 +1609,8 @@
             document.getElementById('modal-wa-btn').onclick = () => { productoIndividualPendiente = { ...prod, precioFinalCalculado: calcularPrecioFinal(prod) }; cerrarModal(); abrirModalCheckout(); };
             document.getElementById('modal-share-btn').onclick = () => compartirProducto(null, prod);
             document.getElementById('modal-add-cart-btn').onclick = (e) => { lanzarEfectoVueloAlCarrito(e.currentTarget, prod.imagen); agregarAlCarrito(prod); cerrarModal(); };
+            actualizarBotonFavoritoModal(prod);
+            document.getElementById('modal-fav-btn').onclick = (e) => { toggleFavorito(e, prod); actualizarBotonFavoritoModal(prod); };
             
             document.getElementById('product-modal').classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -1602,12 +1642,25 @@
         }
 
         // Enlace directo por producto: permite que "Compartir" envíe al producto exacto, no solo a la home
+        let modalHistoryPushed = false; // hay una entrada de historial abierta por el modal de producto
         function actualizarHashProducto(prod) {
             const id = encodeURIComponent(obtenerIdentificadorProducto(prod));
-            history.replaceState(null, '', `#producto-${id}`);
+            if (!modalHistoryPushed) {
+                // Primera apertura: crea una entrada nueva en el historial para que el botón
+                // "atrás" del navegador/celular cierre el modal en vez de salir de la página.
+                history.pushState({ modalProducto: true }, '', `#producto-${id}`);
+                modalHistoryPushed = true;
+            } else if (window.location.hash !== `#producto-${id}`) {
+                // Ya había un modal abierto (ej. se tocó un "producto relacionado"): solo actualizamos
+                // el link, sin apilar otra entrada, para que "atrás" cierre con un solo toque.
+                history.replaceState({ modalProducto: true }, '', `#producto-${id}`);
+            }
         }
         function limpiarHashProducto() {
-            history.replaceState(null, '', window.location.pathname + window.location.search);
+            if (modalHistoryPushed) {
+                modalHistoryPushed = false;
+                history.back();
+            }
         }
         function abrirProductoDesdeHash() {
             const hash = window.location.hash;
@@ -1617,6 +1670,17 @@
                 if (prod) abrirModal(prod);
             }
         }
+        // Al presionar "atrás" (navegador o gesto del celular) con el modal de producto abierto,
+        // esto cierra el modal en vez de sacar al usuario de la página del catálogo.
+        window.addEventListener('popstate', () => {
+            if (window.location.hash.indexOf('#producto-') !== 0) {
+                modalHistoryPushed = false;
+                document.getElementById('product-modal').classList.remove('active');
+                document.body.style.overflow = 'auto';
+            } else {
+                abrirProductoDesdeHash();
+            }
+        });
 
         function lanzarEfectoVueloAlCarrito(source, imgSrc) {
             const target = document.getElementById('cart-float-btn').getBoundingClientRect();
@@ -1719,6 +1783,9 @@
 
             window.open(`https://wa.me/584149956831?text=${encodeURIComponent(msg)}`, '_blank');
             cerrarModalCheckout();
+            // WhatsApp abre en otra pestaña/app: esta pestaña del catálogo sigue abierta.
+            // Se lo recordamos al usuario para que vuelva a seguir viendo productos.
+            mostrarToast('Pedido enviado a WhatsApp. Esta pestaña sigue abierta, ¡vuelve cuando quieras seguir viendo el catálogo!', 'fa-brands fa-whatsapp', '#25d366', 6000);
         }
 
         function abrirModalInfo(tipo) {
