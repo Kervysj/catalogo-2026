@@ -1770,13 +1770,22 @@
             let msg = "";
             if (productoIndividualPendiente) {
                 const p = productoIndividualPendiente;
-                if (esRecargaSaldo(p.categoria)) msg = `Hola, mi nombre es *${nombre}*.\nQuiero procesar la recarga: *${p.nombre}* (Total: $${p.precioFinalCalculado.toFixed(2)}).\n📍 *Nota:* ${dir || 'N/A'}`;
-                else if (esStriming(p.categoria) || esServicioGeneral(p.categoria)) msg = `Hola, mi nombre es *${nombre}*.\nSolicito el servicio: *${p.nombre}* ($${p.precioFinalCalculado.toFixed(2)}).\n📍 *Nota:* ${dir || 'N/A'}`;
-                else msg = `Hola, mi nombre es *${nombre}*.\nMe interesa:\n*Cód:* ${p.codigo_producto || p.id || 'N/A'}\n*Producto:* ${p.nombre}\n*Precio:* $${p.precioFinalCalculado.toFixed(2)}\n📍 *Dirección:* ${dir || 'N/A'}`;
+                const cod = p.codigo_producto || p.id || 'N/A';
+                const descLinea = (p.descripcion || '').trim() ? `\n*Descripción:* ${p.descripcion.trim()}` : '';
+                const fotoLinea = p.imagen ? `\n📸 *Foto:* ${p.imagen}` : '';
+                if (esRecargaSaldo(p.categoria)) msg = `Hola, mi nombre es *${nombre}*.\nQuiero procesar la recarga:\n*Código:* ${cod}\n*Producto:* ${p.nombre}${descLinea}\n*Total:* $${p.precioFinalCalculado.toFixed(2)}${fotoLinea}\n📍 *Nota:* ${dir || 'N/A'}`;
+                else if (esStriming(p.categoria) || esServicioGeneral(p.categoria)) msg = `Hola, mi nombre es *${nombre}*.\nSolicito el servicio:\n*Código:* ${cod}\n*Servicio:* ${p.nombre}${descLinea}\n*Precio:* $${p.precioFinalCalculado.toFixed(2)}${fotoLinea}\n📍 *Nota:* ${dir || 'N/A'}`;
+                else msg = `Hola, mi nombre es *${nombre}*.\nMe interesa:\n*Código:* ${cod}\n*Producto:* ${p.nombre}${descLinea}\n*Precio:* $${p.precioFinalCalculado.toFixed(2)}${fotoLinea}\n📍 *Dirección:* ${dir || 'N/A'}`;
             } else if (carritoGlobal.length > 0) {
-                msg = `Hola, mi nombre es *${nombre}*.\nCotización:\n`;
+                msg = `Hola, mi nombre es *${nombre}*.\nCotización:\n\n`;
                 let t = 0;
-                carritoGlobal.forEach((i, idx) => { t += i.precioFinalCalculado; msg += `*${idx + 1}. ${i.nombre}* ($${i.precioFinalCalculado.toFixed(2)})\n`; });
+                carritoGlobal.forEach((i, idx) => {
+                    t += i.precioFinalCalculado;
+                    const cod = i.codigo_producto || i.id || 'N/A';
+                    const descLinea = (i.descripcion || '').trim() ? `\n*Descripción:* ${i.descripcion.trim()}` : '';
+                    const fotoLinea = i.imagen ? `\n📸 *Foto:* ${i.imagen}` : '';
+                    msg += `*${idx + 1}. ${i.nombre}*\n*Código:* ${cod}${descLinea}\n*Precio:* $${i.precioFinalCalculado.toFixed(2)}${fotoLinea}\n\n`;
+                });
                 msg += `💰 *Total General:* $${t.toFixed(2)}\n📍 *Dirección:* ${dir || 'N/A'}`;
                 carritoGlobal = []; actualizarBtnCarrito();
             } else return cerrarModalCheckout();
