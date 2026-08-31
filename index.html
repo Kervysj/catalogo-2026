@@ -3,7 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo Digital y Servicios</title>
+    <title>BRIDIGI MARKET | Catálogo Digital de Productos y Servicios en San José de Guanipa</title>
+    <meta name="description" content="Catálogo digital de BRIDIGI MARKET en San José de Guanipa. Productos, recargas, streaming y servicios con pedidos directos por WhatsApp y delivery a domicilio.">
+
+    <!-- Open Graph / redes sociales (sin imagen todavía: agregar og:image y og:url cuando definan el dominio y una foto de portada) -->
+    <meta property="og:title" content="BRIDIGI MARKET | Catálogo Digital">
+    <meta property="og:description" content="Explora nuestro catálogo de productos y servicios en San José de Guanipa. Pide directo por WhatsApp con delivery a domicilio.">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="es_VE">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="BRIDIGI MARKET | Catálogo Digital">
+    <meta name="twitter:description" content="Explora nuestro catálogo de productos y servicios en San José de Guanipa. Pide directo por WhatsApp con delivery a domicilio.">
+
+    <!-- Datos estructurados para buscadores (sin "image": agregar cuando tengan una foto del local) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "BRIDIGI MARKET",
+        "telephone": "+584149956831",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Calle Zea entre Unión y Democracia, frente a la Plaza Bolívar, al lado de Mi Plazita",
+            "addressLocality": "San José de Guanipa",
+            "addressRegion": "Anzoátegui",
+            "addressCountry": "VE"
+        },
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 8.8864,
+            "longitude": -64.1532
+        }
+    }
+    </script>
+
     <!-- Configuración para PWA (Instalable) -->
     <meta name="theme-color" content="#2563eb">
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,{
@@ -19,13 +52,9 @@
     <!-- Fuente moderna e iconos -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Librería Leaflet para el Mapa Interactivo -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <!-- Librería jsPDF para descarga de cotizaciones -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Leaflet (mapa) y jsPDF (descarga de cotización) ya NO se cargan aquí: se inyectan dinámicamente
+         solo cuando el usuario abre el mapa o descarga el PDF, para no penalizar la carga inicial. -->
 
     <style>
         :root {
@@ -327,6 +356,18 @@
             background-color: #d97706;
             color: #ffffff;
             border-color: #d97706;
+        }
+
+        .filter-btn.recent-filter {
+            border-color: rgba(6, 182, 212, 0.4);
+            color: #0891b2;
+            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(6, 182, 212, 0.1) 100%);
+        }
+
+        .filter-btn.recent-filter.active {
+            background-color: #0891b2;
+            color: #ffffff;
+            border-color: #0891b2;
         }
 
         .grid {
@@ -649,6 +690,48 @@
         }
         .modal-share-btn:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
 
+        .modal-related-container { margin-top: 20px; }
+        .modal-related-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 16px;
+        }
+        .modal-related-list {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+        .modal-related-card {
+            flex: 0 0 100px;
+            cursor: pointer;
+            text-align: center;
+            transition: var(--transition-smooth);
+        }
+        .modal-related-card:hover { transform: translateY(-2px); }
+        .modal-related-card img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+        .modal-related-card span {
+            display: block;
+            font-size: 0.72rem;
+            margin-top: 6px;
+            color: var(--text-main);
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         .info-modal-list { list-style: none; margin-top: 15px; display: flex; flex-direction: column; gap: 12px; }
         .info-modal-list li {
             background: var(--bg-color);
@@ -919,12 +1002,12 @@
     <div id="news-banner" class="news-banner-bar">
         <span>¡Hay nuevos productos desde tu última visita! Consúltalos o compártelos directamente.</span>
         <a href="https://wa.me/584149956831?text=Hola,%20quiero%20consultar%20las%20novedades%20recientes" target="_blank" style="background: white; color: var(--primary-color); padding: 2px 8px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.75rem;">Ver por WhatsApp</a>
-        <button onclick="cerrarBarraNovedades()" style="background:none; border:none; color:white; cursor:pointer; font-size:1rem; margin-left:10px;">×</button>
+        <button onclick="cerrarBarraNovedades()" style="background:none; border:none; color:white; cursor:pointer; font-size:1rem; margin-left:10px;" aria-label="Cerrar aviso de novedades">×</button>
     </div>
 
     <!-- Switch de Modo Oscuro / Claro Flotante -->
     <div class="theme-switch-container">
-        <button class="theme-switch-btn" id="theme-switch-btn" onclick="toggleTheme()" title="Cambiar Modo Oscuro / Claro">
+        <button class="theme-switch-btn" id="theme-switch-btn" onclick="toggleTheme()" title="Cambiar Modo Oscuro / Claro" aria-label="Cambiar modo oscuro o claro">
             <i class="fa-solid fa-moon" id="theme-icon"></i>
         </button>
     </div>
@@ -935,8 +1018,8 @@
     </div>
 
     <header>
-        <h1>Catálogo Digital</h1>
-        <p>Explora nuestros productos y servicios disponibles</p>
+        <h1>BRIDIGI MARKET</h1>
+        <p>Catálogo Digital de Productos y Servicios en San José de Guanipa</p>
     </header>
 
     <div class="info-badges-container">
@@ -975,7 +1058,7 @@
     <div id="assistant-chat-box" class="assistant-chat-container">
         <div class="assistant-chat-header">
             <span><i class="fa-solid fa-headset"></i> Asistente Virtual</span>
-            <button class="assistant-chat-close" onclick="toggleAsistenteChat()">×</button>
+            <button class="assistant-chat-close" onclick="toggleAsistenteChat()" aria-label="Cerrar asistente virtual">×</button>
         </div>
         <div class="assistant-chat-body">
             <p id="assistant-welcome-msg">¡Hola! 👋 Te recomiendo este artículo destacado:</p>
@@ -1004,7 +1087,7 @@
     <!-- Modal de Producto -->
     <div class="modal" id="product-modal" onclick="if(event.target === this) cerrarModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <button class="modal-close" onclick="cerrarModal()"><i class="fa-solid fa-xmark"></i></button>
+            <button class="modal-close" onclick="cerrarModal()" aria-label="Cerrar ventana de producto"><i class="fa-solid fa-xmark"></i></button>
             <div class="modal-img-container" id="modal-img-container" onclick="toggleZoom(event)">
                 <img id="modal-img" class="modal-img" src="" alt="">
                 <div class="zoom-hint-badge"><i class="fa-solid fa-magnifying-glass-plus"></i> Clic para zoom</div>
@@ -1021,7 +1104,7 @@
                         <button id="modal-wa-btn" class="whatsapp-btn">
                             <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i> Comprar Individual
                         </button>
-                        <button id="modal-share-btn" class="modal-share-btn" title="Compartir producto">
+                        <button id="modal-share-btn" class="modal-share-btn" title="Compartir producto" aria-label="Compartir producto">
                             <i class="fa-solid fa-share-nodes"></i>
                         </button>
                     </div>
@@ -1029,6 +1112,7 @@
                         <i class="fa-solid fa-cart-plus"></i> Agregar al Carrito
                     </button>
                 </div>
+                <div id="modal-related-container" class="modal-related-container"></div>
             </div>
         </div>
     </div>
@@ -1036,7 +1120,7 @@
     <!-- Modal del Carrito -->
     <div class="modal" id="cart-modal" onclick="if(event.target === this) cerrarModalCarrito()">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <button class="modal-close" onclick="cerrarModalCarrito()"><i class="fa-solid fa-xmark"></i></button>
+            <button class="modal-close" onclick="cerrarModalCarrito()" aria-label="Cerrar carrito"><i class="fa-solid fa-xmark"></i></button>
             <div class="modal-body" style="padding-top: 35px;">
                 <h2 class="modal-title" style="color:var(--primary-color); margin-bottom: 15px;"><i class="fa-solid fa-cart-shopping"></i> Cotización</h2>
                 <div class="cart-items-container" id="cart-items-list"></div>
@@ -1054,7 +1138,7 @@
     <!-- Modal de Checkout -->
     <div class="modal" id="checkout-modal" onclick="if(event.target === this) cerrarModalCheckout()">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <button class="modal-close" onclick="cerrarModalCheckout()"><i class="fa-solid fa-xmark"></i></button>
+            <button class="modal-close" onclick="cerrarModalCheckout()" aria-label="Cerrar formulario de pedido"><i class="fa-solid fa-xmark"></i></button>
             <div class="modal-body" style="padding-top: 35px;">
                 <h2 class="modal-title" style="color:var(--primary-color); margin-bottom: 8px;"><i class="fa-solid fa-bag-shopping"></i> Finalizar Pedido</h2>
                 <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 20px;">Indícanos tus datos para coordinar tu entrega o servicio:</p>
@@ -1078,7 +1162,7 @@
     <!-- Modal Info -->
     <div class="modal" id="info-modal" onclick="if(event.target === this) cerrarModalInfo()">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <button class="modal-close" onclick="cerrarModalInfo()"><i class="fa-solid fa-xmark"></i></button>
+            <button class="modal-close" onclick="cerrarModalInfo()" aria-label="Cerrar información"><i class="fa-solid fa-xmark"></i></button>
             <div class="modal-body" style="padding-top: 35px;">
                 <div id="info-modal-header"></div>
                 <div id="info-modal-body-content"></div>
@@ -1089,7 +1173,7 @@
     <!-- Modal Ubicación -->
     <div class="modal" id="location-modal" onclick="if(event.target === this) cerrarModalUbicacion()">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <button class="modal-close" onclick="cerrarModalUbicacion()"><i class="fa-solid fa-xmark"></i></button>
+            <button class="modal-close" onclick="cerrarModalUbicacion()" aria-label="Cerrar ubicación"><i class="fa-solid fa-xmark"></i></button>
             <div class="modal-body" style="padding-top: 35px;">
                 <h2 class="modal-title" style="color:var(--danger-color); margin-bottom: 5px;"><i class="fa-solid fa-location-dot"></i> Nuestra Ubicación</h2>
                 <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom: 15px;">Calle Zea entre Unión y Democracia, frente a la Plaza Bolívar, al lado de Mi Plazita, San José de Guanipa.</p>
@@ -1108,18 +1192,19 @@
     <div id="toast" class="toast"><i class="fa-solid fa-check-circle" style="color: #22c55e;"></i> ¡Enlace copiado al portapapeles!</div>
 
     <div class="social-float">
-        <a href="https://wa.me/584149956831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20tengo%20la%20siguiente%20sugerencia:" target="_blank" class="social-icon bg-sug" title="Enviar sugerencia"><i class="fa-solid fa-lightbulb"></i></a>
-        <a href="https://wa.me/584149956831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20quiero%20más%20información" target="_blank" class="social-icon bg-wa" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
-        <a href="https://tinyurl.com/pageimc" target="_blank" class="social-icon bg-fb" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-        <div class="social-icon bg-maps" onclick="abrirModalUbicacion()" title="Ubicación Interactiva"><i class="fa-solid fa-location-dot"></i></div>
+        <a href="https://wa.me/584149956831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20tengo%20la%20siguiente%20sugerencia:" target="_blank" class="social-icon bg-sug" title="Enviar sugerencia" aria-label="Enviar sugerencia por WhatsApp"><i class="fa-solid fa-lightbulb"></i></a>
+        <a href="https://wa.me/584149956831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20quiero%20más%20información" target="_blank" class="social-icon bg-wa" title="WhatsApp" aria-label="Contactar por WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="https://tinyurl.com/pageimc" target="_blank" class="social-icon bg-fb" title="Facebook" aria-label="Visitar página de Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+        <div class="social-icon bg-maps" onclick="abrirModalUbicacion()" title="Ubicación Interactiva" role="button" tabindex="0" aria-label="Ver ubicación interactiva"><i class="fa-solid fa-location-dot"></i></div>
         <!-- Botón del Asistente -->
-        <div class="social-icon bg-assistant" onclick="toggleAsistenteChat()" title="Asistente Virtual"><i class="fa-solid fa-headset"></i></div>
+        <div class="social-icon bg-assistant" onclick="toggleAsistenteChat()" title="Asistente Virtual" role="button" tabindex="0" aria-label="Abrir asistente virtual"><i class="fa-solid fa-headset"></i></div>
     </div>
 
     <script>
         const urlAPI = "https://script.google.com/macros/s/AKfycbyfjv9UscbcmgqeKjx_0j5UxGWK2qpFudgFGcHeCBt252fUfxgkhcQUKH-b8BeZLU8NNg/exec";
         const CACHE_KEY = 'kervys_catalogo_cache_data';
         const FAVS_KEY = 'kervys_catalogo_favoritos';
+        const RECENT_KEY = 'kervys_catalogo_recientes';
 
         let listaProductosGlobal = [];
         let categoriaSeleccionada = 'todos';
@@ -1127,9 +1212,14 @@
         let carritoGlobal = [];
         let productoIndividualPendiente = null;
         let favoritosGlobal = [];
+        let recientesGlobal = [];
         let leafletMap = null;
         let productoActualMarquesina = null;
         let intervaloMarquesina = null;
+        let intervaloActualizacion = null;
+        let hashInicialProcesado = false;
+        let leafletCargado = false;
+        let jsPDFCargado = false;
 
         // Tema Oscuro
         function inicializarTema() {
@@ -1159,6 +1249,31 @@
             index > -1 ? favoritosGlobal.splice(index, 1) : favoritosGlobal.push(id);
             guardarFavoritosStorage();
             filtrarCombinado();
+        }
+
+        // Búsqueda segura de un producto por su identificador (evita pasar objetos completos en atributos onclick)
+        function buscarProductoPorId(id) {
+            return listaProductosGlobal.find(p => obtenerIdentificadorProducto(p) === id);
+        }
+        function toggleFavoritoPorId(event, encodedId) {
+            const prod = buscarProductoPorId(decodeURIComponent(encodedId));
+            if (prod) toggleFavorito(event, prod);
+        }
+        function compartirProductoPorId(event, encodedId) {
+            if (event) event.stopPropagation();
+            const prod = buscarProductoPorId(decodeURIComponent(encodedId));
+            if (prod) compartirProducto(event, prod);
+        }
+
+        // Vistos Recientemente
+        function cargarRecientesStorage() { recientesGlobal = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'); }
+        function guardarRecientesStorage() { localStorage.setItem(RECENT_KEY, JSON.stringify(recientesGlobal)); }
+        function registrarProductoVisto(prod) {
+            const id = obtenerIdentificadorProducto(prod);
+            recientesGlobal = recientesGlobal.filter(item => item !== id);
+            recientesGlobal.unshift(id);
+            if (recientesGlobal.length > 10) recientesGlobal = recientesGlobal.slice(0, 10);
+            guardarRecientesStorage();
         }
 
         // Temporada
@@ -1286,9 +1401,37 @@
             toggleAsistenteChat();
         }
 
+        // Carga diferida de librerías pesadas (Leaflet y jsPDF), solo cuando realmente se necesitan
+        function cargarScriptExterno(src) {
+            return new Promise((resolve, reject) => {
+                const s = document.createElement('script');
+                s.src = src; s.onload = resolve; s.onerror = reject;
+                document.head.appendChild(s);
+            });
+        }
+        function cargarCSSExterno(href) {
+            return new Promise((resolve) => {
+                const l = document.createElement('link');
+                l.rel = 'stylesheet'; l.href = href; l.onload = resolve;
+                document.head.appendChild(l);
+            });
+        }
+        async function asegurarLeaflet() {
+            if (leafletCargado) return;
+            await cargarCSSExterno('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+            await cargarScriptExterno('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js');
+            leafletCargado = true;
+        }
+        async function asegurarJsPDF() {
+            if (jsPDFCargado) return;
+            await cargarScriptExterno('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+            jsPDFCargado = true;
+        }
+
         // Fetch Data
         function cargarCatalogo(silencioso = false) {
             cargarFavoritosStorage();
+            cargarRecientesStorage();
             if (!silencioso && localStorage.getItem(CACHE_KEY)) {
                 procesarYRenderizarDatos(JSON.parse(localStorage.getItem(CACHE_KEY)));
             }
@@ -1310,6 +1453,11 @@
             if (document.getElementById('assistant-chat-box').classList.contains('active')) {
                 iniciarMarquesinaAsistente();
             }
+            // Si alguien entró con un link directo a un producto (#producto-...), abrirlo una sola vez
+            if (!hashInicialProcesado) {
+                hashInicialProcesado = true;
+                abrirProductoDesdeHash();
+            }
         }
 
         // Reglas de Catálogo Aislado
@@ -1323,7 +1471,8 @@
             const cats = [...new Set(productos.map(p => p.categoria ? p.categoria.trim() : 'General'))];
             
             let html = `<button class="filter-btn ${categoriaSeleccionada === 'todos' ? 'active' : ''}" onclick="cambiarCategoria('todos', this)">Todos</button>
-                        <button class="filter-btn fav-filter ${categoriaSeleccionada === 'favoritos' ? 'active' : ''}" onclick="cambiarCategoria('favoritos', this)"><i class="fa-solid fa-star"></i> Favoritos</button>`;
+                        <button class="filter-btn fav-filter ${categoriaSeleccionada === 'favoritos' ? 'active' : ''}" onclick="cambiarCategoria('favoritos', this)"><i class="fa-solid fa-star"></i> Favoritos</button>
+                        <button class="filter-btn recent-filter ${categoriaSeleccionada === 'recientes' ? 'active' : ''}" onclick="cambiarCategoria('recientes', this)"><i class="fa-solid fa-clock-rotate-left"></i> Recientes</button>`;
             
             cats.forEach(cat => {
                 const isActive = categoriaSeleccionada.toLowerCase() === cat.toLowerCase() ? 'active' : '';
@@ -1349,6 +1498,8 @@
                 lista = lista.filter(p => !debeOcultarseEnPrincipal(p.categoria));
             } else if (categoriaSeleccionada === 'favoritos') {
                 lista = lista.filter(p => esFavorito(p));
+            } else if (categoriaSeleccionada === 'recientes') {
+                lista = recientesGlobal.map(id => buscarProductoPorId(id)).filter(Boolean);
             } else {
                 lista = lista.filter(p => (p.categoria || 'general').trim().toLowerCase() === categoriaSeleccionada.toLowerCase());
             }
@@ -1376,13 +1527,14 @@
                 card.style.animationDelay = `${idx * 0.03}s`;
                 card.onclick = () => abrirModal(prod);
                 const isFav = esFavorito(prod);
+                const idProdEncoded = encodeURIComponent(obtenerIdentificadorProducto(prod));
                 
                 card.innerHTML = `
                     <div class="card-img-container">
                         <img src="${prod.imagen}" alt="${prod.nombre}" loading="lazy">
                         <div class="card-top-actions">
-                            <button class="card-action-icon-btn ${isFav ? 'fav-active' : ''}" onclick="toggleFavorito(event, ${JSON.stringify(prod).replace(/"/g, '"')})"><i class="fa-${isFav ? 'solid' : 'regular'} fa-star"></i></button>
-                            <button class="card-action-icon-btn" onclick="event.stopPropagation(); compartirProducto(event, ${JSON.stringify(prod).replace(/"/g, '"')})"><i class="fa-solid fa-share-nodes"></i></button>
+                            <button class="card-action-icon-btn ${isFav ? 'fav-active' : ''}" onclick="toggleFavoritoPorId(event, '${idProdEncoded}')" aria-label="${isFav ? 'Quitar de favoritos' : 'Agregar a favoritos'}"><i class="fa-${isFav ? 'solid' : 'regular'} fa-star"></i></button>
+                            <button class="card-action-icon-btn" onclick="compartirProductoPorId(event, '${idProdEncoded}')" aria-label="Compartir producto"><i class="fa-solid fa-share-nodes"></i></button>
                         </div>
                     </div>
                     <div class="card-body">
@@ -1422,6 +1574,48 @@
             
             document.getElementById('product-modal').classList.add('active');
             document.body.style.overflow = 'hidden';
+
+            registrarProductoVisto(prod);
+            renderProductosRelacionados(prod);
+            actualizarHashProducto(prod);
+        }
+
+        // Productos relacionados: misma categoría, excluyendo el producto actual
+        function renderProductosRelacionados(prod) {
+            const container = document.getElementById('modal-related-container');
+            if (!container) return;
+            const idActual = obtenerIdentificadorProducto(prod);
+            const relacionados = listaProductosGlobal.filter(p =>
+                obtenerIdentificadorProducto(p) !== idActual &&
+                (p.categoria || 'general').trim().toLowerCase() === (prod.categoria || 'general').trim().toLowerCase()
+            ).slice(0, 6);
+
+            if (relacionados.length === 0) { container.innerHTML = ''; return; }
+
+            container.innerHTML = `<div class="modal-related-title">También te puede interesar</div>
+                <div class="modal-related-list">
+                    ${relacionados.map(p => `<div class="modal-related-card" onclick="abrirModal(buscarProductoPorId(decodeURIComponent('${encodeURIComponent(obtenerIdentificadorProducto(p))}')))">
+                        <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
+                        <span>${p.nombre}</span>
+                    </div>`).join('')}
+                </div>`;
+        }
+
+        // Enlace directo por producto: permite que "Compartir" envíe al producto exacto, no solo a la home
+        function actualizarHashProducto(prod) {
+            const id = encodeURIComponent(obtenerIdentificadorProducto(prod));
+            history.replaceState(null, '', `#producto-${id}`);
+        }
+        function limpiarHashProducto() {
+            history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
+        function abrirProductoDesdeHash() {
+            const hash = window.location.hash;
+            if (hash.indexOf('#producto-') === 0) {
+                const id = decodeURIComponent(hash.replace('#producto-', ''));
+                const prod = buscarProductoPorId(id);
+                if (prod) abrirModal(prod);
+            }
         }
 
         function lanzarEfectoVueloAlCarrito(source, imgSrc) {
@@ -1435,7 +1629,7 @@
             setTimeout(() => { img.remove(); document.getElementById('cart-float-btn').style.transform = 'scale(1.15)'; setTimeout(() => document.getElementById('cart-float-btn').style.transform = 'scale(1)', 200); }, 830);
         }
 
-        function cerrarModal() { document.getElementById('product-modal').classList.remove('active'); document.body.style.overflow = 'auto'; }
+        function cerrarModal() { document.getElementById('product-modal').classList.remove('active'); document.body.style.overflow = 'auto'; limpiarHashProducto(); }
         
         function agregarAlCarrito(prod) { carritoGlobal.push({ ...prod, precioFinalCalculado: calcularPrecioFinal(prod) }); actualizarBtnCarrito(); }
         function actualizarBtnCarrito() {
@@ -1456,7 +1650,7 @@
                             <span class="cart-item-title">${item.nombre}</span>
                             <span class="cart-item-details">Cód: ${item.codigo_producto || item.id || 'N/A'} | $${item.precioFinalCalculado.toFixed(2)}</span>
                         </div>
-                        <button class="cart-item-remove" onclick="removerDelCarrito(${idx})" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                        <button class="cart-item-remove" onclick="removerDelCarrito(${idx})" title="Eliminar" aria-label="Eliminar producto del carrito"><i class="fa-solid fa-trash"></i></button>
                     </div>`;
             });
             document.getElementById('cart-total-text').innerText = `Total: $${total.toFixed(2)}`;
@@ -1466,8 +1660,9 @@
         function cerrarModalCarrito() { document.getElementById('cart-modal').classList.remove('active'); document.body.style.overflow = 'auto'; }
         function removerDelCarrito(idx) { carritoGlobal.splice(idx, 1); actualizarBtnCarrito(); carritoGlobal.length === 0 ? cerrarModalCarrito() : abrirModalCarrito(); }
 
-        function descargarCotizacionPDF() {
+        async function descargarCotizacionPDF() {
             if (carritoGlobal.length === 0) { alert("El carrito está vacío."); return; }
+            await asegurarJsPDF();
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
@@ -1541,9 +1736,10 @@
         function cerrarModalInfo() { document.getElementById('info-modal').classList.remove('active'); document.body.style.overflow = 'auto'; }
 
         // Mapa Leaflet - San José de Guanipa
-        function abrirModalUbicacion() {
+        async function abrirModalUbicacion() {
             document.getElementById('location-modal').classList.add('active');
             document.body.style.overflow = 'hidden';
+            await asegurarLeaflet();
             const localLat = 8.8864, localLng = -64.1532;
             setTimeout(() => {
                 if (!leafletMap) {
@@ -1580,8 +1776,15 @@
 
         window.addEventListener('keydown', e => { if (e.key === 'Escape') { cerrarModal(); cerrarModalInfo(); cerrarModalCarrito(); cerrarModalCheckout(); cerrarModalUbicacion(); document.getElementById('assistant-chat-box').classList.remove('active'); detenerMarquesinaAsistente(); } });
 
+        // Actualización periódica del catálogo: cada 90s y solo si la pestaña está visible (ahorra datos móviles)
+        function iniciarActualizacionPeriodica() {
+            if (intervaloActualizacion) clearInterval(intervaloActualizacion);
+            intervaloActualizacion = setInterval(() => { if (!document.hidden) cargarCatalogo(true); }, 90000);
+        }
+        document.addEventListener('visibilitychange', () => { if (!document.hidden) cargarCatalogo(true); });
+
         // Inicialización
-        inicializarTema(); aplicarCampanaTemporada(); verificarNovedadesVisita(); cargarCatalogo(false); setInterval(() => cargarCatalogo(true), 20000);
+        inicializarTema(); aplicarCampanaTemporada(); verificarNovedadesVisita(); cargarCatalogo(false); iniciarActualizacionPeriodica();
         
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
