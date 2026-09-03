@@ -258,7 +258,7 @@
 
         .search-container {
             max-width: 520px;
-            margin: 0 auto 25px auto;
+            margin: 0 auto 15px auto;
             position: relative;
             transition: var(--transition-smooth);
         }
@@ -296,6 +296,31 @@
         .search-input:focus ~ .search-icon {
             color: var(--primary-color);
             transform: translateY(-50%) scale(1.1);
+        }
+
+        /* Contenedor del desplegable de subcategorías */
+        .subcategory-container {
+            max-width: 520px;
+            margin: 0 auto 25px auto;
+        }
+
+        .subcategory-select {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 25px;
+            border: 2px solid var(--border-color);
+            font-size: 0.95rem;
+            outline: none;
+            transition: var(--transition-smooth);
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow-subtle);
+            color: var(--text-main);
+            cursor: pointer;
+        }
+
+        .subcategory-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12), var(--shadow-subtle);
         }
 
         .filters {
@@ -896,7 +921,6 @@
             transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Ventana Emergente del Asistente con Marquesina Dinámica y Accesos Aleatorios */
         .assistant-chat-container {
             position: fixed;
             bottom: 95px;
@@ -936,7 +960,6 @@
             background: var(--bg-color);
         }
         
-        /* Tarjeta Marquesina Rotativa del Asistente */
         .assistant-product-card {
             background: var(--card-bg);
             border: 2px solid var(--border-color);
@@ -1055,6 +1078,13 @@
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
     </div>
 
+    <!-- Menú Desplegable de Subcategorías -->
+    <div class="subcategory-container">
+        <select id="filter-subcategory" class="subcategory-select" onchange="filterProducts()">
+            <option value="all">Todas las subcategorías</option>
+        </select>
+    </div>
+
     <div class="filters" id="filters-container">
         <!-- Contenedor dinámico de categorías -->
     </div>
@@ -1079,7 +1109,6 @@
         <div class="assistant-chat-body">
             <p id="assistant-welcome-msg">¡Hola! 👋 Te recomiendo este artículo destacado:</p>
             
-            <!-- Marquesina Rotativa de Producto -->
             <div id="assistant-marquee-card" class="assistant-product-card" onclick="abrirProductoDesdeMarquesina()">
                 <img id="assistant-prod-img" class="assistant-prod-img" src="" alt="Producto">
                 <div class="assistant-prod-info">
@@ -1215,7 +1244,6 @@
         <a href="https://wa.me/584149956831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20quiero%20más%20información" target="_blank" class="social-icon bg-wa" title="WhatsApp" aria-label="Contactar por WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
         <a href="https://tinyurl.com/pageimc" target="_blank" class="social-icon bg-fb" title="Facebook" aria-label="Visitar página de Facebook"><i class="fa-brands fa-facebook-f"></i></a>
         <div class="social-icon bg-maps" onclick="abrirModalUbicacion()" title="Ubicación Interactiva" role="button" tabindex="0" aria-label="Ver ubicación interactiva"><i class="fa-solid fa-location-dot"></i></div>
-        <!-- Botón del Asistente -->
         <div class="social-icon bg-assistant" onclick="toggleAsistenteChat()" title="Asistente Virtual" role="button" tabindex="0" aria-label="Abrir asistente virtual"><i class="fa-solid fa-headset"></i></div>
     </div>
 
@@ -1235,10 +1263,27 @@
         let leafletMap = null;
         let productoActualMarquesina = null;
         let intervaloMarquesina = null;
-        let intervaloActualizacion = null;
         let hashInicialProcesado = false;
         let leafletCargado = false;
         let jsPDFCargado = false;
+
+        // Función para poblar el menú desplegable de subcategorías basándose en los datos
+        function loadSubcategories(products) {
+            const select = document.getElementById('filter-subcategory');
+            // Extraer subcategorías únicas y descartar vacías
+            const subcategories = [...new Set(products.map(p => p.subcategoria))].filter(Boolean);
+            
+            // Mantener la opción por defecto y agregar las dinámicas
+            select.innerHTML = '<option value="all">Todas las subcategorías</option>';
+            subcategories.forEach(sub => {
+                select.innerHTML += `<option value="${sub}">${sub}</option>`;
+            });
+        }
+
+        // Función de filtrado combinada (categoría + subcategoría + búsqueda)
+        function filterProducts() {
+            filtrarCombinado();
+        }
 
         // Tema Oscuro
         function inicializarTema() {
@@ -1270,7 +1315,6 @@
             filtrarCombinado();
         }
 
-        // Búsqueda segura de un producto por su identificador (evita pasar objetos completos en atributos onclick)
         function buscarProductoPorId(id) {
             return listaProductosGlobal.find(p => obtenerIdentificadorProducto(p) === id);
         }
@@ -1316,7 +1360,6 @@
             else if (mesActual === 11) { body.classList.add('season-christmas'); icon.className = "fa-solid fa-tree"; text.innerHTML = "¡Felices Fiestas!"; banner.classList.add('show'); }
         }
 
-        // Recordatorios de Novedades
         function verificarNovedadesVisita() {
             const ultimaVisita = localStorage.getItem('kervys_ultima_visita');
             const hoy = new Date().toDateString();
@@ -1329,7 +1372,6 @@
             document.getElementById('news-banner').classList.remove('show');
         }
 
-        // Control del Asistente y Marquesina Rotativa
         function toggleAsistenteChat() {
             const chatBox = document.getElementById('assistant-chat-box');
             chatBox.classList.toggle('active');
@@ -1344,7 +1386,6 @@
             if (listaProductosGlobal.length === 0) return;
             actualizarItemMarquesina();
             if (!intervaloMarquesina) {
-                // Configurado a 12 segundos (12000 milisegundos) para que pase más lento
                 intervaloMarquesina = setInterval(actualizarItemMarquesina, 12000); 
             }
         }
@@ -1359,7 +1400,6 @@
         function actualizarItemMarquesina() {
             if (listaProductosGlobal.length === 0) return;
 
-            // Priorizar productos de ofertas o categorías especiales si existen
             let pool = listaProductosGlobal;
             const ofertas = listaProductosGlobal.filter(p => {
                 const cat = (p.categoria || '').toLowerCase();
@@ -1367,7 +1407,6 @@
                 return cat.includes('oferta') || cat.includes('descuento') || nom.includes('oferta');
             });
 
-            // 60% de probabilidad de mostrar una oferta si las hay, de lo contrario aleatorio general
             let prodSeleccionado;
             if (ofertas.length > 0 && Math.random() < 0.6) {
                 prodSeleccionado = ofertas[Math.floor(Math.random() * ofertas.length)];
@@ -1383,7 +1422,6 @@
             const priceEl = document.getElementById('assistant-prod-price');
             const welcomeMsg = document.getElementById('assistant-welcome-msg');
 
-            // Efecto de fundido suave
             cardEl.style.opacity = '0.3';
             setTimeout(() => {
                 imgEl.src = prodSeleccionado.imagen;
@@ -1412,11 +1450,9 @@
 
         function seleccionarCategoriaORecursoAleatorio() {
             if (listaProductosGlobal.length === 0) return;
-            // Elegir un producto al azar y enfocar su categoría automáticamente
             const randomProd = listaProductosGlobal[Math.floor(Math.random() * listaProductosGlobal.length)];
             const cat = randomProd.categoria ? randomProd.categoria.trim() : 'todos';
             
-            // Buscar el botón de filtro correspondiente y activarlo
             const botonesFiltro = document.querySelectorAll('.filter-btn');
             botonesFiltro.forEach(btn => {
                 if (btn.textContent.trim().toLowerCase().includes(cat.toLowerCase())) {
@@ -1424,11 +1460,9 @@
                 }
             });
             
-            // Cerrar el asistente para ver el resultado
             toggleAsistenteChat();
         }
 
-        // Carga diferida de librerías pesadas (Leaflet y jsPDF), solo cuando realmente se necesitan
         function cargarScriptExterno(src) {
             return new Promise((resolve, reject) => {
                 const s = document.createElement('script');
@@ -1455,7 +1489,6 @@
             jsPDFCargado = true;
         }
 
-        // Fetch Data
         function cargarCatalogo(silencioso = false) {
             cargarFavoritosStorage();
             cargarRecientesStorage();
@@ -1474,20 +1507,18 @@
 
         function procesarYRenderizarDatos(data) {
             listaProductosGlobal = data.filter(prod => prod.status && prod.status.toString().trim().toLowerCase() === 'disponible');
+            loadSubcategories(listaProductosGlobal);
             construirBotonesCategorias(listaProductosGlobal);
             filtrarCombinado();
-            // Si el asistente está abierto, refrescar marquesina
             if (document.getElementById('assistant-chat-box').classList.contains('active')) {
                 iniciarMarquesinaAsistente();
             }
-            // Si alguien entró con un link directo a un producto (#producto-...), abrirlo una sola vez
             if (!hashInicialProcesado) {
                 hashInicialProcesado = true;
                 abrirProductoDesdeHash();
             }
         }
 
-        // Reglas de Catálogo Aislado
         function esStriming(cat) { return cat && (cat.toLowerCase().trim() === 'striming' || cat.toLowerCase().includes('streaming')); }
         function esRecargaSaldo(cat) { return cat && (cat.toLowerCase().trim() === 'recarga saldo' || (cat.toLowerCase().includes('recarga') && cat.toLowerCase().includes('saldo'))); }
         function debeOcultarseEnPrincipal(cat) { return esStriming(cat) || esRecargaSaldo(cat); }
@@ -1519,6 +1550,7 @@
 
         function filtrarCombinado() {
             const txt = document.getElementById('search-input').value.toLowerCase().trim();
+            const selectedSub = document.getElementById('filter-subcategory').value;
             let lista = listaProductosGlobal;
 
             if (categoriaSeleccionada === 'todos') {
@@ -1530,6 +1562,12 @@
             } else {
                 lista = lista.filter(p => (p.categoria || 'general').trim().toLowerCase() === categoriaSeleccionada.toLowerCase());
             }
+
+            // Aplicar filtro de subcategoría
+            lista = lista.filter(prod => {
+                const matchesSub = (selectedSub === 'all' || prod.subcategoria === selectedSub);
+                return matchesSub; 
+            });
 
             if (txt) {
                 lista = lista.filter(p => [p.nombre, p.descripcion, p.mas_detalles, p.codigo_producto, p.id].join(' ').toLowerCase().includes(txt));
@@ -1620,7 +1658,6 @@
             actualizarHashProducto(prod);
         }
 
-        // Productos relacionados: misma categoría, excluyendo el producto actual
         function renderProductosRelacionados(prod) {
             const container = document.getElementById('modal-related-container');
             if (!container) return;
@@ -1641,18 +1678,13 @@
                 </div>`;
         }
 
-        // Enlace directo por producto: permite que "Compartir" envíe al producto exacto, no solo a la home
-        let modalHistoryPushed = false; // hay una entrada de historial abierta por el modal de producto
+        let modalHistoryPushed = false;
         function actualizarHashProducto(prod) {
             const id = encodeURIComponent(obtenerIdentificadorProducto(prod));
             if (!modalHistoryPushed) {
-                // Primera apertura: crea una entrada nueva en el historial para que el botón
-                // "atrás" del navegador/celular cierre el modal en vez de salir de la página.
                 history.pushState({ modalProducto: true }, '', `#producto-${id}`);
                 modalHistoryPushed = true;
             } else if (window.location.hash !== `#producto-${id}`) {
-                // Ya había un modal abierto (ej. se tocó un "producto relacionado"): solo actualizamos
-                // el link, sin apilar otra entrada, para que "atrás" cierre con un solo toque.
                 history.replaceState({ modalProducto: true }, '', `#producto-${id}`);
             }
         }
@@ -1670,8 +1702,6 @@
                 if (prod) abrirModal(prod);
             }
         }
-        // Al presionar "atrás" (navegador o gesto del celular) con el modal de producto abierto,
-        // esto cierra el modal en vez de sacar al usuario de la página del catálogo.
         window.addEventListener('popstate', () => {
             if (window.location.hash.indexOf('#producto-') !== 0) {
                 modalHistoryPushed = false;
@@ -1792,8 +1822,6 @@
 
             window.open(`https://wa.me/584149956831?text=${encodeURIComponent(msg)}`, '_blank');
             cerrarModalCheckout();
-            // WhatsApp abre en otra pestaña/app: esta pestaña del catálogo sigue abierta.
-            // Se lo recordamos al usuario para que vuelva a seguir viendo productos.
             mostrarToast('Pedido enviado a WhatsApp. Esta pestaña sigue abierta, ¡vuelve cuando quieras seguir viendo el catálogo!', 'fa-brands fa-whatsapp', '#25d366', 6000);
         }
 
@@ -1802,71 +1830,74 @@
             const body = document.getElementById('info-modal-body-content');
             if (tipo === 'pagos') {
                 head.innerHTML = `<h2 class="modal-title" style="color:var(--primary-color);"><i class="fa-solid fa-wallet"></i> Métodos de Pago</h2>`;
-                body.innerHTML = `<ul class="info-modal-list"><li><i class="fa-solid fa-mobile-screen-button"></i> Pago Móvil</li><li><i class="fa-solid fa-building-columns"></i> Transferencia</li><li><i class="fa-brands fa-bitcoin"></i> Binance Pay</li></ul>`;
+                body.innerHTML = `<ul class="info-modal-list"><li><i class="fa-solid fa-mobile-screen-button"></i> Pago Móvil</li><li><i class="fa-solid fa-building-columns"></i> Transferencia</li><li><i class="fa-brands fa-bitcoin"></i> Binance Pay</li><li><i class="fa-solid fa-money-bill-wave"></i> Efectivo ($ / Bs)</li></ul>`;
             } else if (tipo === 'delivery') {
-                head.innerHTML = `<h2 class="modal-title" style="color:var(--danger-color);"><i class="fa-solid fa-motorcycle"></i> Delivery</h2>`;
-                body.innerHTML = `<p style="margin-top:10px;">Llevamos tu pedido hasta la puerta de tu casa. El costo del envío varía según ubicación.</p>`;
+                head.innerHTML = `<h2 class="modal-title" style="color:var(--danger-color);"><i class="fa-solid fa-motorcycle"></i> Información de Delivery</h2>`;
+                body.innerHTML = `<ul class="info-modal-list"><li><i class="fa-solid fa-location-dot"></i> Cobertura en todo San José de Guanipa</li><li><i class="fa-solid fa-clock"></i> Entregas rápidas y seguras</li></ul>`;
             }
-            document.getElementById('info-modal').classList.add('active'); document.body.style.overflow = 'hidden';
+            document.getElementById('info-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
         }
         function cerrarModalInfo() { document.getElementById('info-modal').classList.remove('active'); document.body.style.overflow = 'auto'; }
 
-        // Mapa Leaflet - San José de Guanipa
         async function abrirModalUbicacion() {
+            await asegurarLeaflet();
             document.getElementById('location-modal').classList.add('active');
             document.body.style.overflow = 'hidden';
-            await asegurarLeaflet();
-            const localLat = 8.8864, localLng = -64.1532;
+
             setTimeout(() => {
                 if (!leafletMap) {
-                    leafletMap = L.map('interactive-map').setView([localLat, localLng], 15);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(leafletMap);
-                    L.marker([localLat, localLng]).addTo(leafletMap).bindPopup('<b>¡Aquí estamos!</b><br>San José de Guanipa').openPopup();
-                } else leafletMap.invalidateSize();
-
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(pos => {
-                        const userLat = pos.coords.latitude, userLng = pos.coords.longitude;
-                        L.marker([userLat, userLng]).addTo(leafletMap).bindPopup('Tu ubicación actual');
-                        const R = 6371, dLat = (localLat - userLat) * Math.PI / 180, dLon = (localLng - userLng) * Math.PI / 180;
-                        const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(userLat * Math.PI/180) * Math.cos(localLat * Math.PI/180) * Math.sin(dLon/2) * Math.sin(dLon/2);
-                        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)), dist = R * c;
-                        const tiempo = Math.round((dist / 25) * 60);
-                        document.getElementById('route-distance-label').innerHTML = `Estás a <b>${dist.toFixed(1)} km</b> aprox. (~${tiempo > 0 ? tiempo : 1} min en vehículo).`;
-                        leafletMap.fitBounds(L.latLngBounds([[localLat, localLat], [userLat, userLng]]), { padding: [40, 40] });
-                    }, () => document.getElementById('route-distance-label').textContent = "Activa tu GPS para calcular la ruta exacta.");
+                    const latLocal = 8.8864, lngLocal = -64.1532;
+                    leafletMap = L.map('interactive-map').setView([latLocal, lngLocal], 16);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(leafletMap);
+                    L.marker([latLocal, lngLocal]).addTo(leafletMap).bindPopup("<b>BRIDIGI MARKET</b><br>Calle Zea, frente a Plaza Bolívar").openPopup();
+                } else {
+                    leafletMap.invalidateSize();
                 }
-            }, 300);
+            }, 250);
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    const latUser = pos.coords.latitude;
+                    const lonUser = pos.coords.longitude;
+                    const latLocal = 8.8864, lngLocal = -64.1532;
+                    const R = 6371;
+                    const dLat = (latLocal - latUser) * Math.PI / 180;
+                    const dLon = (lngLocal - lonUser) * Math.PI / 180;
+                    const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(latUser * Math.PI / 180) * Math.cos(latLocal * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+                    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                    const d = (R * c).toFixed(1);
+                    document.getElementById('route-distance-label').innerHTML = `Estás a aprox. <b>${d} km</b> del local. ¡Te esperamos o te lo llevamos!`;
+                }, () => {
+                    document.getElementById('route-distance-label').innerHTML = `Calle Zea, frente a la Plaza Bolívar, San José de Guanipa.`;
+                });
+            }
         }
         function cerrarModalUbicacion() { document.getElementById('location-modal').classList.remove('active'); document.body.style.overflow = 'auto'; }
 
         function toggleZoom(e) {
-            const container = e.currentTarget; const img = container.querySelector('.modal-img');
+            const container = e.currentTarget;
+            const img = document.getElementById('modal-img');
             isZoomed = !isZoomed;
             if (isZoomed) {
-                const r = container.getBoundingClientRect();
-                img.style.transformOrigin = `${((e.clientX - r.left) / r.width) * 100}% ${((e.clientY - r.top) / r.height) * 100}%`;
-                img.style.transform = 'scale(2.2)'; container.classList.add('zoomed');
-            } else { img.style.transform = 'scale(1)'; img.style.transformOrigin = 'center center'; container.classList.remove('zoomed'); }
+                container.classList.add('zoomed');
+                const rect = container.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                img.style.transformOrigin = `${x}% ${y}%`;
+                img.style.transform = 'scale(2.2)';
+            } else {
+                container.classList.remove('zoomed');
+                img.style.transform = 'scale(1)';
+            }
         }
 
-        window.addEventListener('keydown', e => { if (e.key === 'Escape') { cerrarModal(); cerrarModalInfo(); cerrarModalCarrito(); cerrarModalCheckout(); cerrarModalUbicacion(); document.getElementById('assistant-chat-box').classList.remove('active'); detenerMarquesinaAsistente(); } });
-
-        // Actualización periódica del catálogo: cada 90s y solo si la pestaña está visible (ahorra datos móviles)
-        function iniciarActualizacionPeriodica() {
-            if (intervaloActualizacion) clearInterval(intervaloActualizacion);
-            intervaloActualizacion = setInterval(() => { if (!document.hidden) cargarCatalogo(true); }, 90000);
-        }
-        document.addEventListener('visibilitychange', () => { if (!document.hidden) cargarCatalogo(true); });
-
-        // Inicialización
-        inicializarTema(); aplicarCampanaTemporada(); verificarNovedadesVisita(); cargarCatalogo(false); iniciarActualizacionPeriodica();
-        
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW falló: ', err));
-            });
-        }
+        window.onload = () => {
+            inicializarTema();
+            aplicarCampanaTemporada();
+            verificarNovedadesVisita();
+            cargarCatalogo();
+        };
     </script>
 </body>
 </html>
