@@ -403,6 +403,24 @@
             margin: 0 auto;
         }
 
+        /* Encabezado de agrupación por subcategoría dentro del grid (no rompe el layout: ocupa todo el ancho) */
+        .subcat-group-title {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 6px 4px;
+            margin-top: 6px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        .subcat-group-title i { color: var(--primary-color); }
+        .subcat-group-title:first-child { margin-top: 0; }
+
         @keyframes cardEntrance {
             from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
@@ -492,6 +510,13 @@
             font-weight: 700;
             margin-bottom: 6px;
         }
+
+        .card-subcat {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .tiktok-icon-btn:hover { background: #000000; }
 
         .card-title {
             font-size: 1.05rem;
@@ -730,6 +755,21 @@
         }
         .modal-fav-btn:hover { border-color: #f59e0b; transform: translateY(-2px); }
         .modal-fav-btn.fav-active { color: #f59e0b; border-color: #f59e0b; }
+
+        .modal-tiktok-btn {
+            background-color: #000000;
+            color: white;
+            border: none;
+            padding: 0 16px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-tiktok-btn:hover { background-color: #25f4ee; color: #000000; transform: translateY(-2px); }
 
         .modal-related-container { margin-top: 20px; }
         .modal-related-title {
@@ -1155,6 +1195,9 @@
                         <button id="modal-share-btn" class="modal-share-btn" title="Compartir producto" aria-label="Compartir producto">
                             <i class="fa-solid fa-share-nodes"></i>
                         </button>
+                        <button id="modal-tiktok-btn" class="modal-tiktok-btn" title="Ver video de TikTok" aria-label="Ver video de TikTok" style="display:none;">
+                            <i class="fa-brands fa-tiktok"></i>
+                        </button>
                     </div>
                     <button class="cart-add-btn" id="modal-add-cart-btn">
                         <i class="fa-solid fa-cart-plus"></i> Agregar al Carrito
@@ -1334,6 +1377,11 @@
             if (event) event.stopPropagation();
             const prod = buscarProductoPorId(decodeURIComponent(encodedId));
             if (prod) compartirProducto(event, prod);
+        }
+        function abrirVideoTikTokPorId(event, encodedId) {
+            if (event) event.stopPropagation();
+            const prod = buscarProductoPorId(decodeURIComponent(encodedId));
+            if (prod && prod.video_tiktok) window.open(prod.video_tiktok, '_blank');
         }
 
         // Vistos Recientemente
@@ -1578,6 +1626,34 @@
 
         function calcularPrecioFinal(prod) { return esRecargaSaldo(prod.categoria) ? (parseFloat(prod.precio) || 0) * 1.12 : (parseFloat(prod.precio) || 0); }
 
+        // Crea el elemento DOM de una tarjeta de producto (misma estructura/HTML de siempre, solo movida a función para poder reutilizarla al agrupar por subcategoría)
+        function crearCardElemento(prod, idx) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.style.animationDelay = `${idx * 0.03}s`;
+            card.onclick = () => abrirModal(prod);
+            const isFav = esFavorito(prod);
+            const idProdEncoded = encodeURIComponent(obtenerIdentificadorProducto(prod));
+            const tieneVideo = prod.video_tiktok && prod.video_tiktok.toString().trim();
+            const btnVideoHtml = tieneVideo ? `<button class="card-action-icon-btn tiktok-icon-btn" onclick="abrirVideoTikTokPorId(event, '${idProdEncoded}')" aria-label="Ver video de TikTok"><i class="fa-brands fa-tiktok"></i></button>` : '';
+            const subcatHtml = prod.subcategoria ? ` <span class="card-subcat">• ${prod.subcategoria}</span>` : '';
+
+            card.innerHTML = `
+                <div class="card-img-container">
+                    <img src="${prod.imagen}" alt="${prod.nombre}" loading="lazy">
+                    <div class="card-top-actions">
+                        <button class="card-action-icon-btn ${isFav ? 'fav-active' : ''}" onclick="toggleFavoritoPorId(event, '${idProdEncoded}')" aria-label="${isFav ? 'Quitar de favoritos' : 'Agregar a favoritos'}"><i class="fa-${isFav ? 'solid' : 'regular'} fa-star"></i></button>
+                        <button class="card-action-icon-btn" onclick="compartirProductoPorId(event, '${idProdEncoded}')" aria-label="Compartir producto"><i class="fa-solid fa-share-nodes"></i></button>
+                        ${btnVideoHtml}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div><div class="card-category">${prod.categoria || 'General'}${subcatHtml}</div><h3 class="card-title">${prod.nombre}</h3><div class="card-price">$${calcularPrecioFinal(prod).toFixed(2)}</div></div>
+                    <div class="card-hint"><i class="fa-solid fa-eye"></i> Ver detalles</div>
+                </div>`;
+            return card;
+        }
+
         function mostrarProductos(lista) {
             const grid = document.getElementById('product-grid');
             grid.innerHTML = '';
@@ -1586,28 +1662,35 @@
                 return;
             }
 
-            lista.forEach((prod, idx) => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.style.animationDelay = `${idx * 0.03}s`;
-                card.onclick = () => abrirModal(prod);
-                const isFav = esFavorito(prod);
-                const idProdEncoded = encodeURIComponent(obtenerIdentificadorProducto(prod));
-                
-                card.innerHTML = `
-                    <div class="card-img-container">
-                        <img src="${prod.imagen}" alt="${prod.nombre}" loading="lazy">
-                        <div class="card-top-actions">
-                            <button class="card-action-icon-btn ${isFav ? 'fav-active' : ''}" onclick="toggleFavoritoPorId(event, '${idProdEncoded}')" aria-label="${isFav ? 'Quitar de favoritos' : 'Agregar a favoritos'}"><i class="fa-${isFav ? 'solid' : 'regular'} fa-star"></i></button>
-                            <button class="card-action-icon-btn" onclick="compartirProductoPorId(event, '${idProdEncoded}')" aria-label="Compartir producto"><i class="fa-solid fa-share-nodes"></i></button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div><div class="card-category">${prod.categoria || 'General'}</div><h3 class="card-title">${prod.nombre}</h3><div class="card-price">$${calcularPrecioFinal(prod).toFixed(2)}</div></div>
-                        <div class="card-hint"><i class="fa-solid fa-eye"></i> Ver detalles</div>
-                    </div>`;
-                grid.appendChild(card);
-            });
+            // Solo se agrupa visualmente por subcategoría cuando tiene sentido: dentro de una categoría específica,
+            // sin filtro de subcategoría activo, sin búsqueda de texto, y con más de una subcategoría presente.
+            // En cualquier otro caso se muestra igual que siempre (lista plana), para no romper nada.
+            const subFiltroActivo = document.getElementById('filter-subcategory').value !== 'all';
+            const hayBusqueda = document.getElementById('search-input').value.trim() !== '';
+            const contextoAgrupable = !subFiltroActivo && !hayBusqueda && !['todos', 'favoritos', 'recientes'].includes(categoriaSeleccionada);
+            const subcatsPresentes = contextoAgrupable ? [...new Set(lista.map(p => (p.subcategoria || '').trim()).filter(Boolean))] : [];
+
+            let idxGlobal = 0;
+            if (contextoAgrupable && subcatsPresentes.length > 1) {
+                subcatsPresentes.forEach(sub => {
+                    const grupo = lista.filter(p => (p.subcategoria || '').trim() === sub);
+                    const header = document.createElement('div');
+                    header.className = 'subcat-group-title';
+                    header.innerHTML = `<i class="fa-solid fa-layer-group"></i> ${sub}`;
+                    grid.appendChild(header);
+                    grupo.forEach(prod => grid.appendChild(crearCardElemento(prod, idxGlobal++)));
+                });
+                const sinSub = lista.filter(p => !(p.subcategoria || '').trim());
+                if (sinSub.length) {
+                    const header = document.createElement('div');
+                    header.className = 'subcat-group-title';
+                    header.innerHTML = `<i class="fa-solid fa-layer-group"></i> Otros`;
+                    grid.appendChild(header);
+                    sinSub.forEach(prod => grid.appendChild(crearCardElemento(prod, idxGlobal++)));
+                }
+            } else {
+                lista.forEach(prod => grid.appendChild(crearCardElemento(prod, idxGlobal++)));
+            }
         }
 
         function mostrarToast(mensaje, icono = 'fa-solid fa-check-circle', color = '#22c55e', duracionMs = 4500) {
@@ -1632,7 +1715,7 @@
             document.getElementById('modal-img-container').classList.remove('zoomed');
             document.getElementById('modal-img').style.transform = 'scale(1)';
             document.getElementById('modal-img').src = prod.imagen;
-            document.getElementById('modal-category').innerText = prod.categoria || '';
+            document.getElementById('modal-category').innerText = prod.subcategoria ? `${prod.categoria || ''} • ${prod.subcategoria}` : (prod.categoria || '');
             document.getElementById('modal-title').innerText = prod.nombre;
             document.getElementById('modal-code').innerText = `Código: ${prod.codigo_producto || prod.id || 'N/A'}`;
             document.getElementById('modal-price').innerText = `$${calcularPrecioFinal(prod).toFixed(2)}`;
@@ -1646,6 +1729,14 @@
             
             document.getElementById('modal-wa-btn').onclick = () => { productoIndividualPendiente = { ...prod, precioFinalCalculado: calcularPrecioFinal(prod) }; cerrarModal(); abrirModalCheckout(); };
             document.getElementById('modal-share-btn').onclick = () => compartirProducto(null, prod);
+            const tiktokBtn = document.getElementById('modal-tiktok-btn');
+            if (prod.video_tiktok && prod.video_tiktok.toString().trim()) {
+                tiktokBtn.style.display = 'flex';
+                tiktokBtn.onclick = () => window.open(prod.video_tiktok, '_blank');
+            } else {
+                tiktokBtn.style.display = 'none';
+                tiktokBtn.onclick = null;
+            }
             document.getElementById('modal-add-cart-btn').onclick = (e) => { lanzarEfectoVueloAlCarrito(e.currentTarget, prod.imagen); agregarAlCarrito(prod); cerrarModal(); };
             actualizarBotonFavoritoModal(prod);
             document.getElementById('modal-fav-btn').onclick = (e) => { toggleFavorito(e, prod); actualizarBotonFavoritoModal(prod); };
