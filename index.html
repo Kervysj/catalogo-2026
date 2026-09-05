@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>CATÁLOGO DIGITAL | San José de Guanipa</title>
     <meta name="description" content="Catálogo digital de productos, recargas, trámites, streaming y compras por encargo en San José de Guanipa con pedidos directos por WhatsApp y delivery.">
+    
+    <!-- Meta para PWA / Guardar en Pantalla de Inicio del Celular -->
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Catálogo Guanipa">
 
     <!-- Fuentes & Iconos -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,7 +32,7 @@
             --text-main: #0f172a;
             --text-muted: #64748b;
             --border-ui: #e2e8f0;
-            --nav-bg: rgba(255, 255, 255, 0.92);
+            --nav-bg: rgba(255, 255, 255, 0.94);
             --radius-box: 16px;
             --shadow-card: 0 2px 8px -2px rgba(0, 0, 0, 0.06), 0 1px 4px -1px rgba(0, 0, 0, 0.04);
             --shadow-hover: 0 12px 24px -4px rgba(37, 99, 235, 0.14);
@@ -46,7 +52,7 @@
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --border-ui: #243049;
-            --nav-bg: rgba(15, 23, 42, 0.92);
+            --nav-bg: rgba(15, 23, 42, 0.94);
             --shadow-card: 0 4px 10px rgba(0, 0, 0, 0.3);
             --shadow-hover: 0 12px 24px rgba(59, 130, 246, 0.2);
         }
@@ -56,26 +62,40 @@
         body {
             background-color: var(--bg-page);
             color: var(--text-main);
-            padding: 12px 14px 90px 14px;
+            padding: 12px 14px 92px 14px;
             min-height: 100vh;
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .main-wrapper { max-width: 1200px; margin: 0 auto; width: 100%; }
 
-        /* Botón Modo Oscuro / Claro */
+        /* Botones de Cabecera Superior */
+        .top-action-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            max-width: 680px; margin: 0 auto 8px auto;
+        }
+        .store-status-badge {
+            display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem;
+            font-weight: 700; color: var(--success); background: rgba(5, 150, 105, 0.1);
+            padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(5, 150, 105, 0.2);
+        }
+        .status-dot {
+            width: 8px; height: 8px; border-radius: 50%; background: var(--success);
+            box-shadow: 0 0 6px var(--success); animation: pulseDot 2s infinite;
+        }
+        @keyframes pulseDot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } }
+
         .btn-theme {
-            position: fixed; top: 12px; right: 14px; z-index: 99;
             background: var(--bg-card); border: 1px solid var(--border-ui);
-            color: var(--text-main); width: 38px; height: 38px; border-radius: 50%;
+            color: var(--text-main); width: 36px; height: 36px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center; cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-size: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); font-size: 0.95rem;
             transition: var(--transition);
         }
         .btn-theme:hover { transform: scale(1.08); border-color: var(--primary); }
 
         /* Encabezado */
-        header.app-header { text-align: center; margin: 6px 0 16px 0; }
+        header.app-header { text-align: center; margin: 4px 0 14px 0; }
         header.app-header h1 {
             font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 800; letter-spacing: -0.03em;
             background: linear-gradient(135deg, var(--danger) 0%, var(--primary) 100%);
@@ -83,7 +103,22 @@
         }
         header.app-header p { color: var(--text-muted); font-size: clamp(0.8rem, 2vw, 0.92rem); }
 
-        /* Accesos Rápidos (Free Fire en primer lugar sin scroll) */
+        /* TASA DE CAMBIO BCV / BS */
+        .tasa-bcv-bar {
+            max-width: 680px; margin: 0 auto 12px auto; background: var(--bg-card);
+            border: 1px solid var(--border-ui); border-radius: 12px; padding: 7px 12px;
+            display: flex; align-items: center; justify-content: space-between; gap: 8px;
+            font-size: 0.78rem; font-weight: 700; box-shadow: var(--shadow-card);
+        }
+        .tasa-bcv-info { display: flex; align-items: center; gap: 6px; color: var(--text-muted); }
+        .tasa-bcv-val { color: var(--primary); font-weight: 800; }
+        .btn-edit-tasa {
+            background: none; border: none; color: var(--text-muted); cursor: pointer;
+            font-size: 0.75rem; text-decoration: underline; font-weight: 600;
+        }
+        .btn-edit-tasa:hover { color: var(--primary); }
+
+        /* Accesos Rápidos (Free Fire destacado sin scroll) */
         .quick-badges-box { width: 100%; margin-bottom: 14px; }
         .quick-badges-grid {
             display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
@@ -107,16 +142,21 @@
         }
         body.dark-mode .quick-badge.gaming { color: #22d3ee; }
 
-        /* Buscador + Subcategoría */
-        .search-container { display: flex; gap: 8px; max-width: 680px; margin: 0 auto 12px auto; align-items: center; }
+        /* Buscador + Subcategoría + Botón Limpiar */
+        .search-container { display: flex; gap: 8px; max-width: 680px; margin: 0 auto 8px auto; align-items: center; }
         .search-input-box { position: relative; flex: 1; min-width: 0; }
         .search-input-box input {
-            width: 100%; padding: 11px 16px 11px 38px; border-radius: 25px;
+            width: 100%; padding: 11px 36px 11px 38px; border-radius: 25px;
             border: 1.5px solid var(--border-ui); font-size: 0.9rem; outline: none;
             background-color: var(--bg-card); color: var(--text-main);
         }
         .search-input-box input:focus { border-color: var(--primary); }
-        .search-input-box i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--danger); font-size: 0.9rem; }
+        .search-input-box .icon-search { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--danger); font-size: 0.9rem; }
+        .btn-clear-search {
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; color: var(--text-muted); cursor: pointer;
+            font-size: 0.95rem; display: none;
+        }
         .subcat-box { flex-shrink: 0; max-width: 180px; }
         @media (max-width: 520px) {
             .search-container { flex-direction: column; }
@@ -128,7 +168,12 @@
             background-color: var(--bg-card); color: var(--text-main); cursor: pointer;
         }
 
-        /* Barra de Categorías Unificada (Ofertas y Encargos centralizados) */
+        .search-results-counter {
+            max-width: 680px; margin: 0 auto 10px auto; font-size: 0.75rem; color: var(--text-muted);
+            font-weight: 600; text-align: left; padding: 0 4px;
+        }
+
+        /* Barra de Categorías Unificada (Aquí residen Ofertas y Por Encargo) */
         .categories-scroll { position: relative; width: 100%; margin-bottom: 18px; }
         .categories-inner {
             display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
@@ -177,22 +222,42 @@
             color: #fde68a; font-size: 0.65rem; font-weight: 700; padding: 2px 7px;
             border-radius: 10px; display: flex; align-items: center; gap: 4px; z-index: 2;
         }
-        .btn-fav {
-            position: absolute; top: 7px; right: 7px; width: 30px; height: 30px; border-radius: 50%;
-            background: rgba(15, 23, 42, 0.65); color: #fff; border: none; display: flex;
-            align-items: center; justify-content: center; cursor: pointer; z-index: 5;
+        
+        .card-top-actions {
+            position: absolute; top: 7px; right: 7px; display: flex; gap: 4px; z-index: 5;
         }
-        .btn-fav.active { color: #f59e0b; }
+        .btn-card-action {
+            width: 28px; height: 28px; border-radius: 50%; background: rgba(15, 23, 42, 0.68);
+            color: #fff; border: none; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 0.75rem; transition: var(--transition);
+        }
+        .btn-card-action:hover { transform: scale(1.1); }
+        .btn-card-action.fav.active { color: #f59e0b; }
 
         .prod-body { padding: 10px 12px 12px 12px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; gap: 6px; }
         .prod-cat { font-size: 0.68rem; text-transform: uppercase; color: var(--danger); font-weight: 800; }
         .prod-title { font-size: 0.86rem; font-weight: 700; line-height: 1.25; min-height: 2.2em; }
-        .prod-price { font-size: 1.05rem; font-weight: 800; color: var(--success); }
+        
+        .prod-prices-block { display: flex; flex-direction: column; }
+        .prod-price-usd { font-size: 1.05rem; font-weight: 800; color: var(--success); }
+        .prod-price-bs { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); }
+
         .prod-action-hint {
             display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.75rem;
             font-weight: 700; color: var(--primary); background: rgba(37, 99, 235, 0.08);
             padding: 6px 10px; border-radius: 8px;
         }
+
+        /* Skeleton Loaders */
+        .skeleton-card {
+            background-color: var(--bg-card); border-radius: var(--radius-box); overflow: hidden;
+            border: 1px solid var(--border-ui); height: 260px; display: flex; flex-direction: column;
+            animation: skeletonPulse 1.5s infinite;
+        }
+        @keyframes skeletonPulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+        .skeleton-img { width: 100%; aspect-ratio: 1/1; background: var(--border-ui); }
+        .skeleton-body { padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+        .skeleton-line { height: 12px; background: var(--border-ui); border-radius: 4px; }
 
         /* Modales Globales */
         .modal-overlay {
@@ -204,6 +269,11 @@
             background-color: var(--bg-card); color: var(--text-main); border-radius: 20px;
             max-width: 460px; width: 100%; max-height: 90vh; display: flex; flex-direction: column;
             overflow: hidden; border: 1px solid var(--border-ui); position: relative;
+            animation: modalPop 0.2s ease-out;
+        }
+        @keyframes modalPop {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
         .modal-close {
             position: absolute; top: 10px; right: 10px; background: rgba(15, 23, 42, 0.6);
@@ -249,6 +319,7 @@
             flex-direction: column; align-items: center; gap: 3px; font-size: 0.65rem;
             font-weight: 700; cursor: pointer; text-decoration: none; flex: 1;
         }
+        .nav-tab.active { color: var(--primary); }
         .nav-cart-btn {
             position: relative; top: -12px; background: linear-gradient(135deg, var(--primary), var(--primary-hover));
             color: #fff; width: 48px; height: 48px; border-radius: 50%; display: flex;
@@ -263,17 +334,35 @@
     </style>
 </head>
 <body>
-    <button class="btn-theme" id="btn-theme" onclick="toggleTheme()" title="Modo Claro/Oscuro">
-        <i class="fa-solid fa-moon" id="theme-icon"></i>
-    </button>
 
     <div class="main-wrapper">
+        <!-- Barra de Estado de la Tienda + Botón Tema Claro/Oscuro -->
+        <div class="top-action-bar">
+            <div class="store-status-badge">
+                <span class="status-dot"></span>
+                <span>Atención Activa · Guanipa</span>
+            </div>
+            <button class="btn-theme" id="btn-theme" onclick="toggleTheme()" title="Modo Claro/Oscuro">
+                <i class="fa-solid fa-moon" id="theme-icon"></i>
+            </button>
+        </div>
+
+        <!-- Encabezado -->
         <header class="app-header">
             <h1>CATÁLOGO DIGITAL</h1>
             <p>Productos, recargas, trámites y compras por encargo en San José de Guanipa</p>
         </header>
 
-        <!-- ACCESOS RÁPIDOS: FREE FIRE DESTACADO SIN SCROLL -->
+        <!-- BARRA DE TASA DE CAMBIO BCV / BS -->
+        <div class="tasa-bcv-bar">
+            <div class="tasa-bcv-info">
+                <i class="fa-solid fa-calculator" style="color:var(--primary);"></i>
+                <span>Tasa Referencial: <strong class="tasa-bcv-val" id="tasa-display">Bs. 85.00 / $</strong></span>
+            </div>
+            <button class="btn-edit-tasa" onclick="cambiarTasaManual()">Ajustar Tasa</button>
+        </div>
+
+        <!-- ACCESOS RÁPIDOS (FREE FIRE DESTACADO SIN SCROLL) -->
         <div class="quick-badges-box">
             <div class="quick-badges-grid">
                 <a href="https://soygamers.com/firestore" target="_blank" class="quick-badge gaming">
@@ -291,11 +380,12 @@
             </div>
         </div>
 
-        <!-- Búsqueda + Subcategoría -->
+        <!-- Buscador + Subcategoría + Botón Limpiar -->
         <div class="search-container">
             <div class="search-input-box">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="search-input" placeholder="Buscar productos, trámites o códigos..." oninput="filtrarProductos()">
+                <i class="fa-solid fa-magnifying-glass icon-search"></i>
+                <input type="text" id="search-input" placeholder="Buscar productos, trámites o códigos..." oninput="onSearchInput()">
+                <button class="btn-clear-search" id="btn-clear-search" onclick="limpiarBuscador()" title="Limpiar"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="subcat-box">
                 <select id="subcat-select" class="subcat-select" onchange="filtrarProductos()">
@@ -303,17 +393,23 @@
                 </select>
             </div>
         </div>
+        <div class="search-results-counter" id="search-results-counter"></div>
 
-        <!-- BARRA DE CATEGORÍAS (LUGAR ÚNICO PARA OFERTAS Y ENCARGOS) -->
+        <!-- BARRA DE CATEGORÍAS UNIFICADA -->
         <div class="categories-scroll">
             <div class="categories-inner" id="categories-bar"></div>
         </div>
 
         <!-- Cuadrícula de Productos -->
-        <div class="product-grid" id="product-grid"></div>
+        <div class="product-grid" id="product-grid">
+            <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line" style="width:50%;"></div><div class="skeleton-line" style="width:80%;"></div><div class="skeleton-line" style="width:40%;"></div></div></div>
+            <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line" style="width:50%;"></div><div class="skeleton-line" style="width:80%;"></div><div class="skeleton-line" style="width:40%;"></div></div></div>
+            <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line" style="width:50%;"></div><div class="skeleton-line" style="width:80%;"></div><div class="skeleton-line" style="width:40%;"></div></div></div>
+            <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line" style="width:50%;"></div><div class="skeleton-line" style="width:80%;"></div><div class="skeleton-line" style="width:40%;"></div></div></div>
+        </div>
     </div>
 
-    <!-- MODAL 1: DETALLE DE PRODUCTO -->
+    <!-- MODAL 1: DETALLE DE PRODUCTO CON COMPARTIR -->
     <div class="modal-overlay" id="modal-producto" onclick="if(event.target === this) cerrarModal('modal-producto')">
         <div class="modal-sheet" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModal('modal-producto')"><i class="fa-solid fa-xmark"></i></button>
@@ -322,11 +418,16 @@
             </div>
             <div class="modal-body">
                 <span id="mod-prod-cat" style="font-size:0.7rem; font-weight:800; text-transform:uppercase; color:var(--danger);"></span>
-                <h2 id="mod-prod-title" style="font-size:1.2rem; font-weight:800; margin:4px 0 6px 0;"></h2>
-                <div id="mod-prod-price" style="font-size:1.3rem; font-weight:800; color:var(--success); margin-bottom:10px;"></div>
+                <h2 id="mod-prod-title" style="font-size:1.2rem; font-weight:800; margin:4px 0 2px 0;"></h2>
+                
+                <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:8px;">
+                    <div id="mod-prod-price-usd" style="font-size:1.35rem; font-weight:800; color:var(--success);"></div>
+                    <div id="mod-prod-price-bs" style="font-size:0.85rem; font-weight:700; color:var(--text-muted);"></div>
+                </div>
                 
                 <p id="mod-prod-desc" style="font-size:0.85rem; color:var(--text-muted); line-height:1.5; margin-bottom:14px;"></p>
                 
+                <!-- Caja de requisitos si aplica -->
                 <div id="mod-prod-req-box" style="display:none; background:rgba(37,99,235,0.08); border:1.5px dashed var(--primary); border-radius:12px; padding:10px 12px; margin-bottom:14px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
                         <span style="font-size:0.75rem; font-weight:800; color:var(--primary);"><i class="fa-solid fa-clipboard-check"></i> REQUISITOS OBLIGATORIOS</span>
@@ -339,15 +440,20 @@
                     <button id="mod-prod-btn-action" style="background:#25d366; color:#fff; border:none; padding:12px; border-radius:12px; font-weight:800; font-size:0.9rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
                         <i class="fa-brands fa-whatsapp text-lg"></i> Adquirir / Pedir por WhatsApp
                     </button>
-                    <button id="mod-prod-btn-cart" onclick="agregarAlCarritoDesdeModal()" style="background:var(--primary); color:#fff; border:none; padding:11px; border-radius:12px; font-weight:700; font-size:0.85rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
-                        <i class="fa-solid fa-cart-plus"></i> Agregar a mi Cotización
-                    </button>
+                    <div style="display:flex; gap:8px;">
+                        <button id="mod-prod-btn-cart" onclick="agregarAlCarritoDesdeModal()" style="flex:1; background:var(--primary); color:#fff; border:none; padding:11px; border-radius:12px; font-weight:700; font-size:0.85rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+                            <i class="fa-solid fa-cart-plus"></i> Cotizar
+                        </button>
+                        <button onclick="compartirProductoActual()" style="background:var(--bg-page); border:1.5px solid var(--border-ui); color:var(--text-main); padding:11px 14px; border-radius:12px; font-weight:700; font-size:0.85rem; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                            <i class="fa-solid fa-share-nodes"></i> Compartir
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL 2: CONFIRMACIÓN DE REQUISITOS (AVANZA DIRECTO A WHATSAPP) -->
+    <!-- MODAL 2: CONFIRMACIÓN DE REQUISITOS (AVANCE DIRECTO A WHATSAPP) -->
     <div class="modal-overlay" id="modal-requisitos" onclick="if(event.target === this) cerrarModal('modal-requisitos')">
         <div class="modal-sheet req-sheet" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModal('modal-requisitos')"><i class="fa-solid fa-xmark"></i></button>
@@ -454,7 +560,7 @@
 
     <!-- Barra de Navegación Inferior -->
     <nav class="bottom-nav">
-        <button class="nav-tab active" onclick="cambiarCategoria('todos')">
+        <button class="nav-tab active" id="tab-nav-home" onclick="cambiarCategoria('todos')">
             <i class="fa-solid fa-house" style="font-size:1.1rem;"></i><span>Inicio</span>
         </button>
         <button class="nav-tab" onclick="abrirModalUbicacion()">
@@ -463,7 +569,7 @@
         <button class="nav-tab nav-cart-btn" onclick="abrirModalCarrito()">
             <i class="fa-solid fa-cart-shopping"></i><span class="cart-badge" id="cart-badge-count">0</span>
         </button>
-        <button class="nav-tab" onclick="cambiarCategoria('favoritos')">
+        <button class="nav-tab" id="tab-nav-favs" onclick="cambiarCategoria('favoritos')">
             <i class="fa-solid fa-star" style="font-size:1.1rem;"></i><span>Favoritos</span>
         </button>
         <a href="https://wa.me/584149956831?text=Hola,%20tengo%20una%20consulta%20del%20catálogo" target="_blank" class="nav-tab">
@@ -476,14 +582,18 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbyfjv9UscbcmgqeKjx_0j5UxGWK2qpFudgFGcHeCBt252fUfxgkhcQUKH-b8BeZLU8NNg/exec";
         const CACHE_KEY = "kervys_catalogo_cache_data";
         const FAVS_KEY = "kervys_catalogo_favoritos";
+        const TASA_KEY = "kervys_tasa_bcv_manual";
 
         let listaProductosGlobal = [];
         let categoriaSeleccionada = 'todos';
         let productoActualModal = null;
         let carrito = [];
         let favoritos = JSON.parse(localStorage.getItem(FAVS_KEY) || '[]');
+        let tasaCambioBCV = parseFloat(localStorage.getItem(TASA_KEY)) || 85.00;
 
         window.addEventListener('DOMContentLoaded', () => {
+            actualizarDisplayTasa();
+
             if (localStorage.getItem('kervys_theme_mode') === 'dark') {
                 document.body.classList.add('dark-mode');
                 document.getElementById('theme-icon').className = 'fa-solid fa-sun';
@@ -527,15 +637,36 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
+        // Tasa de cambio BCV
+        function actualizarDisplayTasa() {
+            document.getElementById('tasa-display').innerText = `Bs. ${tasaCambioBCV.toFixed(2)} / $`;
+        }
+
+        function cambiarTasaManual() {
+            const nueva = prompt("Ingresa la tasa de cambio referencial (Bs. por cada $1):", tasaCambioBCV);
+            if (nueva && !isNaN(parseFloat(nueva)) && parseFloat(nueva) > 0) {
+                tasaCambioBCV = parseFloat(nueva);
+                localStorage.setItem(TASA_KEY, tasaCambioBCV);
+                actualizarDisplayTasa();
+                filtrarProductos();
+                showToast(`Tasa actualizada a Bs. ${tasaCambioBCV.toFixed(2)}`);
+            }
+        }
+
         function getProdId(p) {
             return (p.codigo_producto || p.id || p.nombre || '').toString();
         }
 
-        function calcularPrecioFinal(p) {
+        function calcularPrecioFinalUSD(p) {
             const cat = (p.categoria || '').toLowerCase();
             const esRecarga = cat.includes('recarga') && cat.includes('saldo');
             const base = parseFloat(p.precio) || 0;
             return esRecarga ? base * 1.12 : base;
+        }
+
+        function calcularPrecioFinalBs(p) {
+            const usd = calcularPrecioFinalUSD(p);
+            return usd * tasaCambioBCV;
         }
 
         function obtenerListaRequisitos(p) {
@@ -551,7 +682,7 @@
                 <button class="cat-chip ${categoriaSeleccionada === 'todos' ? 'active' : ''}" onclick="cambiarCategoria('todos')"><i class="fa-solid fa-border-all"></i> Todos</button>
                 <button class="cat-chip ofertas-chip ${categoriaSeleccionada === 'ofertas' ? 'active' : ''}" onclick="cambiarCategoria('ofertas')"><i class="fa-solid fa-fire"></i> Ofertas</button>
                 <button class="cat-chip encargos-chip ${categoriaSeleccionada === 'encargos' ? 'active' : ''}" onclick="cambiarCategoria('encargos')"><i class="fa-solid fa-boxes-packing"></i> Por Encargo</button>
-                <button class="cat-chip favs-chip ${categoriaSeleccionada === 'favoritos' ? 'active' : ''}" onclick="cambiarCategoria('favoritos')"><i class="fa-solid fa-star"></i> Favoritos</button>
+                <button class="cat-chip favs-chip ${categoriaSeleccionada === 'favoritos' ? 'active' : ''}" onclick="cambiarCategoria('favoritos')"><i class="fa-solid fa-star"></i> Favoritos (${favoritos.length})</button>
             `;
             cats.forEach(c => {
                 const esActiva = categoriaSeleccionada.toLowerCase() === c.toLowerCase();
@@ -572,9 +703,26 @@
 
         function cambiarCategoria(cat) {
             categoriaSeleccionada = cat;
+            
+            document.querySelectorAll('.bottom-nav .nav-tab').forEach(t => t.classList.remove('active'));
+            if (cat === 'todos') document.getElementById('tab-nav-home')?.classList.add('active');
+            if (cat === 'favoritos') document.getElementById('tab-nav-favs')?.classList.add('active');
+
             construirCategorias();
             filtrarProductos();
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function onSearchInput() {
+            const val = document.getElementById('search-input').value;
+            document.getElementById('btn-clear-search').style.display = val ? 'block' : 'none';
+            filtrarProductos();
+        }
+
+        function limpiarBuscador() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('btn-clear-search').style.display = 'none';
+            filtrarProductos();
         }
 
         function filtrarProductos() {
@@ -606,6 +754,14 @@
                 lista = lista.filter(p => [p.nombre, p.descripcion, p.codigo_producto, p.categoria, p.subcategoria].filter(Boolean).join(' ').toLowerCase().includes(query));
             }
 
+            const counter = document.getElementById('search-results-counter');
+            if (query || subcat !== 'all' || categoriaSeleccionada !== 'todos') {
+                counter.innerText = `Mostrando ${lista.length} resultado(s)`;
+                counter.style.display = 'block';
+            } else {
+                counter.style.display = 'none';
+            }
+
             renderGrid(lista);
         }
 
@@ -623,21 +779,32 @@
                 const id = getProdId(prod);
                 const reqs = obtenerListaRequisitos(prod);
                 const isFav = favoritos.includes(id);
-                const precio = parseFloat(prod.precio) ? `$${calcularPrecioFinal(prod).toFixed(2)}` : 'Consultar';
+                const numPrecio = parseFloat(prod.precio);
+                const precioUsd = numPrecio ? `$${calcularPrecioFinalUSD(prod).toFixed(2)}` : 'Consultar';
+                const precioBs = numPrecio ? `≈ Bs. ${calcularPrecioFinalBs(prod).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : '';
                 
                 return `
                     <div class="prod-card" onclick="abrirDetalleProducto('${id}')">
                         <div class="prod-img-box">
                             <img src="${prod.imagen || 'https://via.placeholder.com/300'}" alt="${prod.nombre}" loading="lazy">
                             ${reqs.length > 0 ? `<div class="tag-req"><i class="fa-solid fa-clipboard-check"></i> Requisitos</div>` : ''}
-                            <button class="btn-fav ${isFav ? 'active' : ''}" onclick="toggleFav(event, '${id}')">
-                                <i class="fa-solid fa-star"></i>
-                            </button>
+                            
+                            <div class="card-top-actions">
+                                <button class="btn-card-action" onclick="compartirItem(event, '${id}')" title="Compartir">
+                                    <i class="fa-solid fa-share-nodes"></i>
+                                </button>
+                                <button class="btn-card-action fav ${isFav ? 'active' : ''}" onclick="toggleFav(event, '${id}')" title="Favorito">
+                                    <i class="fa-solid fa-star"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="prod-body">
                             <span class="prod-cat">${prod.categoria || 'General'}</span>
                             <h3 class="prod-title">${prod.nombre}</h3>
-                            <div class="prod-price">${precio}</div>
+                            <div class="prod-prices-block">
+                                <span class="prod-price-usd">${precioUsd}</span>
+                                ${precioBs ? `<span class="prod-price-bs">${precioBs}</span>` : ''}
+                            </div>
                             <div class="prod-action-hint">
                                 <i class="fa-brands fa-whatsapp"></i> Adquirir / Ver
                             </div>
@@ -657,7 +824,29 @@
                 showToast('Guardado en favoritos ⭐');
             }
             localStorage.setItem(FAVS_KEY, JSON.stringify(favoritos));
+            construirCategorias();
             filtrarProductos();
+        }
+
+        function compartirItem(e, id) {
+            e.stopPropagation();
+            const prod = listaProductosGlobal.find(p => getProdId(p) === id);
+            if (!prod) return;
+            const precio = parseFloat(prod.precio) ? `$${calcularPrecioFinalUSD(prod).toFixed(2)}` : 'Consultar';
+            const txt = `📌 *${prod.nombre}*\n💰 Precio: ${precio}\n\n¡Consíguelo aquí en el Catálogo Digital de Guanipa!`;
+            
+            if (navigator.share) {
+                navigator.share({ title: prod.nombre, text: txt, url: window.location.href }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(`${txt}\n${window.location.href}`);
+                showToast('Enlace y descripción copiados 📋');
+            }
+        }
+
+        function compartirProductoActual() {
+            if (productoActualModal) {
+                compartirItem({ stopPropagation: () => {} }, getProdId(productoActualModal));
+            }
         }
 
         function cerrarModal(id) {
@@ -672,8 +861,16 @@
             document.getElementById('mod-prod-img').src = prod.imagen || 'https://via.placeholder.com/300';
             document.getElementById('mod-prod-cat').innerText = prod.categoria || 'General';
             document.getElementById('mod-prod-title').innerText = prod.nombre;
-            const precio = parseFloat(prod.precio) ? `$${calcularPrecioFinal(prod).toFixed(2)}` : 'A consultar';
-            document.getElementById('mod-prod-price').innerText = precio;
+            
+            const numPrecio = parseFloat(prod.precio);
+            if (numPrecio) {
+                document.getElementById('mod-prod-price-usd').innerText = `$${calcularPrecioFinalUSD(prod).toFixed(2)}`;
+                document.getElementById('mod-prod-price-bs').innerText = `≈ Bs. ${calcularPrecioFinalBs(prod).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            } else {
+                document.getElementById('mod-prod-price-usd').innerText = 'A consultar';
+                document.getElementById('mod-prod-price-bs').innerText = '';
+            }
+
             document.getElementById('mod-prod-desc').innerText = prod.descripcion || prod.mas_detalles || 'Sin descripción detallada.';
 
             const reqs = obtenerListaRequisitos(prod);
@@ -716,7 +913,8 @@
             const cod = prod.codigo_producto || prod.id || 'N/A';
             const reqs = obtenerListaRequisitos(prod);
             const reqsListado = reqs.map(r => `  • ${r}`).join('\n');
-            const precioTxt = parseFloat(prod.precio) ? `$${calcularPrecioFinal(prod).toFixed(2)}` : 'Consultar';
+            const numPrecio = parseFloat(prod.precio);
+            const precioTxt = numPrecio ? `$${calcularPrecioFinalUSD(prod).toFixed(2)} (≈ Bs. ${calcularPrecioFinalBs(prod).toFixed(2)})` : 'Consultar';
 
             let msg = `Hola, quiero solicitar el siguiente servicio:\n` +
                       `━━━━━━━━━━━━━━━━━━━━\n` +
@@ -725,7 +923,7 @@
                       `💰 *Precio:* ${precioTxt}\n\n` +
                       `✅ *CONFORME: Tengo listos todos los requisitos solicitados:*\n${reqsListado}\n` +
                       (name ? `\n👤 *Cliente:* ${name}` : '') +
-                      `\n━━━━━━━━━━━━━━━━━━━━\n_Enviado desde el Catálogo Digital_`;
+                      `\n━━━━━━━━━━━━━━━━━━━━\n_Enviado desde el Catálogo Digital de Guanipa_`;
 
             window.open(`https://wa.me/584149956831?text=${encodeURIComponent(msg)}`, '_blank');
             cerrarModal('modal-requisitos');
@@ -734,13 +932,14 @@
 
         function abrirWhatsAppDirecto(prod) {
             const cod = prod.codigo_producto || prod.id || 'N/A';
-            const precioTxt = parseFloat(prod.precio) ? `$${calcularPrecioFinal(prod).toFixed(2)}` : 'A consultar';
+            const numPrecio = parseFloat(prod.precio);
+            const precioTxt = numPrecio ? `$${calcularPrecioFinalUSD(prod).toFixed(2)} (≈ Bs. ${calcularPrecioFinalBs(prod).toFixed(2)})` : 'A consultar';
             const msg = `Hola, me interesa ordenar el siguiente producto:\n` +
                         `━━━━━━━━━━━━━━━━━━━━\n` +
                         `📦 *${prod.nombre}*\n` +
                         `🆔 *Código:* ${cod}\n` +
                         `💰 *Precio:* ${precioTxt}\n` +
-                        `━━━━━━━━━━━━━━━━━━━━\n_Enviado desde el Catálogo Digital_`;
+                        `━━━━━━━━━━━━━━━━━━━━\n_Enviado desde el Catálogo Digital de Guanipa_`;
             window.open(`https://wa.me/584149956831?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
@@ -748,7 +947,7 @@
             if (!productoActualModal) return;
             carrito.push(productoActualModal);
             document.getElementById('cart-badge-count').innerText = carrito.length;
-            showToast(`"${productoActualModal.nombre}" añadido al carrito`);
+            showToast(`"${productoActualModal.nombre}" añadido al carrito 🛒`);
             cerrarModal('modal-producto');
         }
 
@@ -759,19 +958,19 @@
                     <div style="text-align:center; padding:30px 10px; color:var(--text-muted);">
                         <i class="fa-solid fa-cart-arrow-down" style="font-size:2.5rem; opacity:0.3; margin-bottom:10px;"></i>
                         <p style="font-weight:700;">Tu cotización está vacía</p>
-                        <p style="font-size:0.8rem;">Agrega productos usando el botón "Agregar a Cotización".</p>
+                        <p style="font-size:0.8rem;">Agrega productos usando el botón "Cotizar" en cada producto.</p>
                     </div>
                 `;
             } else {
-                let total = 0;
+                let totalUsd = 0;
                 let itemsHtml = carrito.map((item, idx) => {
-                    const precio = calcularPrecioFinal(item);
-                    total += precio;
+                    const precioUsd = calcularPrecioFinalUSD(item);
+                    totalUsd += precioUsd;
                     return `
                         <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-ui); font-size:0.85rem;">
                             <div style="flex:1; min-width:0; padding-right:10px;">
                                 <p style="font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.nombre}</p>
-                                <span style="color:var(--success); font-weight:800;">$${precio.toFixed(2)}</span>
+                                <span style="color:var(--success); font-weight:800;">$${precioUsd.toFixed(2)}</span>
                             </div>
                             <button onclick="eliminarDelCarrito(${idx})" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:1rem;">
                                 <i class="fa-solid fa-trash-can"></i>
@@ -780,11 +979,16 @@
                     `;
                 }).join('');
 
+                const totalBs = totalUsd * tasaCambioBCV;
+
                 body.innerHTML = `
                     <div style="max-height:220px; overflow-y:auto; margin-bottom:12px;">${itemsHtml}</div>
-                    <div style="display:flex; justify-content:space-between; font-size:1.05rem; font-weight:800; padding:10px 0; border-top:2px solid var(--border-ui);">
-                        <span>Total:</span>
-                        <span style="color:var(--success);">$${total.toFixed(2)}</span>
+                    <div style="display:flex; justify-content:space-between; align-items:baseline; padding:10px 0; border-top:2px solid var(--border-ui);">
+                        <span style="font-size:1rem; font-weight:800;">Total Estimado:</span>
+                        <div style="text-align:right;">
+                            <div style="font-size:1.2rem; font-weight:800; color:var(--success);">$${totalUsd.toFixed(2)}</div>
+                            <div style="font-size:0.78rem; font-weight:700; color:var(--text-muted);">≈ Bs. ${totalBs.toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
+                        </div>
                     </div>
                     <div style="margin:10px 0;">
                         <input type="text" id="cart-client-name" style="width:100%; padding:9px 12px; border-radius:10px; border:1.5px solid var(--border-ui); font-size:0.85rem; outline:none; background:var(--bg-page); color:var(--text-main);" placeholder="Tu nombre">
@@ -810,21 +1014,22 @@
 
         function enviarCarritoWhatsApp() {
             const name = document.getElementById('cart-client-name').value.trim() || 'Cliente';
-            let t = 0;
+            let tUsd = 0;
             let itemsTexto = '';
             carrito.forEach((it, idx) => {
-                const p = calcularPrecioFinal(it);
-                t += p;
+                const p = calcularPrecioFinalUSD(it);
+                tUsd += p;
                 itemsTexto += `*${idx + 1}. ${it.nombre}* - $${p.toFixed(2)}\n`;
             });
+            const tBs = tUsd * tasaCambioBCV;
 
             const msg = `Hola, mi nombre es *${name}*.\n` +
                         `🛒 *Solicito la siguiente cotización:*\n` +
                         `━━━━━━━━━━━━━━━━━━━━\n` +
                         itemsTexto +
                         `━━━━━━━━━━━━━━━━━━━━\n` +
-                        `💰 *Total General:* $${t.toFixed(2)}\n` +
-                        `_Enviado desde el Catálogo Digital_`;
+                        `💰 *Total:* $${tUsd.toFixed(2)} USD (≈ Bs. ${tBs.toFixed(2)})\n` +
+                        `_Enviado desde el Catálogo Digital de Guanipa_`;
 
             window.open(`https://wa.me/584149956831?text=${encodeURIComponent(msg)}`, '_blank');
             carrito = [];
