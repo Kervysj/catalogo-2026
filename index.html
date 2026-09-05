@@ -86,16 +86,9 @@
             --shadow-hover: 0 20px 25px -5px rgb(59 130 246 / 0.15), 0 8px 10px -6px rgb(59 130 246 / 0.1);
         }
 
-        body.dark-mode .info-badge, body.dark-mode .search-input, body.dark-mode .filter-btn, body.dark-mode .modal-content, body.dark-mode .route-info-box, body.dark-mode .assistant-chat-container, body.dark-mode .assistant-chat-header, body.dark-mode .assistant-chat-body, body.dark-mode .assistant-product-card, body.dark-mode .bottom-nav {
+        body.dark-mode .info-badge, body.dark-mode .search-input, body.dark-mode .filter-btn, body.dark-mode .modal-content, body.dark-mode .route-info-box, body.dark-mode .assistant-chat-container, body.dark-mode .assistant-chat-header, body.dark-mode .assistant-chat-body, body.dark-mode .assistant-product-card {
             background-color: #1e293b;
             color: #f8fafc;
-            border-color: #334155;
-        }
-
-        body.dark-mode .bottom-nav {
-            background: rgba(30, 41, 59, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
         }
 
         body.dark-mode .filter-btn.special-filter {
@@ -195,11 +188,10 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             padding: 20px;
-            padding-bottom: 100px;
+            padding-bottom: 90px;
             opacity: 0;
             animation: fadeInBody 0.5s ease forwards;
             transition: background-color 0.3s ease, color 0.3s ease;
-            contain: layout style;
         }
 
         @keyframes fadeInBody { to { opacity: 1; } }
@@ -243,14 +235,12 @@
             cursor: pointer;
             transition: var(--transition-smooth);
             text-decoration: none;
-            will-change: transform;
         }
 
-        .info-badge:hover, .info-badge:focus-visible {
+        .info-badge:hover {
             border-color: var(--primary-color);
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(37, 99, 235, 0.15);
-            outline: 2px solid var(--primary-color);
         }
 
         .info-badge i { font-size: 1.1rem; color: var(--primary-color); }
@@ -285,10 +275,9 @@
             color: var(--text-main);
         }
 
-        .search-input:focus, .search-input:focus-visible {
+        .search-input:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.12), var(--shadow-subtle);
-            outline: none;
         }
 
         .search-icon {
@@ -325,10 +314,9 @@
             cursor: pointer;
         }
 
-        .subcategory-select:focus, .subcategory-select:focus-visible {
+        .subcategory-select:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12), var(--shadow-subtle);
-            outline: none;
         }
 
         .filters {
@@ -351,14 +339,12 @@
             color: var(--text-muted);
             transition: var(--transition-smooth);
             box-shadow: var(--shadow-subtle);
-            will-change: transform;
         }
 
-        .filter-btn:hover, .filter-btn:focus-visible {
+        .filter-btn:hover {
             border-color: var(--primary-color);
             color: var(--primary-color);
             transform: translateY(-2px);
-            outline: 2px solid var(--primary-color);
         }
 
         .filter-btn.active {
@@ -411,7 +397,6 @@
             gap: 25px;
             max-width: 1200px;
             margin: 0 auto;
-            contain: layout;
         }
 
         .subcat-group-title {
@@ -448,15 +433,12 @@
             position: relative;
             border: 1px solid var(--border-color);
             animation: cardEntrance 0.4s ease forwards;
-            will-change: transform;
-            contain: content;
         }
 
-        .card:hover, .card:focus-visible {
+        .card:hover {
             transform: translateY(-6px);
             box-shadow: var(--shadow-hover);
             border-color: rgba(37, 99, 235, 0.3);
-            outline: 2px solid var(--primary-color);
         }
 
         .card-img-container {
@@ -472,7 +454,6 @@
             height: 100%;
             object-fit: cover;
             transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            will-change: transform;
         }
 
         .card:hover img { transform: scale(1.07); }
@@ -499,14 +480,11 @@
             cursor: pointer;
             transition: var(--transition-smooth);
             backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            will-change: transform;
         }
 
-        .card-action-icon-btn:hover, .card-action-icon-btn:focus-visible {
+        .card-action-icon-btn:hover {
             background: var(--primary-color);
             transform: scale(1.1);
-            outline: 2px solid #fff;
         }
 
         .card-action-icon-btn.fav-active { color: #f59e0b; }
@@ -597,7 +575,6 @@
             height: 100%;
             background-color: rgba(15, 23, 42, 0.75);
             backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
             justify-content: center;
             align-items: center;
             padding: 20px;
@@ -619,7 +596,6 @@
             transform: scale(0.92) translateY(15px);
             transition: var(--transition-smooth);
             position: relative;
-            will-change: transform;
         }
 
         .modal.active .modal-content { transform: scale(1) translateY(0); }
@@ -641,7 +617,6 @@
             object-fit: cover;
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             transform-origin: center center;
-            will-change: transform;
         }
 
         .zoom-hint-badge {
@@ -659,7 +634,6 @@
             align-items: center;
             gap: 5px;
             backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
         }
 
         .modal-body { padding: 25px; }
@@ -681,13 +655,11 @@
             justify-content: center;
             transition: var(--transition-smooth);
             z-index: 10;
-            will-change: transform;
         }
 
-        .modal-close:hover, .modal-close:focus-visible {
+        .modal-close:hover {
             background: var(--danger-color);
             transform: rotate(90deg) scale(1.1);
-            outline: 2px solid #fff;
         }
 
         .modal-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 6px; color: var(--text-main); }
@@ -736,19 +708,21 @@
             border: none;
             cursor: pointer;
             color: white;
-            will-change: transform;
         }
 
         .whatsapp-btn { background-color: #25d366; box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35); }
-        .whatsapp-btn:hover, .whatsapp-btn:focus-visible { background-color: #20ba5a; transform: translateY(-2px); outline: 2px solid #fff; }
+        .whatsapp-btn:hover { background-color: #20ba5a; transform: translateY(-2px); }
 
         .cart-add-btn { background-color: var(--primary-color); box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35); }
-        .cart-add-btn:hover, .cart-add-btn:focus-visible { background-color: var(--primary-hover); transform: translateY(-2px); outline: 2px solid #fff; }
+        .cart-add-btn:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
 
         .pdf-btn { background-color: var(--danger-color); box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35); margin-top: 8px; }
-        .pdf-btn:hover, .pdf-btn:focus-visible { background-color: var(--danger-hover); transform: translateY(-2px); outline: 2px solid #fff; }
+        .pdf-btn:hover { background-color: var(--danger-hover); transform: translateY(-2px); }
 
-        .modal-share-btn, .modal-fav-btn, .modal-tiktok-btn {
+        .modal-share-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
             padding: 0 16px;
             border-radius: 14px;
             cursor: pointer;
@@ -757,31 +731,40 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            will-change: transform;
-        }
-
-        .modal-share-btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
             box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
         }
-        .modal-share-btn:hover, .modal-share-btn:focus-visible { background-color: var(--primary-hover); transform: translateY(-2px); outline: 2px solid #fff; }
+        .modal-share-btn:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
 
         .modal-fav-btn {
             background-color: var(--card-bg);
             color: var(--text-main);
             border: 2px solid var(--border-color);
+            padding: 0 16px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .modal-fav-btn:hover, .modal-fav-btn:focus-visible { border-color: #f59e0b; transform: translateY(-2px); outline: 2px solid #fff; }
+        .modal-fav-btn:hover { border-color: #f59e0b; transform: translateY(-2px); }
         .modal-fav-btn.fav-active { color: #f59e0b; border-color: #f59e0b; }
 
         .modal-tiktok-btn {
             background-color: #000000;
             color: white;
             border: none;
+            padding: 0 16px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .modal-tiktok-btn:hover, .modal-tiktok-btn:focus-visible { background-color: #25f4ee; color: #000000; transform: translateY(-2px); outline: 2px solid #fff; }
+        .modal-tiktok-btn:hover { background-color: #25f4ee; color: #000000; transform: translateY(-2px); }
 
         .modal-related-container { margin-top: 20px; }
         .modal-related-title {
@@ -805,7 +788,6 @@
             cursor: pointer;
             text-align: center;
             transition: var(--transition-smooth);
-            will-change: transform;
         }
         .modal-related-card:hover { transform: translateY(-2px); }
         .modal-related-card img {
@@ -828,16 +810,17 @@
 
         .requisitos-toggle-btn {
             width: 100%; display: flex; align-items: center; justify-content: space-between;
-            gap: 8px; background: var(--card-bg); border: 1px solid var(--border-color);
+            gap: 8px; background: var(--card-bg, #f3f4f6); border: 1px solid var(--border-color, #e5e7eb);
             color: var(--text-main); font-weight: 600; font-size: 0.95rem; padding: 12px 16px;
             border-radius: 10px; cursor: pointer; margin-top: 12px; transition: background 0.2s;
         }
-        .requisitos-toggle-btn:hover, .requisitos-toggle-btn:focus-visible { background: var(--primary-color); color: #fff; outline: 2px solid var(--primary-color); }
+        .requisitos-toggle-btn:hover { background: var(--primary-color); color: #fff; }
         .requisitos-toggle-btn .toggle-icon { transition: transform 0.25s; }
         .requisitos-toggle-btn.open .toggle-icon { transform: rotate(180deg); }
         .requisitos-panel { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
         .requisitos-panel.open { max-height: 600px; }
         .requisitos-panel .info-modal-list { padding: 14px 4px 4px; margin-top: 0; }
+        body.dark-mode .requisitos-toggle-btn { background: #2a2a2a; border-color: #3a3a3a; }
 
         #requisitos-modal { z-index: 1100; }
         .requisitos-bubble-content {
@@ -931,7 +914,7 @@
 
         .toast {
             position: fixed;
-            bottom: 85px;
+            bottom: 30px;
             left: 50%;
             transform: translateX(-50%) translateY(100px);
             background: #0f172a;
@@ -949,94 +932,59 @@
         }
         .toast.show { transform: translateX(-50%) translateY(0); }
 
-        /* Nueva Barra de Navegación Inferior (Bottom Nav) */
-        .bottom-nav {
+        .social-float {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 68px;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 999;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
-            padding: 0 6px;
-        }
-
-        .bottom-nav-item {
-            background: none;
-            border: none;
+            bottom: 25px;
+            right: 25px;
             display: flex;
             flex-direction: column;
+            gap: 12px;
+            z-index: 999;
+        }
+        .social-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
             align-items: center;
             justify-content: center;
-            flex: 1;
-            height: 100%;
-            color: var(--text-muted);
-            cursor: pointer;
+            color: white;
+            font-size: 1.3rem;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
             transition: var(--transition-smooth);
             text-decoration: none;
-            position: relative;
-            will-change: transform;
+            cursor: pointer;
         }
+        .social-icon:hover { transform: scale(1.12) rotate(5deg); box-shadow: 0 10px 22px rgba(0,0,0,0.3); }
 
-        .bottom-nav-item i {
-            font-size: 1.25rem;
-            margin-bottom: 3px;
+        .bg-wa { background-color: #25d366; }
+        .bg-fb { background-color: #1877f2; }
+        .bg-maps { background-color: var(--danger-color); }
+        .bg-sug { background-color: #9333ea; }
+        .bg-assistant { background-color: #3b82f6; }
+
+        .cart-float-btn {
+            position: fixed;
+            bottom: 25px;
+            left: 25px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+            cursor: pointer;
+            z-index: 998;
             transition: var(--transition-smooth);
         }
-
-        .bottom-nav-item span {
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: -0.01em;
-        }
-
-        .bottom-nav-item:hover, .bottom-nav-item:focus-visible {
-            color: var(--primary-color);
-            outline: none;
-        }
-
-        .bottom-nav-item:active {
-            transform: scale(0.92);
-        }
-
-        .bottom-nav-item.active {
-            color: var(--primary-color);
-        }
-
-        .bottom-nav-item.active i {
-            transform: translateY(-2px);
-        }
-
-        .bottom-nav-badge {
-            position: absolute;
-            top: 10px;
-            right: calc(50% - 16px);
-            background: var(--danger-color);
-            color: white;
-            border-radius: 50%;
-            padding: 1px 5px;
-            font-size: 0.65rem;
-            font-weight: 700;
-            box-shadow: 0 2px 6px rgba(220, 38, 38, 0.4);
-            transform: scale(0);
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .bottom-nav-badge.show {
-            transform: scale(1);
-        }
-
-        /* Ocultar elementos antiguos redundantes */
-        .social-float, .cart-float-btn {
-            display: none !important;
-        }
+        .cart-float-btn.show { display: flex; }
+        .cart-float-btn:hover { transform: scale(1.05); background: var(--primary-hover); }
+        .cart-badge { background: var(--danger-color); color: white; border-radius: 50%; padding: 2px 8px; font-size: 0.8rem; }
 
         .cart-items-container { max-height: 280px; overflow-y: auto; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
         .cart-item-row { display: flex; justify-content: space-between; align-items: center; background: var(--bg-color); padding: 10px; border-radius: 12px; border: 1px solid var(--border-color); font-size: 0.9rem; gap: 10px; }
@@ -1060,7 +1008,7 @@
             background: var(--bg-color);
             color: var(--text-main);
         }
-        .checkout-form-input:focus, .checkout-form-textarea:focus, .checkout-form-input:focus-visible, .checkout-form-textarea:focus-visible { border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); outline: none; }
+        .checkout-form-input:focus, .checkout-form-textarea:focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
         .checkout-form-textarea { resize: vertical; min-height: 80px; }
 
         .flying-item {
@@ -1077,8 +1025,8 @@
 
         .assistant-chat-container {
             position: fixed;
-            bottom: 80px;
-            right: 20px;
+            bottom: 95px;
+            right: 25px;
             width: 330px;
             max-width: calc(100vw - 40px);
             background: var(--card-bg);
@@ -1216,10 +1164,10 @@
     </header>
 
     <div class="info-badges-container">
-        <div class="info-badge" role="button" tabindex="0" onclick="abrirModalInfo('pagos')">
+        <div class="info-badge" onclick="abrirModalInfo('pagos')">
             <i class="fa-solid fa-wallet"></i> Métodos de Pago
         </div>
-        <div class="info-badge red-icon" role="button" tabindex="0" onclick="abrirModalInfo('delivery')">
+        <div class="info-badge red-icon" onclick="abrirModalInfo('delivery')">
             <i class="fa-solid fa-motorcycle"></i> Tenemos Delivery
         </div>
         <a href="https://soygamers.com/firestore" target="_blank" class="info-badge gaming-badge">
@@ -1228,18 +1176,18 @@
     </div>
 
     <div class="search-container">
-        <input type="text" id="search-input" class="search-input" placeholder="Buscar productos, servicios..." oninput="debounceFiltrarCombinado()" aria-label="Buscar productos y servicios">
+        <input type="text" id="search-input" class="search-input" placeholder="Buscar productos, servicios..." oninput="filtrarCombinado()">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
     </div>
 
     <!-- Menú Desplegable de Subcategorías -->
     <div class="subcategory-container">
-        <select id="filter-subcategory" class="subcategory-select" onchange="filterProducts()" aria-label="Filtrar por subcategoría">
+        <select id="filter-subcategory" class="subcategory-select" onchange="filterProducts()">
             <option value="all">Todas las subcategorías</option>
         </select>
     </div>
 
-    <div class="filters" id="filters-container" role="region" aria-label="Filtros de categorías">
+    <div class="filters" id="filters-container">
         <!-- Contenedor dinámico de categorías -->
     </div>
 
@@ -1248,6 +1196,11 @@
         <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div></div>
         <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div></div>
     </div>
+
+    <!-- Botón flotante del carrito -->
+    <button class="cart-float-btn" id="cart-float-btn" onclick="abrirModalCarrito()">
+        <i class="fa-solid fa-cart-shopping"></i> Ver Cotización <span class="cart-badge" id="cart-count">0</span>
+    </button>
 
     <!-- Ventana Emergente del Asistente con Marquesina Rotativa -->
     <div id="assistant-chat-box" class="assistant-chat-container">
@@ -1258,8 +1211,8 @@
         <div class="assistant-chat-body">
             <p id="assistant-welcome-msg">¡Hola! 👋 Te recomiendo este artículo destacado:</p>
             
-            <div id="assistant-marquee-card" class="assistant-product-card" onclick="abrirProductoDesdeMarquesina()" role="button" tabindex="0">
-                <img id="assistant-prod-img" class="assistant-prod-img" src="" alt="Producto destacado" loading="lazy">
+            <div id="assistant-marquee-card" class="assistant-product-card" onclick="abrirProductoDesdeMarquesina()">
+                <img id="assistant-prod-img" class="assistant-prod-img" src="" alt="Producto">
                 <div class="assistant-prod-info">
                     <span id="assistant-prod-tag" class="assistant-prod-tag">Destacado</span>
                     <span id="assistant-prod-title" class="assistant-prod-title">Cargando...</span>
@@ -1283,7 +1236,7 @@
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModal()" aria-label="Cerrar ventana de producto"><i class="fa-solid fa-xmark"></i></button>
             <div class="modal-img-container" id="modal-img-container" onclick="toggleZoom(event)">
-                <img id="modal-img" class="modal-img" src="" alt="" loading="lazy">
+                <img id="modal-img" class="modal-img" src="" alt="">
                 <div class="zoom-hint-badge"><i class="fa-solid fa-magnifying-glass-plus"></i> Clic para zoom</div>
             </div>
             <div class="modal-body">
@@ -1414,32 +1367,15 @@
         </div>
     </div>
 
-    <div id="toast" class="toast" role="status"><i id="toast-icon" class="fa-solid fa-check-circle" style="color: #22c55e;"></i> <span id="toast-text">¡Enlace copiado al portapapeles!</span></div>
+    <div id="toast" class="toast"><i id="toast-icon" class="fa-solid fa-check-circle" style="color: #22c55e;"></i> <span id="toast-text">¡Enlace copiado al portapapeles!</span></div>
 
-    <!-- Nueva Barra de Navegación Inferior Nativa (Bottom Nav) -->
-    <nav class="bottom-nav" role="navigation" aria-label="Navegación inferior">
-        <button class="bottom-nav-item active" onclick="navegarBottomNav('catalogo', this)" aria-label="Ir al catálogo">
-            <i class="fa-solid fa-store"></i>
-            <span>Catálogo</span>
-        </button>
-        <button class="bottom-nav-item" onclick="abrirModalCarrito(); marcarNavActiva(this);" aria-label="Abrir carrito y cotización">
-            <i class="fa-solid fa-cart-shopping"></i>
-            <span>Carrito</span>
-            <span class="bottom-nav-badge" id="bottom-cart-count">0</span>
-        </button>
-        <button class="bottom-nav-item" onclick="abrirModalUbicacion(); marcarNavActiva(this);" aria-label="Ver ubicación de la tienda">
-            <i class="fa-solid fa-location-dot"></i>
-            <span>Ubicación</span>
-        </button>
-        <button class="bottom-nav-item" onclick="toggleAsistenteChat(); marcarNavActiva(this);" aria-label="Abrir asistente virtual">
-            <i class="fa-solid fa-headset"></i>
-            <span>Asistente</span>
-        </button>
-        <a href="https://wa.me/584149956831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20quiero%20más%20información" target="_blank" class="bottom-nav-item" aria-label="Contactar por WhatsApp directo">
-            <i class="fa-brands fa-whatsapp" style="color: #25d366;"></i>
-            <span>WhatsApp</span>
-        </a>
-    </nav>
+    <div class="social-float">
+        <a href="https://wa.me/584149956831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20tengo%20la%20siguiente%20sugerencia:" target="_blank" class="social-icon bg-sug" title="Enviar sugerencia" aria-label="Enviar sugerencia por WhatsApp"><i class="fa-solid fa-lightbulb"></i></a>
+        <a href="https://wa.me/584149956831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20quiero%20más%20información" target="_blank" class="social-icon bg-wa" title="WhatsApp" aria-label="Contactar por WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="https://tinyurl.com/pageimc" target="_blank" class="social-icon bg-fb" title="Facebook" aria-label="Visitar página de Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+        <div class="social-icon bg-maps" onclick="abrirModalUbicacion()" title="Ubicación Interactiva" role="button" tabindex="0" aria-label="Ver ubicación interactiva"><i class="fa-solid fa-location-dot"></i></div>
+        <div class="social-icon bg-assistant" onclick="toggleAsistenteChat()" title="Asistente Virtual" role="button" tabindex="0" aria-label="Abrir asistente virtual"><i class="fa-solid fa-headset"></i></div>
+    </div>
 
     <script>
         const urlAPI = "https://script.google.com/macros/s/AKfycbyfjv9UscbcmgqeKjx_0j5UxGWK2qpFudgFGcHeCBt252fUfxgkhcQUKH-b8BeZLU8NNg/exec";
@@ -1461,31 +1397,6 @@
         let hashInicialProcesado = false;
         let leafletCargado = false;
         let jsPDFCargado = false;
-        let debounceTimer = null;
-
-        // Debounce para búsqueda fluida
-        function debounceFiltrarCombinado() {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => {
-                requestAnimationFrame(() => filtrarCombinado());
-            }, 180);
-        }
-
-        function navegarBottomNav(seccion, btn) {
-            marcarNavActiva(btn);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            if (categoriaSeleccionada !== 'todos') {
-                const primerBtnFiltro = document.querySelector('.filter-btn');
-                if (primerBtnFiltro) primerBtnFiltro.click();
-            }
-        }
-
-        function marcarNavActiva(btn) {
-            document.querySelectorAll('.bottom-nav-item').forEach(item => item.classList.remove('active'));
-            if (btn && btn.classList.contains('bottom-nav-item')) {
-                btn.classList.add('active');
-            }
-        }
 
         function loadSubcategories(products) {
             const select = document.getElementById('filter-subcategory');
@@ -1498,7 +1409,7 @@
         }
 
         function filterProducts() {
-            requestAnimationFrame(() => filtrarCombinado());
+            filtrarCombinado();
         }
 
         function inicializarTema() {
@@ -1762,7 +1673,7 @@
             categoriaSeleccionada = cat;
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             if(btn) btn.classList.add('active');
-            requestAnimationFrame(() => filtrarCombinado());
+            filtrarCombinado();
         }
 
         function filtrarCombinado() {
@@ -1797,10 +1708,8 @@
         function crearCardElemento(prod, idx) {
             const card = document.createElement('div');
             card.className = 'card';
-            card.setAttribute('tabindex', '0');
             card.style.animationDelay = `${idx * 0.03}s`;
             card.onclick = () => abrirModal(prod);
-            card.onkeydown = (e) => { if (e.key === 'Enter') abrirModal(prod); };
             const isFav = esFavorito(prod);
             const idProdEncoded = encodeURIComponent(obtenerIdentificadorProducto(prod));
             const tieneVideo = prod.video_tiktok && prod.video_tiktok.toString().trim();
@@ -1986,28 +1895,22 @@
         });
 
         function lanzarEfectoVueloAlCarrito(source, imgSrc) {
-            const bottomNavCart = document.querySelector('.bottom-nav-item:nth-child(2)').getBoundingClientRect();
+            const target = document.getElementById('cart-float-btn').getBoundingClientRect();
             const rect = source.getBoundingClientRect();
             const img = document.createElement('img');
             img.src = imgSrc; img.className = 'flying-item';
             img.style.left = `${rect.left + rect.width / 2 - 25}px`; img.style.top = `${rect.top + rect.height / 2 - 25}px`;
             document.body.appendChild(img);
-            setTimeout(() => { img.style.left = `${bottomNavCart.left + bottomNavCart.width / 2 - 15}px`; img.style.top = `${bottomNavCart.top + bottomNavCart.height / 2 - 15}px`; img.style.transform = 'scale(0.3) rotate(360deg)'; img.style.opacity = '0.5'; }, 30);
-            setTimeout(() => { img.remove(); }, 830);
+            setTimeout(() => { img.style.left = `${target.left + target.width / 2 - 15}px`; img.style.top = `${target.top + target.height / 2 - 15}px`; img.style.transform = 'scale(0.3) rotate(360deg)'; img.style.opacity = '0.5'; }, 30);
+            setTimeout(() => { img.remove(); document.getElementById('cart-float-btn').style.transform = 'scale(1.15)'; setTimeout(() => document.getElementById('cart-float-btn').style.transform = 'scale(1)', 200); }, 830);
         }
 
         function cerrarModal() { document.getElementById('product-modal').classList.remove('active'); document.body.style.overflow = 'auto'; limpiarHashProducto(); }
         
         function agregarAlCarrito(prod) { carritoGlobal.push({ ...prod, precioFinalCalculado: calcularPrecioFinal(prod) }); actualizarBtnCarrito(); }
         function actualizarBtnCarrito() {
-            const count = carritoGlobal.length;
-            const badgeNav = document.getElementById('bottom-cart-count');
-            badgeNav.innerText = count;
-            if (count > 0) {
-                badgeNav.classList.add('show');
-            } else {
-                badgeNav.classList.remove('show');
-            }
+            document.getElementById('cart-count').innerText = carritoGlobal.length;
+            carritoGlobal.length > 0 ? document.getElementById('cart-float-btn').classList.add('show') : document.getElementById('cart-float-btn').classList.remove('show');
         }
 
         function abrirModalCarrito() {
@@ -2018,7 +1921,7 @@
                 total += item.precioFinalCalculado;
                 container.innerHTML += `
                     <div class="cart-item-row">
-                        <img src="${item.imagen}" alt="${item.nombre}" class="cart-item-thumb" loading="lazy">
+                        <img src="${item.imagen}" alt="${item.nombre}" class="cart-item-thumb">
                         <div class="cart-item-info">
                             <span class="cart-item-title">${item.nombre}</span>
                             <span class="cart-item-details">Cód: ${item.codigo_producto || item.id || 'N/A'} | $${item.precioFinalCalculado.toFixed(2)}</span>
@@ -2109,10 +2012,22 @@
             const body = document.getElementById('info-modal-body-content');
             if (tipo === 'pagos') {
                 head.innerHTML = `<h2 class="modal-title" style="color:var(--primary-color);"><i class="fa-solid fa-wallet"></i> Métodos de Pago</h2>`;
-                body.innerHTML = `<ul class="info-modal-list"><li><i class="fa-solid fa-mobile-screen-button"></i> Pago Móvil</li><li><i class="fa-solid fa-building-columns"></i> Transferencia</li><li><i class="fa-brands fa-bitcoin"></i> Binance Pay</li><li><i class="fa-solid fa-money-bill-wave"></i> Efectivo ($ / Bs)</li></ul>`;
+                body.innerHTML = `
+                    <ul class="info-modal-list">
+                        <li><i class="fa-solid fa-money-bill-wave"></i> Pago Móvil / Transferencia Nacional (Bs.)</li>
+                        <li><i class="fa-solid fa-dollar-sign"></i> Divisas en efectivo ($ / €)</li>
+                        <li><i class="fa-brands fa-usdt"></i> USDT / Binance Pay</li>
+                    </ul>
+                `;
             } else if (tipo === 'delivery') {
-                head.innerHTML = `<h2 class="modal-title" style="color:var(--danger-color);"><i class="fa-solid fa-motorcycle"></i> Información de Delivery</h2>`;
-                body.innerHTML = `<ul class="info-modal-list"><li><i class="fa-solid fa-location-dot"></i> Cobertura en todo San José de Guanipa</li><li><i class="fa-solid fa-clock"></i> Entregas rápidas y seguras</li></ul>`;
+                head.innerHTML = `<h2 class="modal-title" style="color:var(--danger-color);"><i class="fa-solid fa-motorcycle"></i> Servicio de Delivery</h2>`;
+                body.innerHTML = `
+                    <ul class="info-modal-list">
+                        <li><i class="fa-solid fa-location-crosshairs"></i> Entregas rápidas en todo San José de Guanipa.</li>
+                        <li><i class="fa-solid fa-clock"></i> Horario de atención coordinado por WhatsApp.</li>
+                        <li><i class="fa-solid fa-shield-halved"></i> Garantía y seguridad en cada envío.</li>
+                    </ul>
+                `;
             }
             document.getElementById('info-modal').classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -2120,15 +2035,18 @@
         function cerrarModalInfo() { document.getElementById('info-modal').classList.remove('active'); document.body.style.overflow = 'auto'; }
 
         async function abrirModalUbicacion() {
-            await asegurarLeaflet();
             document.getElementById('location-modal').classList.add('active');
             document.body.style.overflow = 'hidden';
-            
+            await asegurarLeaflet();
             setTimeout(() => {
                 if (!leafletMap) {
                     leafletMap = L.map('interactive-map').setView([8.8864, -64.1532], 16);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(leafletMap);
-                    L.marker([8.8864, -64.1532]).addTo(leafletMap).bindPopup("<b>BRIDIGI MARKET</b><br>Calle Zea, frente a Plaza Bolívar").openPopup();
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; OpenStreetMap contributors'
+                    }).addTo(leafletMap);
+                    L.marker([8.8864, -64.1532]).addTo(leafletMap)
+                        .bindPopup('<b>BRIDIGI MARKET</b><br>Calle Zea, frente a la Plaza Bolívar, al lado de Mi Plazita')
+                        .openPopup();
                 } else {
                     leafletMap.invalidateSize();
                 }
@@ -2139,23 +2057,29 @@
                     const latUser = pos.coords.latitude;
                     const lonUser = pos.coords.longitude;
                     const distanciaKm = calcularDistanciaGeo(latUser, lonUser, 8.8864, -64.1532);
-                    document.getElementById('route-distance-label').innerHTML = `Estás a aprox. <b>${distanciaKm.toFixed(1)} km</b> de nuestro local.`;
+                    document.getElementById('route-distance-label').innerText = `Estás a aprox. ${distanciaKm.toFixed(1)} km del local.`;
                 }, () => {
-                    document.getElementById('route-distance-label').innerText = "Activa tu ubicación para estimar distancia.";
+                    document.getElementById('route-distance-label').innerText = 'Calle Zea entre Unión y Democracia, frente a la Plaza Bolívar, al lado de Mi Plazita.';
                 });
             } else {
-                document.getElementById('route-distance-label').innerText = "Geolocalización no soportada en este navegador.";
+                document.getElementById('route-distance-label').innerText = 'Calle Zea entre Unión y Democracia, frente a la Plaza Bolívar, al lado de Mi Plazita.';
             }
         }
-        function cerrarModalUbicacion() { document.getElementById('location-modal').classList.remove('active'); document.body.style.overflow = 'auto'; }
 
         function calcularDistanciaGeo(lat1, lon1, lat2, lon2) {
             const R = 6371;
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
             return R * c;
+        }
+
+        function cerrarModalUbicacion() {
+            document.getElementById('location-modal').classList.remove('active');
+            document.body.style.overflow = 'auto';
         }
 
         function toggleZoom(e) {
@@ -2163,12 +2087,12 @@
             const img = document.getElementById('modal-img');
             isZoomed = !isZoomed;
             if (isZoomed) {
+                container.classList.add('zoomed');
                 const rect = container.getBoundingClientRect();
                 const x = ((e.clientX - rect.left) / rect.width) * 100;
                 const y = ((e.clientY - rect.top) / rect.height) * 100;
-                container.classList.add('zoomed');
                 img.style.transformOrigin = `${x}% ${y}%`;
-                img.style.transform = 'scale(2)';
+                img.style.transform = 'scale(2.2)';
             } else {
                 container.classList.remove('zoomed');
                 img.style.transform = 'scale(1)';
