@@ -1,6 +1,0 @@
-{
-  "name": "Catálogo Digital Guanipa",
-  "description": "Catálogo digital de productos y servicios con pedidos directos por WhatsApp, compras por encargo, carrito interactivo y validación de requisitos.",
-  "requestFramePermissions": ["geolocation"],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
