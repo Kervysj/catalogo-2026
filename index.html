@@ -134,7 +134,7 @@
             color: #fde68a;
         }
 
-        /* Tema Switch - Mejorado */
+        /* Tema Switch */
         .theme-switch-container {
             position: fixed;
             top: 16px;
@@ -320,7 +320,7 @@
             color: #0891b2; 
         }
 
-        /* Búsqueda - Optimizada */
+        /* Búsqueda */
         .search-container {
             max-width: 520px;
             margin: 0 auto 12px auto;
@@ -473,7 +473,7 @@
             border-color: #0891b2;
         }
 
-        /* Grid - Optimizado */
+        /* Grid */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -654,7 +654,7 @@
             color: var(--primary-color); 
         }
 
-        /* Skeleton - Optimizado */
+        /* Skeleton */
         @keyframes pulseSkeleton {
             0% { opacity: 0.5; transform: scale(0.98); }
             50% { opacity: 1; transform: scale(1); }
@@ -693,7 +693,7 @@
         .skeleton-line.medium { width: 65%; }
         .skeleton-line.long { width: 100%; }
 
-        /* Modales - Optimizados */
+        /* Modales */
         .modal {
             display: none;
             position: fixed;
@@ -969,4 +969,51 @@
             transform: scale(0.95); 
         }
         .modal-fav-btn.fav-active { 
-            color: #f59
+            color: #f59e0b; 
+            border-color: #f59e0b; 
+        }
+
+        .modal-tiktok-btn {
+            background-color: #000000;
+            color: white;
+            border: none;
+            padding: 0 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-tiktok-btn:hover { 
+            background-color: #25f4ee; 
+            color: #000000; 
+            transform: translateY(-2px); 
+        }
+        .modal-tiktok-btn:active { 
+            transform: scale(0.95); 
+        }
+
+        .modal-related-container { 
+            margin-top: 16px; 
+        }
+        .modal-related-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 12px;
+        }
+        .modal-related-list {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: thin;
+        }
+        .modal-related-card {
+            flex:
