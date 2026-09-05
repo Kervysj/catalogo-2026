@@ -69,6 +69,8 @@
             --shadow-subtle: 0 4px 6px -1px rgb(0 0 0 / 0.04), 0 2px 4px -2px rgb(0 0 0 / 0.04);
             --shadow-hover: 0 20px 25px -5px rgb(37 99 235 / 0.12), 0 8px 10px -6px rgb(37 99 235 / 0.08);
             --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            --bottom-nav-height: 64px;
+            --nav-glass-bg: rgba(255, 255, 255, 0.78);
         }
 
         body.dark-mode {
@@ -84,6 +86,7 @@
             --border-color: #334155;
             --shadow-subtle: 0 4px 6px -1px rgb(0 0 0 / 0.2), 0 2px 4px -2px rgb(0 0 0 / 0.2);
             --shadow-hover: 0 20px 25px -5px rgb(59 130 246 / 0.15), 0 8px 10px -6px rgb(59 130 246 / 0.1);
+            --nav-glass-bg: rgba(15, 23, 42, 0.78);
         }
 
         body.dark-mode .info-badge, body.dark-mode .search-input, body.dark-mode .filter-btn, body.dark-mode .modal-content, body.dark-mode .route-info-box, body.dark-mode .assistant-chat-container, body.dark-mode .assistant-chat-header, body.dark-mode .assistant-chat-body, body.dark-mode .assistant-product-card {
@@ -184,11 +187,28 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
 
+        html { scroll-behavior: smooth; }
+
+        a:focus-visible, button:focus-visible, [tabindex]:focus-visible, input:focus-visible, select:focus-visible {
+            outline: 3px solid var(--primary-color);
+            outline-offset: 2px;
+            border-radius: 6px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            *, *::before, *::after {
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.001ms !important;
+            }
+        }
+
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
             padding: 20px;
-            padding-bottom: 90px;
+            padding-bottom: calc(var(--bottom-nav-height) + 30px);
             opacity: 0;
             animation: fadeInBody 0.5s ease forwards;
             transition: background-color 0.3s ease, color 0.3s ease;
@@ -433,6 +453,7 @@
             position: relative;
             border: 1px solid var(--border-color);
             animation: cardEntrance 0.4s ease forwards;
+            contain: layout style;
         }
 
         .card:hover {
@@ -914,77 +935,174 @@
 
         .toast {
             position: fixed;
-            bottom: 30px;
+            bottom: calc(var(--bottom-nav-height) + 20px);
             left: 50%;
-            transform: translateX(-50%) translateY(100px);
+            transform: translateX(-50%) translateY(20px);
+            opacity: 0;
+            pointer-events: none;
             background: #0f172a;
             color: #fff;
             padding: 12px 24px;
             border-radius: 30px;
             font-size: 0.9rem;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
             z-index: 2000;
             font-weight: 500;
             display: flex;
             align-items: center;
             gap: 8px;
+            max-width: calc(100vw - 40px);
+            text-align: center;
         }
-        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto; }
 
-        .social-float {
+        /* ============ Barra de Navegación Inferior (estilo app nativa) ============ */
+        .bottom-nav {
             position: fixed;
-            bottom: 25px;
-            right: 25px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 950;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: var(--bottom-nav-height);
+            padding: 8px 6px calc(8px + env(safe-area-inset-bottom, 0px)) 6px;
+            background: var(--nav-glass-bg);
+            backdrop-filter: blur(18px) saturate(180%);
+            -webkit-backdrop-filter: blur(18px) saturate(180%);
+            border-top: 1px solid var(--border-color);
+            box-shadow: 0 -8px 24px rgba(0,0,0,0.06);
+            contain: layout style;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .bottom-nav-item {
+            appearance: none;
+            background: none;
+            border: none;
+            color: var(--text-muted);
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            font-family: inherit;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            flex: 1 1 0;
+            min-width: 0;
+            padding: 6px 2px;
+            border-radius: 14px;
+            transition: color 0.25s ease, transform 0.15s ease;
+            will-change: transform;
         }
-        .social-icon {
-            width: 50px;
-            height: 50px;
+
+        .bottom-nav-item i { font-size: 1.22rem; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+        .bottom-nav-item span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .bottom-nav-item:hover, .bottom-nav-item:focus-visible { color: var(--primary-color); }
+        .bottom-nav-item:active { transform: scale(0.88); }
+        .bottom-nav-item:active i { transform: scale(0.9); }
+        .bottom-nav-item.wa-item:hover, .bottom-nav-item.wa-item:focus-visible { color: #25d366; }
+
+        /* Botón central del carrito: FAB elevado dentro de la barra */
+        .cart-float-btn {
+            position: relative;
+            top: -16px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: #ffffff;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            box-shadow: 0 10px 22px rgba(37, 99, 235, 0.45);
+            border: 4px solid var(--bg-color);
             font-size: 1.3rem;
-            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
-            transition: var(--transition-smooth);
-            text-decoration: none;
-            cursor: pointer;
+            flex: 0 0 56px;
+            padding: 0;
         }
-        .social-icon:hover { transform: scale(1.12) rotate(5deg); box-shadow: 0 10px 22px rgba(0,0,0,0.3); }
+        .cart-float-btn:hover, .cart-float-btn:focus-visible { color: #ffffff; transform: translateY(-2px); }
+        .cart-float-btn:active { transform: scale(0.9); }
+        .cart-float-btn .nav-label { display: none; }
 
-        .bg-wa { background-color: #25d366; }
-        .bg-fb { background-color: #1877f2; }
-        .bg-maps { background-color: var(--danger-color); }
-        .bg-sug { background-color: #9333ea; }
-        .bg-assistant { background-color: #3b82f6; }
-
-        .cart-float-btn {
-            position: fixed;
-            bottom: 25px;
-            left: 25px;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 30px;
-            padding: 12px 20px;
-            font-size: 1rem;
-            font-weight: 600;
+        .cart-badge {
+            position: absolute;
+            top: -2px;
+            right: -4px;
+            background: var(--danger-color);
+            color: #ffffff;
+            border-radius: 50%;
+            min-width: 20px;
+            height: 20px;
+            font-size: 0.68rem;
+            font-weight: 700;
             display: none;
             align-items: center;
-            gap: 10px;
-            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
-            cursor: pointer;
-            z-index: 998;
+            justify-content: center;
+            padding: 0 4px;
+            border: 2px solid var(--bg-color);
+        }
+        .cart-float-btn.show .cart-badge {
+            display: flex;
+            animation: badgePop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes badgePop {
+            0% { transform: scale(0); opacity: 0; }
+            70% { transform: scale(1.25); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @media (min-width: 640px) {
+            .bottom-nav {
+                left: 50%;
+                right: auto;
+                transform: translateX(-50%);
+                bottom: 14px;
+                width: min(480px, calc(100vw - 32px));
+                border: 1px solid var(--border-color);
+                border-radius: 22px;
+                box-shadow: 0 16px 34px rgba(0,0,0,0.16);
+            }
+        }
+
+        /* Footer con enlaces secundarios (Facebook / Sugerencias) */
+        .site-footer {
+            max-width: 1200px;
+            margin: 50px auto 10px auto;
+            padding: 24px 10px 6px 10px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            text-align: center;
+        }
+        .footer-links { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+        .footer-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 9px 16px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            box-shadow: var(--shadow-subtle);
             transition: var(--transition-smooth);
         }
-        .cart-float-btn.show { display: flex; }
-        .cart-float-btn:hover { transform: scale(1.05); background: var(--primary-hover); }
-        .cart-badge { background: var(--danger-color); color: white; border-radius: 50%; padding: 2px 8px; font-size: 0.8rem; }
+        .footer-link:hover { transform: translateY(-2px); border-color: var(--primary-color); color: var(--primary-color); }
+        .footer-link.fb-link:hover { color: #1877f2; border-color: #1877f2; }
+        .footer-link.sug-link:hover { color: #9333ea; border-color: #9333ea; }
+        .footer-note { color: var(--text-muted); font-size: 0.78rem; }
 
         .cart-items-container { max-height: 280px; overflow-y: auto; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
         .cart-item-row { display: flex; justify-content: space-between; align-items: center; background: var(--bg-color); padding: 10px; border-radius: 12px; border: 1px solid var(--border-color); font-size: 0.9rem; gap: 10px; }
@@ -1025,7 +1143,7 @@
 
         .assistant-chat-container {
             position: fixed;
-            bottom: 95px;
+            bottom: calc(var(--bottom-nav-height) + 28px);
             right: 25px;
             width: 330px;
             max-width: calc(100vw - 40px);
@@ -1135,6 +1253,35 @@
             gap: 6px;
         }
         .assistant-chat-footer-btn:hover { background: #20ba5a; transform: translateY(-1px); }
+
+        /* ============ Responsive ============ */
+        @media (max-width: 720px) {
+            body { padding: 14px; padding-bottom: calc(var(--bottom-nav-height) + 26px); }
+            header { margin-bottom: 18px; }
+            header h1 { font-size: 1.7rem; }
+            header p { font-size: 0.85rem; }
+            .info-badges-container { gap: 8px; margin-bottom: 18px; }
+            .info-badge { padding: 8px 12px; font-size: 0.78rem; gap: 7px; }
+            .search-container { margin-bottom: 12px; }
+            .search-input { padding: 12px 16px 12px 44px; font-size: 0.92rem; }
+            .search-icon { left: 16px; }
+            .subcategory-container { margin-bottom: 18px; }
+            .filters { gap: 8px; margin-bottom: 22px; }
+            .filter-btn { padding: 8px 14px; font-size: 0.8rem; }
+            .grid { grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 12px; }
+            .card-img-container { height: 140px; }
+            .modal-img-container { height: 220px; }
+            .modal-body { padding: 18px; }
+            .assistant-chat-container { right: 10px; left: 10px; width: auto; max-width: none; }
+        }
+
+        @media (max-width: 380px) {
+            .grid { grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 10px; }
+            header h1 { font-size: 1.45rem; }
+            .bottom-nav-item { font-size: 0.6rem; }
+            .bottom-nav-item i { font-size: 1.1rem; }
+            .cart-float-btn { width: 50px; height: 50px; top: -14px; font-size: 1.15rem; }
+        }
     </style>
 </head>
 <body id="main-body">
@@ -1176,7 +1323,7 @@
     </div>
 
     <div class="search-container">
-        <input type="text" id="search-input" class="search-input" placeholder="Buscar productos, servicios..." oninput="filtrarCombinado()">
+        <input type="text" id="search-input" class="search-input" placeholder="Buscar productos, servicios..." oninput="filtrarCombinadoDebounced()">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
     </div>
 
@@ -1197,10 +1344,18 @@
         <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div></div>
     </div>
 
-    <!-- Botón flotante del carrito -->
-    <button class="cart-float-btn" id="cart-float-btn" onclick="abrirModalCarrito()">
-        <i class="fa-solid fa-cart-shopping"></i> Ver Cotización <span class="cart-badge" id="cart-count">0</span>
-    </button>
+    <!-- Footer con enlaces secundarios -->
+    <footer class="site-footer">
+        <div class="footer-links">
+            <a href="https://tinyurl.com/pageimc" target="_blank" class="footer-link fb-link" aria-label="Visitar página de Facebook">
+                <i class="fa-brands fa-facebook-f"></i> Síguenos en Facebook
+            </a>
+            <a href="https://wa.me/584149956831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20tengo%20la%20siguiente%20sugerencia:" target="_blank" class="footer-link sug-link" aria-label="Enviar sugerencia por WhatsApp">
+                <i class="fa-solid fa-lightbulb"></i> Enviar una sugerencia
+            </a>
+        </div>
+        <p class="footer-note">© <span id="footer-year"></span> Catálogo Digital · San José de Guanipa</p>
+    </footer>
 
     <!-- Ventana Emergente del Asistente con Marquesina Rotativa -->
     <div id="assistant-chat-box" class="assistant-chat-container">
@@ -1369,13 +1524,30 @@
 
     <div id="toast" class="toast"><i id="toast-icon" class="fa-solid fa-check-circle" style="color: #22c55e;"></i> <span id="toast-text">¡Enlace copiado al portapapeles!</span></div>
 
-    <div class="social-float">
-        <a href="https://wa.me/584149956831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20tengo%20la%20siguiente%20sugerencia:" target="_blank" class="social-icon bg-sug" title="Enviar sugerencia" aria-label="Enviar sugerencia por WhatsApp"><i class="fa-solid fa-lightbulb"></i></a>
-        <a href="https://wa.me/584149956831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20quiero%20más%20información" target="_blank" class="social-icon bg-wa" title="WhatsApp" aria-label="Contactar por WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
-        <a href="https://tinyurl.com/pageimc" target="_blank" class="social-icon bg-fb" title="Facebook" aria-label="Visitar página de Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-        <div class="social-icon bg-maps" onclick="abrirModalUbicacion()" title="Ubicación Interactiva" role="button" tabindex="0" aria-label="Ver ubicación interactiva"><i class="fa-solid fa-location-dot"></i></div>
-        <div class="social-icon bg-assistant" onclick="toggleAsistenteChat()" title="Asistente Virtual" role="button" tabindex="0" aria-label="Abrir asistente virtual"><i class="fa-solid fa-headset"></i></div>
-    </div>
+    <!-- Barra de Navegación Inferior (app-style) -->
+    <nav class="bottom-nav" role="navigation" aria-label="Navegación principal">
+        <button type="button" class="bottom-nav-item" onclick="irInicio()" aria-label="Volver arriba">
+            <i class="fa-solid fa-house"></i>
+            <span>Inicio</span>
+        </button>
+        <button type="button" class="bottom-nav-item" onclick="abrirModalUbicacion()" aria-label="Ver ubicación interactiva">
+            <i class="fa-solid fa-location-dot"></i>
+            <span>Ubicación</span>
+        </button>
+        <button type="button" class="bottom-nav-item cart-float-btn" id="cart-float-btn" onclick="abrirModalCarrito()" aria-label="Ver cotización, carrito">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span class="nav-label">Carrito</span>
+            <span class="cart-badge" id="cart-count">0</span>
+        </button>
+        <a href="https://wa.me/584149956831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20quiero%20más%20información" target="_blank" class="bottom-nav-item wa-item" aria-label="Contactar por WhatsApp">
+            <i class="fa-brands fa-whatsapp"></i>
+            <span>WhatsApp</span>
+        </a>
+        <button type="button" class="bottom-nav-item" onclick="toggleAsistenteChat()" aria-label="Abrir asistente virtual">
+            <i class="fa-solid fa-headset"></i>
+            <span>Asistente</span>
+        </button>
+    </nav>
 
     <script>
         const urlAPI = "https://script.google.com/macros/s/AKfycbyfjv9UscbcmgqeKjx_0j5UxGWK2qpFudgFGcHeCBt252fUfxgkhcQUKH-b8BeZLU8NNg/exec";
@@ -1397,6 +1569,23 @@
         let hashInicialProcesado = false;
         let leafletCargado = false;
         let jsPDFCargado = false;
+
+        // Utilidad genérica de debounce para evitar sobrecarga en eventos frecuentes (ej. búsqueda)
+        function debounce(fn, delay = 220) {
+            let temporizador;
+            return (...args) => {
+                clearTimeout(temporizador);
+                temporizador = setTimeout(() => fn(...args), delay);
+            };
+        }
+
+        // Vuelve al inicio del catálogo de forma suave (acción "Inicio" del nav inferior)
+        function irInicio() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Se define abajo, una vez declarada filtrarCombinado() (las funciones se "hoistean" en JS, así que es seguro usarla aquí)
+        const filtrarCombinadoDebounced = debounce(() => filtrarCombinado(), 200);
 
         function loadSubcategories(products) {
             const select = document.getElementById('filter-subcategory');
@@ -1718,7 +1907,7 @@
 
             card.innerHTML = `
                 <div class="card-img-container">
-                    <img src="${prod.imagen}" alt="${prod.nombre}" loading="lazy">
+                    <img src="${prod.imagen}" alt="${prod.nombre}" loading="lazy" decoding="async">
                     <div class="card-top-actions">
                         <button class="card-action-icon-btn ${isFav ? 'fav-active' : ''}" onclick="toggleFavoritoPorId(event, '${idProdEncoded}')" aria-label="${isFav ? 'Quitar de favoritos' : 'Agregar a favoritos'}"><i class="fa-${isFav ? 'solid' : 'regular'} fa-star"></i></button>
                         <button class="card-action-icon-btn" onclick="compartirProductoPorId(event, '${idProdEncoded}')" aria-label="Compartir producto"><i class="fa-solid fa-share-nodes"></i></button>
@@ -1854,7 +2043,7 @@
             container.innerHTML = `<div class="modal-related-title">También te puede interesar</div>
                 <div class="modal-related-list">
                     ${relacionados.map(p => `<div class="modal-related-card" onclick="abrirModal(buscarProductoPorId(decodeURIComponent('${encodeURIComponent(obtenerIdentificadorProducto(p))}')))">
-                        <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
+                        <img src="${p.imagen}" alt="${p.nombre}" loading="lazy" decoding="async">
                         <span>${p.nombre}</span>
                     </div>`).join('')}
                 </div>`;
@@ -1901,7 +2090,9 @@
             img.src = imgSrc; img.className = 'flying-item';
             img.style.left = `${rect.left + rect.width / 2 - 25}px`; img.style.top = `${rect.top + rect.height / 2 - 25}px`;
             document.body.appendChild(img);
-            setTimeout(() => { img.style.left = `${target.left + target.width / 2 - 15}px`; img.style.top = `${target.top + target.height / 2 - 15}px`; img.style.transform = 'scale(0.3) rotate(360deg)'; img.style.opacity = '0.5'; }, 30);
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                img.style.left = `${target.left + target.width / 2 - 15}px`; img.style.top = `${target.top + target.height / 2 - 15}px`; img.style.transform = 'scale(0.3) rotate(360deg)'; img.style.opacity = '0.5';
+            }));
             setTimeout(() => { img.remove(); document.getElementById('cart-float-btn').style.transform = 'scale(1.15)'; setTimeout(() => document.getElementById('cart-float-btn').style.transform = 'scale(1)', 200); }, 830);
         }
 
@@ -2045,7 +2236,7 @@
                         attribution: '&copy; OpenStreetMap contributors'
                     }).addTo(leafletMap);
                     L.marker([8.8864, -64.1532]).addTo(leafletMap)
-                        .bindPopup('<b>BRIDIGI MARKET</b><br>Calle Zea, frente a la Plaza Bolívar, al lado de Mi Plazita')
+                        .bindPopup('<b>📍 Nuestro Local</b><br>Calle Zea, frente a la Plaza Bolívar, al lado de Mi Plazita')
                         .openPopup();
                 } else {
                     leafletMap.invalidateSize();
@@ -2104,6 +2295,8 @@
             aplicarCampanaTemporada();
             verificarNovedadesVisita();
             cargarCatalogo();
+            const footerYearEl = document.getElementById('footer-year');
+            if (footerYearEl) footerYearEl.innerText = new Date().getFullYear();
         };
     </script>
 </body>
