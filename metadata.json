@@ -1,0 +1,7 @@
+{
+  "name": "Catálogo Digital Guanipa",
+  "description": "Catálogo digital de productos, recargas, streaming y compras por encargo en San José de Guanipa con pedidos directos por WhatsApp.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
