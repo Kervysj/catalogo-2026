@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>CATÁLOGO DIGITAL 2026 | San José de Guanipa</title>
-    <meta name="description" content="Catálogo digital de productos, recargas, streaming y compras por encargo en San José de Guanipa con pedidos directos por WhatsApp y delivery a domicilio.">
+    <meta name="description" content="Catálogo digital de productos, recargas, streaming y compras en San José de Guanipa con pedidos directos por WhatsApp y delivery a domicilio.">
 
     <!-- Open Graph / redes sociales -->
     <meta property="og:title" content="Catálogo Digital | San José de Guanipa">
-    <meta property="og:description" content="Explora nuestro catálogo de productos, compras por encargo y servicios en San José de Guanipa. Pide directo por WhatsApp.">
+    <meta property="og:description" content="Explora nuestro catálogo de productos y servicios en San José de Guanipa. Pide directo por WhatsApp.">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="es_VE">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Catálogo Digital | San José de Guanipa">
-    <meta name="twitter:description" content="Explora nuestro catálogo de productos, compras por encargo y servicios en San José de Guanipa. Pide directo por WhatsApp.">
+    <meta name="twitter:description" content="Explora nuestro catálogo de productos y servicios en San José de Guanipa. Pide directo por WhatsApp.">
 
     <!-- Datos estructurados para buscadores -->
     <script type="application/ld+json">
@@ -104,14 +104,12 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Contenedor central responsivo */
         .app-container {
             max-width: 1240px;
             margin: 0 auto;
             width: 100%;
         }
 
-        /* Barra de Novedades Superior */
         .news-banner-bar {
             background: linear-gradient(90deg, var(--primary-color), var(--primary-hover));
             color: white;
@@ -139,7 +137,6 @@
             white-space: nowrap;
         }
 
-        /* Banner de temporada */
         .seasonal-banner {
             background: linear-gradient(135deg, var(--danger-color), var(--primary-color));
             color: white;
@@ -156,7 +153,6 @@
         }
         .seasonal-banner.show { display: flex; }
 
-        /* Botón de tema flotante */
         .theme-switch-btn {
             position: fixed;
             top: 14px;
@@ -178,7 +174,6 @@
         }
         .theme-switch-btn:hover { transform: scale(1.08); border-color: var(--primary-color); color: var(--primary-color); }
 
-        /* Encabezado compacto y limpio */
         header.app-header {
             text-align: center;
             margin-top: 4px;
@@ -200,7 +195,6 @@
             line-height: 1.3;
         }
 
-        /* Badges de acceso rápido (Barra horizontal en móvil) */
         .info-badges-wrapper {
             width: 100%;
             overflow-x: auto;
@@ -249,7 +243,6 @@
         }
         .info-badge.gaming-badge i { color: #0891b2; }
 
-        /* Controles de Búsqueda y Subcategorías compactos y responsivos */
         .search-row {
             display: flex;
             gap: 8px;
@@ -313,7 +306,6 @@
             border-color: var(--primary-color);
         }
 
-        /* Barra horizontal de Categorías (Pills con scroll táctil suave) */
         .categories-scroll-wrapper {
             position: relative;
             width: 100%;
@@ -385,7 +377,6 @@
             color: #fff;
         }
 
-        /* Cuadrícula de Productos Optimizada */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -416,7 +407,6 @@
         }
         .subcat-group-title i { color: var(--primary-color); }
 
-        /* Tarjeta de Producto */
         .card {
             background-color: var(--card-bg);
             border-radius: var(--radius-card);
@@ -456,7 +446,6 @@
             transform: scale(1.05);
         }
 
-        /* Badge flotante de requisitos en la card si tiene */
         .card-req-badge {
             position: absolute;
             bottom: 8px;
@@ -475,7 +464,6 @@
             z-index: 2;
         }
 
-        /* Botón de favorito discreto en esquina */
         .card-fav-btn {
             position: absolute;
             top: 8px;
@@ -550,7 +538,6 @@
             color: white;
         }
 
-        /* Skeletons para carga rápida */
         .skeleton-card {
             background-color: var(--card-bg);
             border-radius: var(--radius-card);
@@ -568,7 +555,6 @@
         .skeleton-line.long { width: 100%; }
         @keyframes pulseSkeleton { 0% { opacity: 0.5; } 50% { opacity: 0.9; } 100% { opacity: 0.5; } }
 
-        /* ================= MODALES (Optimizados y Scrollables) ================= */
         .modal {
             display: none;
             position: fixed;
@@ -685,7 +671,6 @@
             align-items: flex-start;
         }
 
-        /* Botón de requisitos dentro del modal de producto */
         .requisitos-banner-box {
             background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(147, 51, 234, 0.08));
             border: 1.5px dashed var(--primary-color);
@@ -722,7 +707,6 @@
             text-transform: uppercase;
         }
 
-        /* Botones de acción modal */
         .modal-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
         .modal-actions-row { display: flex; gap: 8px; }
 
@@ -768,7 +752,6 @@
         .modal-tiktok-btn { background: #000; color: #fff; border: none; }
         .modal-tiktok-btn:hover { background: #222; }
 
-        /* MODAL DE CONFIRMACIÓN DE REQUISITOS (NOVEDAD CLAVE) */
         #confirm-requisitos-modal { z-index: 1200; }
         .confirm-req-card {
             max-width: 440px;
@@ -861,7 +844,6 @@
         }
         .btn-cancel-req:hover { color: var(--text-main); background: var(--card-bg); }
 
-        /* Productos relacionados */
         .modal-related-container { margin-top: 18px; border-top: 1px solid var(--border-color); padding-top: 14px; }
         .modal-related-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
         .modal-related-list { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
@@ -869,7 +851,6 @@
         .modal-related-card img { width: 100%; height: 75px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border-color); }
         .modal-related-card span { display: block; font-size: 0.7rem; margin-top: 4px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); }
 
-        /* Carrito modal */
         .cart-items-container { max-height: 260px; overflow-y: auto; margin-bottom: 14px; display: flex; flex-direction: column; gap: 8px; }
         .cart-item-row { display: flex; align-items: center; justify-content: space-between; background: var(--bg-color); padding: 8px 10px; border-radius: 12px; border: 1px solid var(--border-color); gap: 10px; }
         .cart-item-thumb { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; background: var(--border-color); }
@@ -879,7 +860,6 @@
         .cart-item-remove { background: none; border: none; color: var(--danger-color); cursor: pointer; font-size: 1rem; padding: 6px; }
         .cart-total { font-size: 1.15rem; font-weight: 800; text-align: right; margin-bottom: 14px; color: var(--success-color); }
 
-        /* Checkout Form */
         .checkout-form-group { margin-bottom: 12px; }
         .checkout-form-group label { display: block; font-size: 0.84rem; font-weight: 600; margin-bottom: 5px; }
         .checkout-form-input, .checkout-form-textarea {
@@ -894,7 +874,6 @@
         }
         .checkout-form-input:focus, .checkout-form-textarea:focus { border-color: var(--primary-color); }
 
-        /* Animación de vuelo al carrito */
         .flying-item {
             position: fixed;
             z-index: 9999;
@@ -907,7 +886,6 @@
             transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Toast flotante */
         .toast {
             position: fixed;
             bottom: calc(var(--bottom-nav-height) + 16px);
@@ -932,7 +910,6 @@
         }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto; }
 
-        /* ================= BARRA INFERIOR MODERNA ================= */
         .bottom-nav {
             position: fixed;
             left: 0;
@@ -1001,8 +978,22 @@
             font-size: 1.25rem;
             flex: 0 0 52px;
             padding: 0;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .cart-float-btn:hover { color: #fff; transform: translateY(-2px); }
+        
+        /* Efecto Bounce solicitado para el botón del carrito */
+        @keyframes cartBounce {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.25); }
+            50% { transform: scale(0.9); }
+            70% { transform: scale(1.12); }
+            100% { transform: scale(1); }
+        }
+        .cart-bounce-effect {
+            animation: cartBounce 0.55s ease-in-out;
+        }
+
         .cart-badge {
             position: absolute;
             top: -2px;
@@ -1021,65 +1012,6 @@
         }
         .cart-float-btn.show .cart-badge { display: flex; }
 
-        /* Badges de tarjeta para Ofertas y Encargos */
-        .card-oferta-badge {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: linear-gradient(135deg, #f97316, #ea580c);
-            color: #ffffff;
-            font-size: 0.68rem;
-            font-weight: 800;
-            padding: 4px 9px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            box-shadow: 0 4px 10px rgba(249, 115, 22, 0.4);
-            z-index: 5;
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
-        }
-        .card-encargo-badge {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: linear-gradient(135deg, #6366f1, #4f46e5);
-            color: #ffffff;
-            font-size: 0.68rem;
-            font-weight: 800;
-            padding: 4px 9px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.4);
-            z-index: 5;
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
-        }
-        .filter-btn.oferta-filter {
-            background: rgba(249, 115, 22, 0.1);
-            color: #ea580c;
-            border-color: rgba(249, 115, 22, 0.3);
-        }
-        .filter-btn.oferta-filter.active, .filter-btn.oferta-filter:hover {
-            background: #f97316;
-            color: #ffffff;
-            border-color: #f97316;
-        }
-        .filter-btn.encargo-filter {
-            background: rgba(99, 102, 241, 0.1);
-            color: #4f46e5;
-            border-color: rgba(99, 102, 241, 0.3);
-        }
-        .filter-btn.encargo-filter.active, .filter-btn.encargo-filter:hover {
-            background: #6366f1;
-            color: #ffffff;
-            border-color: #6366f1;
-        }
-
-        /* Bloque de Compra por Encargo (Meta 25 personas) */
         .encargo-progress-box {
             background: var(--bg-color);
             border: 1.5px solid #818cf8;
@@ -1175,12 +1107,10 @@
             box-shadow: 0 8px 20px rgba(79, 70, 229, 0.45);
         }
 
-        /* Map modal */
         .map-modal-container { width: 100%; height: 220px; border-radius: 12px; overflow: hidden; margin-bottom: 12px; border: 1px solid var(--border-color); }
         .route-info-box { background: var(--bg-color); border: 1px solid var(--border-color); padding: 10px 12px; border-radius: 10px; font-size: 0.84rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
         .route-info-box i { color: var(--danger-color); font-size: 1.1rem; }
 
-        /* Footer */
         .site-footer {
             max-width: 1200px;
             margin: 40px auto 10px auto;
@@ -1209,7 +1139,6 @@
         }
         .footer-note { color: var(--text-muted); font-size: 0.75rem; }
 
-        /* ================= MODAL DE SUGERENCIAS Y REPORTES (GUIADO) ================= */
         .sug-category-tabs {
             display: flex;
             gap: 6px;
@@ -1305,14 +1234,12 @@
 </head>
 <body id="main-body">
 
-    <!-- Switch de Modo Oscuro / Claro Flotante -->
     <button class="theme-switch-btn" id="theme-switch-btn" onclick="toggleTheme()" title="Cambiar Modo Oscuro / Claro" aria-label="Cambiar tema">
         <i class="fa-solid fa-moon" id="theme-icon"></i>
     </button>
 
     <div class="app-container">
 
-        <!-- Barra Superior de Novedades -->
         <div id="news-banner" class="news-banner-bar">
             <span>¡Nuevos productos en catálogo! Descúbrelos y pide directo.</span>
             <div style="display:flex; align-items:center; gap:8px;">
@@ -1321,7 +1248,6 @@
             </div>
         </div>
 
-        <!-- Banner dinámico de temporada -->
         <div id="seasonal-banner" class="seasonal-banner">
             <i id="seasonal-icon" class="fa-solid fa-gift"></i> <span id="seasonal-text">¡Bienvenidos a nuestra temporada especial!</span>
         </div>
@@ -1331,7 +1257,6 @@
             <p>Productos, recargas de saldo y streaming en San José de Guanipa</p>
         </header>
 
-        <!-- Badges de acceso rápido en fila scrollable -->
         <div class="info-badges-wrapper">
             <div class="info-badges-container">
                 <div class="info-badge" onclick="abrirModalInfo('pagos')">
@@ -1339,12 +1264,6 @@
                 </div>
                 <div class="info-badge red-icon" onclick="abrirModalInfo('delivery')">
                     <i class="fa-solid fa-motorcycle"></i> Tenemos Delivery
-                </div>
-                <div class="info-badge" onclick="cambiarCategoria('encargos', null)">
-                    <i class="fa-solid fa-boxes-packing" style="color:#6366f1;"></i> Por Encargo
-                </div>
-                <div class="info-badge" onclick="filtrarOfertasYTendencias()">
-                    <i class="fa-solid fa-fire" style="color:#f97316;"></i> Ofertas
                 </div>
                 <div class="info-badge" onclick="abrirModalSugerencias()">
                     <i class="fa-solid fa-comments" style="color:#9333ea;"></i> Sugerencias y Reportes
@@ -1355,7 +1274,6 @@
             </div>
         </div>
 
-        <!-- Búsqueda + Selector de Subcategoría en fila compacta -->
         <div class="search-row">
             <div class="search-box">
                 <i class="fa-solid fa-magnifying-glass"></i>
@@ -1368,14 +1286,12 @@
             </div>
         </div>
 
-        <!-- Barra scrollable horizontal de Categorías -->
         <div class="categories-scroll-wrapper">
             <div class="categories-scroll-container" id="filters-container">
                 <!-- Filtros generados dinámicamente -->
             </div>
         </div>
 
-        <!-- Cuadrícula de Productos -->
         <div class="grid" id="product-grid">
             <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div></div></div>
             <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div></div></div>
@@ -1383,7 +1299,6 @@
             <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line short"></div><div class="skeleton-line long"></div></div></div>
         </div>
 
-        <!-- Footer -->
         <footer class="site-footer">
             <div class="footer-links">
                 <a href="https://tinyurl.com/pageimc" target="_blank" class="footer-link">
@@ -1392,16 +1307,12 @@
                 <button type="button" onclick="abrirModalSugerencias()" class="footer-link" style="cursor:pointer; background:none; border:1px solid var(--border-color);">
                     <i class="fa-solid fa-comments" style="color:#9333ea;"></i> Sugerencias y Reportes
                 </button>
-                <button type="button" onclick="cambiarCategoria('encargos', null); irInicio();" class="footer-link" style="cursor:pointer; background:none; border:1px solid var(--border-color);">
-                    <i class="fa-solid fa-boxes-packing" style="color:#6366f1;"></i> Ver Encargos (Meta 25)
-                </button>
             </div>
             <p class="footer-note">© <span id="footer-year"></span> Catálogo Digital · San José de Guanipa, Anzoátegui</p>
         </footer>
 
     </div>
 
-    <!-- MODAL DE BUZÓN DE SUGERENCIAS Y REPORTES (GUIADO) -->
     <div class="modal" id="sugerencias-modal" onclick="if(event.target === this) cerrarModalSugerencias()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close-btn" onclick="cerrarModalSugerencias()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
@@ -1419,7 +1330,6 @@
                     Selecciona una categoría y marca las opciones que correspondan. ¡Llega directo a nuestro WhatsApp para atenderte rápido!
                 </p>
 
-                <!-- Pestañas de categoría -->
                 <div class="sug-category-tabs">
                     <button type="button" class="sug-tab-btn active" id="sug-tab-error" onclick="cambiarTabSugerencia('error')">
                         <i class="fa-solid fa-wrench"></i>
@@ -1435,10 +1345,8 @@
                     </button>
                 </div>
 
-                <!-- Contenedor dinámico de opciones predefinidas con selección táctil -->
                 <div id="sug-options-container" class="sug-options-grid"></div>
 
-                <!-- Campo de comentario adicional opcional -->
                 <div class="checkout-form-group" style="margin-top:4px; margin-bottom:10px;">
                     <label for="sug-detail-input" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
                         <span>Comentario o detalle adicional:</span>
@@ -1447,7 +1355,6 @@
                     <textarea id="sug-detail-input" class="checkout-form-input" rows="2" style="resize:none; padding:8px 10px; font-size:0.85rem;" placeholder="¿Deseas especificar algo más? (opcional)"></textarea>
                 </div>
 
-                <!-- Nombre y WhatsApp opcionales -->
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
                     <div class="checkout-form-group" style="margin-bottom:0;">
                         <label for="sug-name-input" style="font-size:0.78rem;">Tu Nombre (opcional):</label>
@@ -1466,75 +1373,6 @@
         </div>
     </div>
 
-    <!-- MODAL DE REGISTRO EN LISTA DE ESPERA POR ENCARGO (META 25 PERSONAS) -->
-    <div class="modal" id="encargo-modal" onclick="if(event.target === this) cerrarModalEncargo()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <button class="modal-close-btn" onclick="cerrarModalEncargo()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
-            <div class="modal-scrollable-body" style="padding-top:24px;">
-                <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
-                    <div style="width:42px; height:42px; border-radius:12px; background:#e0e7ff; color:#4f46e5; display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0;">
-                        <i class="fa-solid fa-boxes-packing"></i>
-                    </div>
-                    <div>
-                        <span style="font-size:0.72rem; text-transform:uppercase; font-weight:800; color:#4f46e5; letter-spacing:0.04em;">Preventa por Encargo</span>
-                        <h2 class="modal-title" style="font-size:1.1rem; line-height:1.25;" id="encargo-prod-title">Anotarme en la Lista de Espera</h2>
-                    </div>
-                </div>
-
-                <div class="encargo-progress-box" style="margin-top:4px;">
-                    <div class="encargo-header-info">
-                        <span class="encargo-badge-chip"><i class="fa-solid fa-users"></i> Meta del Lote</span>
-                        <span class="encargo-count-display" id="encargo-form-counter">0 / 25 personas</span>
-                    </div>
-                    <div class="encargo-progress-track">
-                        <div class="encargo-progress-fill" id="encargo-form-progress-bar" style="width:0%;"></div>
-                    </div>
-                    <p class="encargo-modal-help">
-                        Al alcanzar 25 personas interesadas, se solicita el pedido. Te contactaremos a tu WhatsApp antes de ordenar para realizar el pago previo.
-                    </p>
-                </div>
-
-                <div class="checkout-form-group">
-                    <label for="encargo-client-name">Tu Nombre y Apellido:</label>
-                    <input type="text" id="encargo-client-name" class="checkout-form-input" placeholder="Ej. Carlos Martínez">
-                </div>
-
-                <div class="checkout-form-group">
-                    <label for="encargo-client-phone">Tu número de WhatsApp:</label>
-                    <input type="tel" id="encargo-client-phone" class="checkout-form-input" placeholder="Ej. 0414-1234567">
-                </div>
-
-                <div class="checkout-form-group">
-                    <label for="encargo-client-quantity">¿Cuántas unidades te gustaría apartar?:</label>
-                    <select id="encargo-client-quantity" class="checkout-form-input">
-                        <option value="1">1 unidad</option>
-                        <option value="2">2 unidades</option>
-                        <option value="3">3 unidades</option>
-                        <option value="4">4 unidades</option>
-                        <option value="5 o más">5 o más unidades</option>
-                    </select>
-                </div>
-
-                <div class="checkout-form-group">
-                    <label for="encargo-client-note">Preferencia o detalle (opcional):</label>
-                    <input type="text" id="encargo-client-note" class="checkout-form-input" placeholder="Color, talla, modelo o especificación...">
-                </div>
-
-                <div style="background:var(--warning-bg); border:1px solid var(--warning-border); padding:10px 12px; border-radius:10px; font-size:0.8rem; color:var(--warning-text); margin-bottom:14px; display:flex; gap:8px;">
-                    <i class="fa-solid fa-circle-check" style="color:#059669; font-size:1rem; margin-top:2px;"></i>
-                    <span>Acepto pagar mi pedido por adelantado una vez que se complete la meta de 25 personas para hacer la compra colectiva.</span>
-                </div>
-
-                <button class="encargo-join-btn" onclick="enviarRegistroEncargoWhatsApp()">
-                    <i class="fa-brands fa-whatsapp" style="font-size:1.15rem;"></i> Confirmar y Anotarme por WhatsApp
-                </button>
-            </div>
-        </div>
-    </div>
-
-
-
-    <!-- MODAL DE PRODUCTO (Optimizado para móvil) -->
     <div class="modal" id="product-modal" onclick="if(event.target === this) cerrarModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close-btn" onclick="cerrarModal()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
@@ -1549,7 +1387,6 @@
                 <div id="modal-price" class="modal-price"></div>
                 <div id="recharge-alert-container"></div>
                 
-                <!-- Botón de requisitos destacado si el producto los tiene -->
                 <div id="modal-requisitos-container" style="display:none;">
                     <div class="requisitos-banner-box" onclick="abrirModalRequisitosDirecto()">
                         <div class="requisitos-banner-text">
@@ -1562,31 +1399,7 @@
 
                 <p id="modal-desc" class="modal-desc"></p>
 
-                <!-- Botones de compra y acción -->
                 <div class="modal-actions">
-                    <!-- Contenedor dinámico de preventa / encargo -->
-                    <div id="modal-encargo-section" style="display:none; width:100%; margin-bottom:6px;">
-                        <div class="encargo-progress-box">
-                            <div class="encargo-header-info">
-                                <span class="encargo-badge-chip"><i class="fa-solid fa-boxes-packing"></i> Pedido por Encargo</span>
-                                <span class="encargo-count-display" id="modal-encargo-badge-count">0 / 25 personas</span>
-                            </div>
-                            <div class="encargo-progress-track">
-                                <div class="encargo-progress-fill" id="modal-encargo-bar" style="width:0%;"></div>
-                            </div>
-                            <p class="encargo-modal-help">
-                                📦 <strong>Meta del lote: 25 personas.</strong> Al completarse el grupo te contactamos a tu WhatsApp para coordinar el pago previo antes de pedirlo.
-                            </p>
-                            <div id="modal-encargo-already-joined" style="display:none;" class="encargo-user-already-joined">
-                                <i class="fa-solid fa-circle-check"></i> ¡Ya estás registrado en la lista de interesados!
-                            </div>
-                        </div>
-                        <button id="modal-encargo-btn" class="encargo-join-btn" onclick="abrirModalFormularioEncargo()">
-                            <i class="fa-solid fa-hand-holding-dollar"></i> Anotarme en la Lista (Meta 25 pers.)
-                        </button>
-                    </div>
-
-                    <!-- Botones estándar de compra directa -->
                     <div id="modal-regular-actions" style="width:100%; display:flex; flex-direction:column; gap:8px;">
                         <div class="modal-actions-row">
                             <button id="modal-wa-btn" class="whatsapp-btn">
@@ -1613,7 +1426,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE CONFIRMACIÓN OBLIGATORIA DE REQUISITOS (SOLICITADO) -->
+    <!-- MODAL DE CONFIRMACIÓN OBLIGATORIA DE REQUISITOS -> REDIRECCIÓN DIRECTA A WHATSAPP -->
     <div class="modal" id="confirm-requisitos-modal" onclick="if(event.target === this) cerrarConfirmacionRequisitos()">
         <div class="modal-content confirm-req-card" onclick="event.stopPropagation()">
             <div class="confirm-req-header">
@@ -1626,16 +1439,16 @@
             <div class="confirm-req-body">
                 <p style="font-size:0.86rem; color:var(--text-muted);">Para procesar tu pedido sin demoras ni preguntas extra por chat, asegúrate de tener listos:</p>
                 <ul id="confirm-req-list" class="req-bullet-list">
-                    <!-- Lista de requisitos -->
+                    <!-- Lista de requisitos dinámica -->
                 </ul>
                 <div style="background:var(--warning-bg); border:1px solid var(--warning-border); padding:10px 12px; border-radius:10px; font-size:0.82rem; color:var(--warning-text); display:flex; gap:8px;">
                     <i class="fa-solid fa-circle-info" style="margin-top:2px;"></i>
-                    <span>Al continuar, confirmas que posees estos recaudos listos para enviarlos al WhatsApp.</span>
+                    <span>Al hacer clic en "Sí, los tengo listos", saltarás directamente a WhatsApp con tu solicitud armada.</span>
                 </div>
             </div>
             <div class="confirm-req-footer">
-                <button class="btn-confirm-req" id="btn-confirm-requisitos-proceder">
-                    <i class="fa-solid fa-check-circle"></i> Sí, los leí y los tengo listos
+                <button class="btn-confirm-req" id="btn-confirm-requisitos-proceder" onclick="ejecutarAccionDirectaWhatsApp()">
+                    <i class="fa-solid fa-check-circle"></i> Sí, los tengo listos (Ir a WhatsApp)
                 </button>
                 <button class="btn-cancel-req" onclick="cerrarConfirmacionRequisitos()">
                     No los tengo aún (Cancelar)
@@ -1644,7 +1457,6 @@
         </div>
     </div>
 
-    <!-- Modal de Carrito -->
     <div class="modal" id="cart-modal" onclick="if(event.target === this) cerrarModalCarrito()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close-btn" onclick="cerrarModalCarrito()"><i class="fa-solid fa-xmark"></i></button>
@@ -1664,7 +1476,6 @@
         </div>
     </div>
 
-    <!-- Modal de Checkout -->
     <div class="modal" id="checkout-modal" onclick="if(event.target === this) cerrarModalCheckout()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close-btn" onclick="cerrarModalCheckout()"><i class="fa-solid fa-xmark"></i></button>
@@ -1690,7 +1501,6 @@
         </div>
     </div>
 
-    <!-- Modal Info (Métodos de pago / Delivery) -->
     <div class="modal" id="info-modal" onclick="if(event.target === this) cerrarModalInfo()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close-btn" onclick="cerrarModalInfo()"><i class="fa-solid fa-xmark"></i></button>
@@ -1701,7 +1511,6 @@
         </div>
     </div>
 
-    <!-- Modal Ubicación Interactivo -->
     <div class="modal" id="location-modal" onclick="if(event.target === this) cerrarModalUbicacion()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close-btn" onclick="cerrarModalUbicacion()"><i class="fa-solid fa-xmark"></i></button>
@@ -1722,13 +1531,11 @@
         </div>
     </div>
 
-    <!-- Toast de Notificaciones -->
     <div id="toast" class="toast">
         <i id="toast-icon" class="fa-solid fa-check-circle" style="color:#22c55e;"></i>
         <span id="toast-text">Acción completada</span>
     </div>
 
-    <!-- Barra de Navegación Inferior (Estilo App Nativa) -->
     <nav class="bottom-nav" role="navigation" aria-label="Navegación principal">
         <button type="button" class="bottom-nav-item" onclick="irInicio()" aria-label="Inicio">
             <i class="fa-solid fa-house"></i>
@@ -1746,14 +1553,10 @@
             <i class="fa-brands fa-whatsapp"></i>
             <span>WhatsApp</span>
         </a>
-        <button type="button" class="bottom-nav-item" id="nav-btn-ofertas" onclick="filtrarOfertasYTendencias()" aria-label="Ofertas y Tendencias">
-            <i class="fa-solid fa-fire" style="color:#f97316;"></i>
-            <span>Ofertas</span>
-        </button>
     </nav>
 
     <script>
-        const urlAPI = "https://script.google.com/macros/s/AKfycbyfjv9UscbcmgqeKjx_0j5UxGWK2qpFudgFGcHeCBt252fUfxgkhcQUKH-b8BeZLU8NNg/exec";
+        const urlAPI = "https://script.google.com/macros/s/AKfycbz_qzzzwFK6szGI5zZRHoy_cFZC04PdakHSwZEqU3JaRUnkaAWGV1qhN261-8gUnBLM9g/exec";
         const CACHE_KEY = 'kervys_catalogo_cache_data';
         const FAVS_KEY = 'kervys_catalogo_favoritos';
         const RECENT_KEY = 'kervys_catalogo_recientes';
@@ -1766,12 +1569,10 @@
         let favoritosGlobal = [];
         let recientesGlobal = [];
         let leafletMap = null;
-        const ENCARGOS_KEY = 'kervys_catalogo_encargos_registrados';
-        let encargosRegistrados = JSON.parse(localStorage.getItem(ENCARGOS_KEY) || '{}');
         let hashInicialProcesado = false;
         let leafletCargado = false;
         let jsPDFCargado = false;
-        let accionPendienteRequisitos = null; // Callback tras confirmar requisitos
+        let accionPendienteRequisitos = null; 
 
         function debounce(fn, delay = 200) {
             let timer;
@@ -1848,11 +1649,6 @@
             const prod = buscarProductoPorId(decodeURIComponent(encodedId));
             if (prod) compartirProducto(event, prod);
         }
-        function abrirVideoTikTokPorId(event, encodedId) {
-            if (event) event.stopPropagation();
-            const prod = buscarProductoPorId(decodeURIComponent(encodedId));
-            if (prod && prod.video_tiktok) window.open(prod.video_tiktok, '_blank');
-        }
 
         function cargarRecientesStorage() { recientesGlobal = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'); }
         function guardarRecientesStorage() { localStorage.setItem(RECENT_KEY, JSON.stringify(recientesGlobal)); }
@@ -1886,132 +1682,6 @@
         function cerrarBarraNovedades() {
             document.getElementById('news-banner').classList.remove('show');
         }
-
-        // ================= GESTIÓN DE OFERTAS, TENDENCIAS Y ENCARGOS (META 25) =================
-        function esPorEncargo(prod) {
-            if (!prod) return false;
-            const texto = [prod.categoria, prod.subcategoria, prod.nombre, prod.descripcion, prod.etiquetas, prod.mas_detalles, prod.tipo]
-                .filter(Boolean).join(' ').toLowerCase();
-            return texto.includes('encargo') || texto.includes('preventa') || texto.includes('reserva') || 
-                   texto.includes('por pedido') || texto.includes('pedido previo') || prod.por_encargo === true || prod.por_encargo === 'true';
-        }
-
-        function esOfertaOTendencia(prod) {
-            if (!prod) return false;
-            const texto = [prod.categoria, prod.subcategoria, prod.nombre, prod.descripcion, prod.etiquetas, prod.tags]
-                .filter(Boolean).join(' ').toLowerCase();
-            return texto.includes('oferta') || texto.includes('promo') || texto.includes('descuento') || 
-                   texto.includes('rebaja') || texto.includes('tendencia') || texto.includes('top') || 
-                   texto.includes('destacado') || texto.includes('%') || prod.en_oferta === true || prod.en_oferta === 'true';
-        }
-
-        function obtenerSemillaInteresados(prod) {
-            const str = obtenerIdentificadorProducto(prod);
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                hash = (hash * 31 + str.charCodeAt(i)) % 1000;
-            }
-            return 15 + (Math.abs(hash) % 7); // Entre 15 y 21 personas para mostrar actividad hacia la meta de 25
-        }
-
-        function obtenerInteresadosEncargo(prod) {
-            const id = obtenerIdentificadorProducto(prod);
-            const dataGuardada = encargosRegistrados[id];
-            const base = obtenerSemillaInteresados(prod);
-            if (dataGuardada && dataGuardada.joined) {
-                return Math.min(25, base + (dataGuardada.extraCount || 1));
-            }
-            return Math.min(24, base);
-        }
-
-        function usuarioEstaAnotadoEnEncargo(prod) {
-            const id = obtenerIdentificadorProducto(prod);
-            return !!(encargosRegistrados[id] && encargosRegistrados[id].joined);
-        }
-
-        function filtrarOfertasYTendencias() {
-            categoriaSeleccionada = 'ofertas';
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            const ofertaBtn = document.querySelector('.filter-btn.oferta-filter');
-            if (ofertaBtn) ofertaBtn.classList.add('active');
-            filtrarCombinado();
-            irInicio();
-            mostrarToast('🔥 Mostrando artículos en Oferta y Tendencia', 'fa-solid fa-fire', '#f97316');
-        }
-
-        let productoParaEncargoActual = null;
-
-        function abrirModalFormularioEncargo() {
-            if (!productoActualModal) return;
-            productoParaEncargoActual = productoActualModal;
-            document.getElementById('encargo-prod-title').innerText = productoActualModal.nombre;
-            
-            const count = obtenerInteresadosEncargo(productoActualModal);
-            const pct = Math.min(100, Math.round((count / 25) * 100));
-            document.getElementById('encargo-form-counter').innerText = `${count} / 25 personas`;
-            document.getElementById('encargo-form-progress-bar').style.width = `${pct}%`;
-
-            document.getElementById('encargo-modal').classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function cerrarModalEncargo() {
-            document.getElementById('encargo-modal').classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-
-        function enviarRegistroEncargoWhatsApp() {
-            const prod = productoParaEncargoActual || productoActualModal;
-            if (!prod) return;
-
-            const nombre = document.getElementById('encargo-client-name').value.trim();
-            const tlf = document.getElementById('encargo-client-phone').value.trim();
-            const cantidad = document.getElementById('encargo-client-quantity').value;
-            const nota = document.getElementById('encargo-client-note').value.trim();
-
-            if (!nombre) {
-                mostrarToast("Por favor ingresa tu nombre y apellido", "fa-solid fa-circle-exclamation", "#ef4444");
-                return;
-            }
-            if (!tlf) {
-                mostrarToast("Por favor ingresa tu número de WhatsApp", "fa-solid fa-circle-exclamation", "#ef4444");
-                return;
-            }
-
-            const id = obtenerIdentificadorProducto(prod);
-            encargosRegistrados[id] = {
-                joined: true,
-                nombre,
-                tlf,
-                cantidad,
-                nota,
-                extraCount: 1,
-                fecha: new Date().toISOString()
-            };
-            localStorage.setItem(ENCARGOS_KEY, JSON.stringify(encargosRegistrados));
-
-            const cod = prod.codigo_producto || prod.id || 'N/A';
-            const precioRef = parseFloat(prod.precio) ? `$${calcularPrecioFinal(prod).toFixed(2)}` : 'A definir según lote';
-
-            const msg = `📦 *REGISTRO EN LISTA DE ENCARGO (META 25)*\n` +
-                        `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-                        `🛍️ *Producto:* ${prod.nombre}\n` +
-                        `🆔 *Código:* ${cod}\n` +
-                        `💰 *Precio estimado:* ${precioRef}\n` +
-                        `👤 *Cliente:* ${nombre}\n` +
-                        `📱 *WhatsApp:* ${tlf}\n` +
-                        `🔢 *Cantidad a reservar:* ${cantidad} unidad(es)\n` +
-                        `📝 *Preferencia/Detalle:* ${nota || 'Sin preferencia específica'}\n` +
-                        `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-                        `✅ *Compromiso:* Me anoto formalmente en el lote. Entiendo que al completar la meta de 25 personas interesadas, me contactarán por este chat para realizar el pago previo antes de enviar la orden de compra.`;
-
-            window.open(`https://wa.me/584149956831?text=${encodeURIComponent(msg)}`, '_blank');
-            cerrarModalEncargo();
-            cerrarModal();
-            mostrarToast("¡Registro enviado! Te contactaremos al llegar a 25 personas.", "fa-solid fa-circle-check", "#22c55e", 4500);
-            filtrarCombinado();
-        }
-
 
         function cargarScriptExterno(src) {
             return new Promise((resolve, reject) => {
@@ -2061,7 +1731,7 @@
         function procesarYRenderizarDatos(data) {
             listaProductosGlobal = data.filter(prod => prod.status && prod.status.toString().trim().toLowerCase() === 'disponible');
             loadSubcategories(listaProductosGlobal);
-            construirBotonesCategorias(listaProductosGlobal);
+            construirBotonesCategoriasDinamicos(listaProductosGlobal);
             filtrarCombinado();
             if (!hashInicialProcesado) {
                 hashInicialProcesado = true;
@@ -2074,225 +1744,257 @@
         function debeOcultarseEnPrincipal(cat) { return esStriming(cat) || esRecargaSaldo(cat); }
         function esServicioGeneral(cat) { return cat && cat.toLowerCase().includes('servicio'); }
 
-        function construirBotonesCategorias(productos) {
+        /* Algoritmo mejorado: detección automática de categorías únicas con íconos inteligentes por palabras clave */
+        function obtenerIconoParaCategoria(nombreCategoria) {
+            const cat = (nombreCategoria || '').toLowerCase();
+            if (cat.includes('tecno') || cat.includes('electro') || cat.includes('phone') || cat.includes('movil')) return 'fa-mobile-screen';
+            if (cat.includes('streaming') || cat.includes('striming') || cat.includes('netflix') || cat.includes('video')) return 'fa-tv';
+            if (cat.includes('recarga') || cat.includes('saldo') || cat.includes('pago')) return 'fa-wallet';
+            if (cat.includes('juego') || cat.includes('gamer') || cat.includes('diamante') || cat.includes('free fire')) return 'fa-gamepad';
+            if (cat.includes('ropa') || cat.includes('moda') || cat.includes('textil')) return 'fa-shirt';
+            if (cat.includes('hogar') || cat.includes('casa') || cat.includes('cocina')) return 'fa-house';
+            if (cat.includes('servicio') || cat.includes('tramite') || cat.includes('papeleria')) return 'fa-print';
+            return 'fa-box-open';
+        }
+
+        function construirBotonesCategoriasDinamicos(productos) {
             const container = document.getElementById('filters-container');
-            const cats = [...new Set(productos.map(p => p.categoria ? p.categoria.trim() : 'General'))];
+            const catsSet = new Set();
+            productos.forEach(p => {
+                if (p.categoria) {
+                    const cClean = p.categoria.trim();
+                    if (cClean) catsSet.add(cClean);
+                }
+            });
+            const cats = Array.from(catsSet);
             
-            let html = `<button class="filter-btn ${categoriaSeleccionada === 'todos' ? 'active' : ''}" onclick="cambiarCategoria('todos', this)"><i class="fa-solid fa-border-all"></i> Todos</button>
-                        <button class="filter-btn oferta-filter ${categoriaSeleccionada === 'ofertas' ? 'active' : ''}" onclick="cambiarCategoria('ofertas', this)"><i class="fa-solid fa-fire"></i> Ofertas</button>
-                        <button class="filter-btn encargo-filter ${categoriaSeleccionada === 'encargos' ? 'active' : ''}" onclick="cambiarCategoria('encargos', this)"><i class="fa-solid fa-boxes-packing"></i> Por Encargo</button>
-                        <button class="filter-btn fav-filter ${categoriaSeleccionada === 'favoritos' ? 'active' : ''}" onclick="cambiarCategoria('favoritos', this)"><i class="fa-solid fa-star"></i> Favoritos</button>
-                        <button class="filter-btn recent-filter ${categoriaSeleccionada === 'recientes' ? 'active' : ''}" onclick="cambiarCategoria('recientes', this)"><i class="fa-solid fa-clock-rotate-left"></i> Recientes</button>`;
+            let html = `<button class="filter-btn ${categoriaSeleccionada === 'todos' ? 'active' : ''}" onclick="cambiarCategoria('todos', this)"><i class="fa-solid fa-border-all"></i> Todos</button>`;
             
             cats.forEach(cat => {
-                const isActive = categoriaSeleccionada.toLowerCase() === cat.toLowerCase() ? 'active' : '';
-                const especial = debeOcultarseEnPrincipal(cat) ? 'special-filter' : '';
-                const icon = esRecargaSaldo(cat) ? '<i class="fa-solid fa-bolt"></i>' : (esStriming(cat) ? '<i class="fa-solid fa-tv"></i>' : '<i class="fa-solid fa-tag"></i>');
-                html += `<button class="filter-btn ${especial} ${isActive}" onclick="cambiarCategoria('${cat}', this)">${icon} ${cat}</button>`;
+                const icono = obtenerIconoParaCategoria(cat);
+                const isActive = (categoriaSeleccionada.toLowerCase() === cat.toLowerCase()) ? 'active' : '';
+                html += `<button class="filter-btn ${isActive}" onclick="cambiarCategoria('${cat.replace(/'/g, "\\'")}', this)"><i class="fa-solid ${icono}"></i> ${cat}</button>`;
             });
+
             container.innerHTML = html;
         }
 
         function cambiarCategoria(cat, btn) {
             categoriaSeleccionada = cat;
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            if(btn) {
+            if (btn) {
                 btn.classList.add('active');
             } else {
-                const found = Array.from(document.querySelectorAll('.filter-btn')).find(b => b.innerText.toLowerCase().includes(cat.toLowerCase()));
-                if (found) found.classList.add('active');
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    if (b.textContent.trim().toLowerCase() === cat.toLowerCase()) b.classList.add('active');
+                });
             }
             filtrarCombinado();
         }
 
         function filtrarCombinado() {
-            const txt = document.getElementById('search-input').value.toLowerCase().trim();
-            const selectedSub = document.getElementById('filter-subcategory').value;
-            let lista = listaProductosGlobal;
-
-            if (categoriaSeleccionada === 'todos') {
-                lista = lista.filter(p => !debeOcultarseEnPrincipal(p.categoria));
-            } else if (categoriaSeleccionada === 'ofertas') {
-                const enOferta = lista.filter(p => esOfertaOTendencia(p));
-                // Si no hay productos explícitamente etiquetados como oferta, mostramos los artículos más destacados/populares
-                lista = enOferta.length > 0 ? enOferta : lista.filter(p => !debeOcultarseEnPrincipal(p.categoria)).slice(0, 12);
-            } else if (categoriaSeleccionada === 'encargos') {
-                lista = lista.filter(p => esPorEncargo(p));
-            } else if (categoriaSeleccionada === 'favoritos') {
-                lista = lista.filter(p => esFavorito(p));
-            } else if (categoriaSeleccionada === 'recientes') {
-                lista = recientesGlobal.map(id => buscarProductoPorId(id)).filter(Boolean);
-            } else {
-                lista = lista.filter(p => (p.categoria || 'general').trim().toLowerCase() === categoriaSeleccionada.toLowerCase());
-            }
-
-            lista = lista.filter(prod => (selectedSub === 'all' || prod.subcategoria === selectedSub));
-
-            if (txt) {
-                lista = lista.filter(p => [p.nombre, p.descripcion, p.mas_detalles, p.codigo_producto, p.id].join(' ').toLowerCase().includes(txt));
-            }
-            
-            mostrarProductos(lista);
-        }
-
-        function calcularPrecioFinal(prod) { 
-            return esRecargaSaldo(prod.categoria) ? (parseFloat(prod.precio) || 0) * 1.12 : (parseFloat(prod.precio) || 0); 
-        }
-
-        function obtenerListaRequisitos(prod) {
-            if (!prod || !prod.requisitos) return [];
-            return prod.requisitos.toString().split('|').map(r => r.trim()).filter(Boolean);
-        }
-
-        function crearCardElemento(prod) {
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.onclick = () => abrirModal(prod);
-            const isFav = esFavorito(prod);
-            const idProdEncoded = encodeURIComponent(obtenerIdentificadorProducto(prod));
-            const subcatHtml = prod.subcategoria ? ` • ${prod.subcategoria}` : '';
-            const requisitos = obtenerListaRequisitos(prod);
-            const reqBadgeHtml = requisitos.length > 0 ? `<div class="card-req-badge"><i class="fa-solid fa-clipboard-check"></i> Requisitos</div>` : '';
-            
-            const esEncargoProd = esPorEncargo(prod);
-            const esOfertaProd = !esEncargoProd && esOfertaOTendencia(prod);
-            
-            let statusBadgeHtml = '';
-            let hintBtnHtml = `<div class="card-hint-btn"><i class="fa-solid fa-eye"></i> Ver detalle</div>`;
-            
-            if (esEncargoProd) {
-                const count = obtenerInteresadosEncargo(prod);
-                statusBadgeHtml = `<div class="card-encargo-badge"><i class="fa-solid fa-boxes-packing"></i> Encargo (${count}/25)</div>`;
-                hintBtnHtml = `<div class="card-hint-btn" style="background:rgba(99,102,241,0.12); color:#4f46e5; border-color:#c7d2fe;"><i class="fa-solid fa-user-plus"></i> Ver Encargo</div>`;
-            } else if (esOfertaProd) {
-                statusBadgeHtml = `<div class="card-oferta-badge"><i class="fa-solid fa-fire"></i> Oferta</div>`;
-            }
-
-            const precioDisplay = parseFloat(prod.precio) ? `$${calcularPrecioFinal(prod).toFixed(2)}` : (esEncargoProd ? 'Por Encargo' : 'Consultar');
-
-            card.innerHTML = `
-                <div class="card-img-container">
-                    <img src="${prod.imagen || 'https://via.placeholder.com/300'}" alt="${prod.nombre}" loading="lazy" decoding="async">
-                    <button class="card-fav-btn ${isFav ? 'fav-active' : ''}" onclick="toggleFavoritoPorId(event, '${idProdEncoded}')" aria-label="Favorito">
-                        <i class="fa-${isFav ? 'solid' : 'regular'} fa-star"></i>
-                    </button>
-                    ${statusBadgeHtml}
-                    ${reqBadgeHtml}
-                </div>
-                <div class="card-body">
-                    <div>
-                        <div class="card-category">${prod.categoria || 'General'}${subcatHtml}</div>
-                        <h3 class="card-title">${prod.nombre}</h3>
-                    </div>
-                    <div>
-                        <div class="card-price">${precioDisplay}</div>
-                        ${hintBtnHtml}
-                    </div>
-                </div>`;
-            return card;
-        }
-
-        function mostrarProductos(lista) {
+            const textoBusqueda = (document.getElementById('search-input').value || '').toLowerCase().trim();
+            const subcatSeleccionada = document.getElementById('filter-subcategory').value;
             const grid = document.getElementById('product-grid');
-            grid.innerHTML = '';
-            if (!lista.length) {
-                if (categoriaSeleccionada === 'encargos') {
-                    grid.innerHTML = `
-                        <div style="grid-column: 1 / -1; background: var(--card-bg); border: 2px dashed #818cf8; border-radius: 18px; padding: 36px 20px; text-align: center; max-width: 540px; margin: 24px auto; box-shadow: var(--shadow-sm);">
-                            <div style="width: 64px; height: 64px; border-radius: 50%; background: #e0e7ff; color: #4f46e5; display: inline-flex; align-items: center; justify-content: center; font-size: 1.8rem; margin-bottom: 14px;">
-                                <i class="fa-solid fa-boxes-packing"></i>
-                            </div>
-                            <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 8px; color: var(--text-color);">Próximas Campañas por Encargo</h3>
-                            <p style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.55; margin-bottom: 20px;">
-                                Aquí publicamos los productos seleccionados para compras colectivas (meta de 25 personas interesadas para importar al mejor precio). ¡Revisa las opciones activas y anótate con tu WhatsApp!
-                            </p>
-                            <a href="https://wa.me/584149956831?text=Hola,%20quisiera%20consultar%20sobre%20los%20próximos%20pedidos%20por%20encargo:" target="_blank" class="whatsapp-btn" style="max-width: 320px; margin: 0 auto; display: inline-flex; justify-content: center; align-items: center; gap: 8px; font-size: 0.92rem; text-decoration: none;">
-                                <i class="fa-brands fa-whatsapp"></i> Consultar por WhatsApp
-                            </a>
-                        </div>`;
-                } else {
-                    grid.innerHTML = `<p style="text-align:center; grid-column:1/-1; color: var(--text-muted); padding: 40px;">No se encontraron productos en este criterio.</p>`;
+
+            let filtrados = listaProductosGlobal.filter(prod => {
+                const cat = prod.categoria ? prod.categoria.trim() : '';
+                const subcat = prod.subcategoria ? prod.subcategoria.trim() : '';
+                const nombre = prod.nombre ? prod.nombre.toLowerCase() : '';
+                const desc = prod.descripcion ? prod.descripcion.toLowerCase() : '';
+                const codigo = prod.codigo_producto ? prod.codigo_producto.toLowerCase() : '';
+
+                let matchCat = true;
+                if (categoriaSeleccionada !== 'todos') {
+                    matchCat = cat.toLowerCase() === categoriaSeleccionada.toLowerCase();
                 }
+
+                let matchSubcat = subcatSeleccionada === 'all' || subcat === subcatSeleccionada;
+                let matchTexto = !textoBusqueda || nombre.includes(textoBusqueda) || desc.includes(textoBusqueda) || codigo.includes(textoBusqueda);
+
+                return matchCat && matchSubcat && matchTexto;
+            });
+
+            if (filtrados.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);"><i class="fa-solid fa-box-open" style="font-size: 2.5rem; margin-bottom: 10px; display: block;"></i>No se encontraron productos con esos criterios.</div>';
                 return;
             }
 
-            const subFiltroActivo = document.getElementById('filter-subcategory').value !== 'all';
-            const hayBusqueda = document.getElementById('search-input').value.trim() !== '';
-            const contextoAgrupable = !subFiltroActivo && !hayBusqueda && !['todos', 'ofertas', 'encargos', 'favoritos', 'recientes'].includes(categoriaSeleccionada);
-            const subcatsPresentes = contextoAgrupable ? [...new Set(lista.map(p => (p.subcategoria || '').trim()).filter(Boolean))] : [];
+            let html = '';
+            filtrados.forEach(prod => {
+                const img = prod.imagen || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500';
+                const titulo = prod.nombre || 'Producto';
+                const cat = prod.categoria || '';
+                const precioNum = parseFloat(prod.precio) || 0;
+                const precioTxt = precioNum > 0 ? `$${precioNum.toFixed(2)}` : 'Consultar';
+                const reqs = prod.requisitos ? prod.requisitos.toString().trim() : '';
+                const hasReqs = reqs.length > 0;
+                const isFav = esFavorito(prod);
 
-            if (contextoAgrupable && subcatsPresentes.length > 1) {
-                subcatsPresentes.forEach(sub => {
-                    const grupo = lista.filter(p => (p.subcategoria || '').trim() === sub);
-                    const header = document.createElement('div');
-                    header.className = 'subcat-group-title';
-                    header.innerHTML = `<i class="fa-solid fa-layer-group"></i> ${sub}`;
-                    grid.appendChild(header);
-                    grupo.forEach(prod => grid.appendChild(crearCardElemento(prod)));
-                });
-                const sinSub = lista.filter(p => !(p.subcategoria || '').trim());
-                if (sinSub.length) {
-                    const header = document.createElement('div');
-                    header.className = 'subcat-group-title';
-                    header.innerHTML = `<i class="fa-solid fa-layer-group"></i> Otros`;
-                    grid.appendChild(header);
-                    sinSub.forEach(prod => grid.appendChild(crearCardElemento(prod)));
-                }
+                html += `
+                    <div class="card" onclick="abrirModalProducto('${encodeURIComponent(obtenerIdentificadorProducto(prod))}')">
+                        <div class="card-img-container">
+                            <img src="${img}" alt="${titulo}" loading="lazy">
+                            <button class="card-fav-btn ${isFav ? 'fav-active' : ''}" onclick="toggleFavoritoId(event, '${encodeURIComponent(obtenerIdentificadorProducto(prod))}')" aria-label="Favorito">
+                                <i class="fa-${isFav ? 'solid' : 'regular'} fa-star"></i>
+                            </button>
+                            ${hasReqs ? '<div class="card-req-badge"><i class="fa-solid fa-clipboard-list"></i> Requisitos</div>' : ''}
+                        </div>
+                        <div class="card-body">
+                            <div>
+                                <div class="card-category">${cat}</div>
+                                <div class="card-title">${titulo}</div>
+                            </div>
+                            <div style="display:flex; align-items:center; justify-content:space-between; margin-top:8px;">
+                                <div class="card-price">${precioTxt}</div>
+                                <div class="card-hint-btn"><i class="fa-solid fa-eye"></i> Ver</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = html;
+        }
+
+        function toggleFavoritoId(event, encodedId) {
+            const prod = buscarProductoPorId(decodeURIComponent(encodedId));
+            if (prod) toggleFavorito(event, prod);
+        }
+
+        let productoActualModal = null;
+
+        function abrirModalProducto(encodedId) {
+            const prod = buscarProductoPorId(decodeURIComponent(encodedId));
+            if (!prod) return;
+            productoActualModal = prod;
+            registrarProductoVisto(prod);
+
+            const img = prod.imagen || '';
+            document.getElementById('modal-img').src = img;
+            document.getElementById('modal-category').innerText = prod.categoria || '';
+            document.getElementById('modal-title').innerText = prod.nombre || '';
+            document.getElementById('modal-code').innerText = prod.codigo_producto ? `Código: ${prod.codigo_producto}` : '';
+            
+            const precioNum = parseFloat(prod.precio) || 0;
+            document.getElementById('modal-price').innerText = precioNum > 0 ? `$${precioNum.toFixed(2)}` : 'Precio a consultar';
+            document.getElementById('modal-desc').innerText = prod.descripcion || 'Sin descripción detallada.';
+
+            const alertContainer = document.getElementById('recharge-alert-container');
+            if (esRecargaSaldo(prod.categoria)) {
+                alertContainer.innerHTML = `<div class="recharge-alert-box"><i class="fa-solid fa-circle-info" style="font-size: 1.1rem; flex-shrink: 0; margin-top: 2px;"></i><span>Recarga procesada de forma segura. Ingresa los datos exactos al pedir por WhatsApp.</span></div>`;
             } else {
-                lista.forEach(prod => grid.appendChild(crearCardElemento(prod)));
+                alertContainer.innerHTML = '';
+            }
+
+            const reqs = prod.requisitos ? prod.requisitos.toString().trim() : '';
+            const reqContainer = document.getElementById('modal-requisitos-container');
+            if (reqs.length > 0) {
+                reqContainer.style.display = 'block';
+            } else {
+                reqContainer.style.display = 'none';
+            }
+
+            actualizarBotonFavoritoModal(prod);
+
+            const waBtn = document.getElementById('modal-wa-btn');
+            waBtn.onclick = () => prepararAccionWhatsApp(prod);
+
+            const addCartBtn = document.getElementById('modal-add-cart-btn');
+            addCartBtn.onclick = () => agregarAlCarrito(prod);
+
+            const shareBtn = document.getElementById('modal-share-btn');
+            shareBtn.onclick = (e) => compartirProducto(e, prod);
+
+            const tiktokBtn = document.getElementById('modal-tiktok-btn');
+            if (prod.video_tiktok) {
+                tiktokBtn.style.display = 'flex';
+                tiktokBtn.onclick = () => window.open(prod.video_tiktok, '_blank');
+            } else {
+                tiktokBtn.style.display = 'none';
+            }
+
+            renderizarProductosRelacionados(prod);
+
+            document.getElementById('product-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarModal() {
+            document.getElementById('product-modal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            isZoomed = false;
+            document.getElementById('modal-img-container').classList.remove('zoomed');
+            document.getElementById('modal-img').style.transform = 'scale(1)';
+        }
+
+        function toggleZoom(event) {
+            const container = document.getElementById('modal-img-container');
+            const img = document.getElementById('modal-img');
+            isZoomed = !isZoomed;
+            if (isZoomed) {
+                container.classList.add('zoomed');
+                img.style.transform = 'scale(1.8)';
+            } else {
+                container.classList.remove('zoomed');
+                img.style.transform = 'scale(1)';
             }
         }
 
-        function mostrarToast(mensaje, icono = 'fa-solid fa-check-circle', color = '#22c55e', duracionMs = 3500) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-text').textContent = mensaje;
-            const iconEl = document.getElementById('toast-icon');
-            iconEl.className = icono;
-            iconEl.style.color = color;
-            toast.classList.add('show');
-            clearTimeout(toast._timeoutId);
-            toast._timeoutId = setTimeout(() => toast.classList.remove('show'), duracionMs);
+        function renderizarProductosRelacionados(prodActual) {
+            const container = document.getElementById('modal-related-container');
+            const cat = prodActual.categoria || '';
+            const rels = listaProductosGlobal.filter(p => p.categoria === cat && obtenerIdentificadorProducto(p) !== obtenerIdentificadorProducto(prodActual)).slice(0, 6);
+
+            if (rels.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = `<div class="modal-related-title">Te puede interesar también</div><div class="modal-related-list">`;
+            rels.forEach(r => {
+                html += `
+                    <div class="modal-related-card" onclick="abrirModalProducto('${encodeURIComponent(obtenerIdentificadorProducto(r))}')">
+                        <img src="${r.imagen || ''}" alt="${r.nombre || ''}" loading="lazy">
+                        <span>${r.nombre || ''}</span>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
         }
 
-        function compartirProducto(evt, prod) {
-            const precioTxt = parseFloat(prod.precio) ? `$${calcularPrecioFinal(prod).toFixed(2)}` : 'Por Encargo';
-            const txt = `📌 *${prod.nombre}*\n💰 Precio: ${precioTxt}\n\n¡Consíguelo en nuestro Catálogo Digital!`;
-            if (navigator.share) {
-                navigator.share({ title: prod.nombre, text: txt, url: window.location.href }).catch(() => {});
+        /* Lógica para verificar requisitos y continuar directo a WhatsApp */
+        function prepararAccionWhatsApp(prod) {
+            const reqs = prod.requisitos ? prod.requisitos.toString().trim() : '';
+            if (reqs.length > 0) {
+                accionPendienteRequisitos = () => dispararWhatsAppDirecto(prod);
+                mostrarModalRequisitos(prod, reqs);
             } else {
-                navigator.clipboard.writeText(txt + "\n" + window.location.href);
-                mostrarToast('¡Enlace copiado al portapapeles!', 'fa-solid fa-check-circle', '#22c55e', 2500);
+                dispararWhatsAppDirecto(prod);
             }
         }
 
-        // ================= GESTIÓN DE REQUISITOS OBLIGATORIOS =================
         function abrirModalRequisitosDirecto() {
             if (!productoActualModal) return;
-            const reqs = obtenerListaRequisitos(productoActualModal);
-            if (!reqs.length) return;
-            mostrarConfirmacionRequisitos(productoActualModal, null);
+            const reqs = productoActualModal.requisitos ? productoActualModal.requisitos.toString().trim() : '';
+            accionPendienteRequisitos = () => dispararWhatsAppDirecto(productoActualModal);
+            mostrarModalRequisitos(productoActualModal, reqs);
         }
 
-        function mostrarConfirmacionRequisitos(prod, onConfirmar) {
-            const reqs = obtenerListaRequisitos(prod);
-            if (!reqs.length) {
-                if (onConfirmar) onConfirmar();
-                return;
-            }
-
+        function mostrarModalRequisitos(prod, reqsString) {
             document.getElementById('confirm-req-prod-title').innerText = `Requisitos para: ${prod.nombre}`;
             const listEl = document.getElementById('confirm-req-list');
-            listEl.innerHTML = reqs.map(r => `<li><i class="fa-solid fa-circle-check"></i> <span>${r}</span></li>`).join('');
-
-            accionPendienteRequisitos = onConfirmar;
-            document.getElementById('btn-confirm-requisitos-proceder').onclick = () => {
-                cerrarConfirmacionRequisitos();
-                if (accionPendienteRequisitos) {
-                    accionPendienteRequisitos();
-                    accionPendienteRequisitos = null;
-                }
-            };
-
+            
+            const items = reqsString.split(/[\n,;]+/).map(i => i.trim()).filter(Boolean);
+            let itemsHtml = '';
+            items.forEach(item => {
+                itemsHtml += `<li><i class="fa-solid fa-circle-check"></i><span>${item}</span></li>`;
+            });
+            if (items.length === 0) {
+                itemsHtml = `<li><i class="fa-solid fa-circle-check"></i><span>Tener datos de identificación y pago listos.</span></li>`;
+            }
+            listEl.innerHTML = itemsHtml;
             document.getElementById('confirm-requisitos-modal').classList.add('active');
         }
 
@@ -2301,479 +2003,284 @@
             accionPendienteRequisitos = null;
         }
 
-        let productoActualModal = null;
+        function ejecutarAccionDirectaWhatsApp() {
+            if (accionPendienteRequisitos) {
+                accionPendienteRequisitos();
+            }
+            cerrarConfirmacionRequisitos();
+        }
 
-        function abrirModal(prod) {
-            productoActualModal = prod;
-            isZoomed = false;
-            document.getElementById('modal-img-container').classList.remove('zoomed');
-            document.getElementById('modal-img').style.transform = 'scale(1)';
-            document.getElementById('modal-img').src = prod.imagen || 'https://via.placeholder.com/400';
-            document.getElementById('modal-category').innerText = prod.subcategoria ? `${prod.categoria || ''} • ${prod.subcategoria}` : (prod.categoria || '');
-            document.getElementById('modal-title').innerText = prod.nombre;
-            document.getElementById('modal-code').innerText = `Código: ${prod.codigo_producto || prod.id || 'N/A'}`;
-            document.getElementById('modal-price').innerText = parseFloat(prod.precio) ? `$${calcularPrecioFinal(prod).toFixed(2)}` : (esPorEncargo(prod) ? 'Precio a definir según lote' : 'Consultar');
+        function dispararWhatsAppDirecto(prod) {
+            const cod = prod.codigo_producto || prod.id || 'N/A';
+            const precioNum = parseFloat(prod.precio) || 0;
+            const precioTxt = precioNum > 0 ? `$${precioNum.toFixed(2)}` : 'A consultar';
             
-            const alert = document.getElementById('recharge-alert-container');
-            if (esRecargaSaldo(prod.categoria)) {
-                alert.innerHTML = `<div class="recharge-alert-box"><i class="fa-solid fa-triangle-exclamation"></i><div><strong>Nota:</strong> Incluye 12% adicional. El trámite se procesa tras confirmar el pago.</div></div>`;
-            } else if (esStriming(prod.categoria) || esServicioGeneral(prod.categoria)) {
-                alert.innerHTML = `<div class="recharge-alert-box"><i class="fa-solid fa-circle-info"></i><div><strong>Aviso:</strong> El servicio se procesa tras verificar el pago.</div></div>`;
+            const msg = `Hola, quiero pedir este producto con los requisitos listos:\n\n` +
+                        `🛍️ *${prod.nombre}*\n` +
+                        `🆔 Código: ${cod}\n` +
+                        `💰 Precio: ${precioTxt}\n\n` +
+                        `Quedo atento para coordinar la entrega y el pago.`;
+
+            window.open(`https://wa.me/584149956831?text=${encodeURIComponent(msg)}`, '_blank');
+            cerrarModal();
+        }
+
+        function compartirProducto(event, prod) {
+            if (event) event.stopPropagation();
+            const url = `${window.location.origin}${window.location.pathname}#prod=${encodeURIComponent(obtenerIdentificadorProducto(prod))}`;
+            if (navigator.share) {
+                navigator.share({ title: prod.nombre, text: `Mira este producto: ${prod.nombre} - $${prod.precio}`, url: url }).catch(() => {});
             } else {
-                alert.innerHTML = '';
-            }
-            
-            document.getElementById('modal-desc').innerHTML = (prod.descripcion || '') + (prod.mas_detalles ? `<br><br><strong>Detalles:</strong> ${prod.mas_detalles}` : '');
-
-            // Gestión de encargo colectivo (Meta 25 personas)
-            const encargoSec = document.getElementById('modal-encargo-section');
-            const regularActions = document.getElementById('modal-regular-actions');
-            if (esPorEncargo(prod)) {
-                encargoSec.style.display = 'block';
-                regularActions.style.display = 'none';
-                
-                const count = obtenerInteresadosEncargo(prod);
-                const pct = Math.min(100, Math.round((count / 25) * 100));
-                document.getElementById('modal-encargo-badge-count').innerText = `${count} / 25 personas`;
-                document.getElementById('modal-encargo-bar').style.width = `${pct}%`;
-                
-                const yaAnotado = usuarioEstaAnotadoEnEncargo(prod);
-                const alreadyBox = document.getElementById('modal-encargo-already-joined');
-                if (alreadyBox) alreadyBox.style.display = yaAnotado ? 'block' : 'none';
-
-                const joinBtn = document.getElementById('modal-encargo-btn');
-                if (joinBtn) {
-                    joinBtn.innerHTML = yaAnotado
-                        ? `<i class="fa-solid fa-clipboard-check"></i> Anotado (${count}/25) - Ver / Modificar WhatsApp`
-                        : `<i class="fa-solid fa-hand-holding-dollar"></i> Anotarme en la Lista (Meta 25 pers.)`;
-                }
-            } else {
-                encargoSec.style.display = 'none';
-                regularActions.style.display = 'flex';
-            }
-
-            // Contenedor de requisitos
-            const reqContainer = document.getElementById('modal-requisitos-container');
-            const requisitos = obtenerListaRequisitos(prod);
-            reqContainer.style.display = requisitos.length ? 'block' : 'none';
-
-            // Comprar individual con validación previa de requisitos
-            document.getElementById('modal-wa-btn').onclick = () => {
-                if (requisitos.length > 0) {
-                    mostrarConfirmacionRequisitos(prod, () => {
-                        productoIndividualPendiente = { ...prod, precioFinalCalculado: calcularPrecioFinal(prod) };
-                        cerrarModal();
-                        abrirModalCheckout();
-                    });
-                } else {
-                    productoIndividualPendiente = { ...prod, precioFinalCalculado: calcularPrecioFinal(prod) };
-                    cerrarModal();
-                    abrirModalCheckout();
-                }
-            };
-
-            // Agregar al carrito con validación previa de requisitos
-            document.getElementById('modal-add-cart-btn').onclick = (e) => {
-                const btn = e.currentTarget;
-                if (requisitos.length > 0) {
-                    mostrarConfirmacionRequisitos(prod, () => {
-                        lanzarEfectoVueloAlCarrito(btn, prod.imagen);
-                        agregarAlCarrito(prod);
-                        cerrarModal();
-                        mostrarToast(`"${prod.nombre}" añadido al carrito`, 'fa-solid fa-cart-check', '#22c55e');
-                    });
-                } else {
-                    lanzarEfectoVueloAlCarrito(btn, prod.imagen);
-                    agregarAlCarrito(prod);
-                    cerrarModal();
-                    mostrarToast(`"${prod.nombre}" añadido al carrito`, 'fa-solid fa-cart-check', '#22c55e');
-                }
-            };
-
-            document.getElementById('modal-share-btn').onclick = () => compartirProducto(null, prod);
-            
-            const tiktokBtn = document.getElementById('modal-tiktok-btn');
-            if (prod.video_tiktok && prod.video_tiktok.toString().trim()) {
-                tiktokBtn.style.display = 'flex';
-                tiktokBtn.onclick = () => window.open(prod.video_tiktok, '_blank');
-            } else {
-                tiktokBtn.style.display = 'none';
-                tiktokBtn.onclick = null;
-            }
-
-            actualizarBotonFavoritoModal(prod);
-            document.getElementById('modal-fav-btn').onclick = (e) => { 
-                toggleFavorito(e, prod); 
-                actualizarBotonFavoritoModal(prod); 
-            };
-            
-            document.getElementById('product-modal').classList.add('active');
-            document.body.style.overflow = 'hidden';
-
-            registrarProductoVisto(prod);
-            renderProductosRelacionados(prod);
-            actualizarHashProducto(prod);
-        }
-
-        function renderProductosRelacionados(prod) {
-            const container = document.getElementById('modal-related-container');
-            if (!container) return;
-            const idActual = obtenerIdentificadorProducto(prod);
-            const relacionados = listaProductosGlobal.filter(p =>
-                obtenerIdentificadorProducto(p) !== idActual &&
-                (p.categoria || 'general').trim().toLowerCase() === (prod.categoria || 'general').trim().toLowerCase()
-            ).slice(0, 6);
-
-            if (relacionados.length === 0) { container.innerHTML = ''; return; }
-
-            container.innerHTML = `<div class="modal-related-title">También te puede interesar</div>
-                <div class="modal-related-list">
-                    ${relacionados.map(p => `<div class="modal-related-card" onclick="abrirModal(buscarProductoPorId(decodeURIComponent('${encodeURIComponent(obtenerIdentificadorProducto(p))}')))">
-                        <img src="${p.imagen || 'https://via.placeholder.com/150'}" alt="${p.nombre}" loading="lazy" decoding="async">
-                        <span>${p.nombre}</span>
-                    </div>`).join('')}
-                </div>`;
-        }
-
-        let modalHistoryPushed = false;
-        function actualizarHashProducto(prod) {
-            const id = encodeURIComponent(obtenerIdentificadorProducto(prod));
-            if (!modalHistoryPushed) {
-                history.pushState({ modalProducto: true }, '', `#producto-${id}`);
-                modalHistoryPushed = true;
-            } else if (window.location.hash !== `#producto-${id}`) {
-                history.replaceState({ modalProducto: true }, '', `#producto-${id}`);
+                navigator.clipboard.writeText(url);
+                mostrarToast("Enlace copiado al portapapeles", "fa-solid fa-clipboard", "#2563eb");
             }
         }
-        function limpiarHashProducto() {
-            if (modalHistoryPushed) {
-                modalHistoryPushed = false;
-                history.back();
-            }
-        }
+
         function abrirProductoDesdeHash() {
             const hash = window.location.hash;
-            if (hash.indexOf('#producto-') === 0) {
-                const id = decodeURIComponent(hash.replace('#producto-', ''));
-                const prod = buscarProductoPorId(id);
-                if (prod) abrirModal(prod);
+            if (hash.includes('prod=')) {
+                const encodedId = hash.split('prod=')[1];
+                if (encodedId) {
+                    setTimeout(() => abrirModalProducto(encodedId), 400);
+                }
             }
         }
-        window.addEventListener('popstate', () => {
-            if (window.location.hash.indexOf('#producto-') !== 0) {
-                modalHistoryPushed = false;
-                document.getElementById('product-modal').classList.remove('active');
-                document.body.style.overflow = 'auto';
-            } else {
-                abrirProductoDesdeHash();
-            }
-        });
 
-        function lanzarEfectoVueloAlCarrito(source, imgSrc) {
+        /* Funcionalidad del Carrito y Animación Visual 'Bounce' */
+        function agregarAlCarrito(prod) {
+            const precio = parseFloat(prod.precio) || 0;
+            const itemExistente = carritoGlobal.find(i => obtenerIdentificadorProducto(i.producto) === obtenerIdentificadorProducto(prod));
+            
+            if (itemExistente) {
+                itemExistente.cantidad += 1;
+            } else {
+                carritoGlobal.push({ producto: prod, cantidad: 1, precio });
+            }
+
+            actualizarContadorCarrito();
+            lanzarEfectoAnimacionVuelo(prod);
+            
+            // Animación Bounce en el BottomNav
+            const cartNavBtn = document.getElementById('cart-float-btn');
+            if (cartNavBtn) {
+                cartNavBtn.classList.remove('cart-bounce-effect');
+                void cartNavBtn.offsetWidth; // Trigger reflow
+                cartNavBtn.classList.add('cart-bounce-effect');
+            }
+
+            mostrarToast(`¡${prod.nombre} agregado al carrito!`, "fa-solid fa-cart-shopping", "#059669");
+            cerrarModal();
+        }
+
+        function actualizarContadorCarrito() {
+            const totalItems = carritoGlobal.reduce((sum, item) => sum + item.cantidad, 0);
+            const badge = document.getElementById('cart-count');
             const cartBtn = document.getElementById('cart-float-btn');
-            if (!cartBtn || !source) return;
-            const target = cartBtn.getBoundingClientRect();
-            const rect = source.getBoundingClientRect();
-            const img = document.createElement('img');
-            img.src = imgSrc || 'https://via.placeholder.com/100'; 
-            img.className = 'flying-item';
-            img.style.left = `${rect.left + rect.width / 2 - 22}px`; 
-            img.style.top = `${rect.top + rect.height / 2 - 22}px`;
-            document.body.appendChild(img);
-            requestAnimationFrame(() => requestAnimationFrame(() => {
-                img.style.left = `${target.left + target.width / 2 - 15}px`; 
-                img.style.top = `${target.top + target.height / 2 - 15}px`; 
-                img.style.transform = 'scale(0.3) rotate(360deg)'; 
-                img.style.opacity = '0.3';
-            }));
-            setTimeout(() => { 
-                img.remove(); 
-                cartBtn.style.transform = 'scale(1.18)'; 
-                setTimeout(() => cartBtn.style.transform = 'scale(1)', 200); 
+            
+            badge.innerText = totalItems;
+            if (totalItems > 0) {
+                cartBtn.classList.add('show');
+            } else {
+                cartBtn.classList.remove('show');
+            }
+        }
+
+        function lanzarEfectoAnimacionVuelo(prod) {
+            const imgUrl = prod.imagen || '';
+            if (!imgUrl) return;
+
+            const flying = document.createElement('img');
+            flying.src = imgUrl;
+            flying.className = 'flying-item';
+            flying.style.left = `${window.innerWidth / 2 - 22}px`;
+            flying.style.top = `${window.innerHeight / 2 - 22}px`;
+            document.body.appendChild(flying);
+
+            const cartBtn = document.getElementById('cart-float-btn').getBoundingClientRect();
+
+            setTimeout(() => {
+                flying.style.left = `${cartBtn.left + cartBtn.width / 2 - 22}px`;
+                flying.style.top = `${cartBtn.top + cartBtn.height / 2 - 22}px`;
+                flying.style.transform = 'scale(0.25)';
+                flying.style.opacity = '0.3';
+            }, 30);
+
+            setTimeout(() => {
+                flying.remove();
             }, 750);
         }
 
-        function cerrarModal() { 
-            document.getElementById('product-modal').classList.remove('active'); 
-            document.body.style.overflow = 'auto'; 
-            limpiarHashProducto(); 
-        }
-        
-        function agregarAlCarrito(prod) { 
-            carritoGlobal.push({ ...prod, precioFinalCalculado: calcularPrecioFinal(prod) }); 
-            actualizarBtnCarrito(); 
-        }
-        function actualizarBtnCarrito() {
-            document.getElementById('cart-count').innerText = carritoGlobal.length;
-            carritoGlobal.length > 0 
-                ? document.getElementById('cart-float-btn').classList.add('show') 
-                : document.getElementById('cart-float-btn').classList.remove('show');
-        }
-
         function abrirModalCarrito() {
-            productoIndividualPendiente = null;
-            const container = document.getElementById('cart-items-list'); 
-            container.innerHTML = '';
-            let total = 0;
+            const container = document.getElementById('cart-items-list');
             if (carritoGlobal.length === 0) {
-                container.innerHTML = '<p style="text-align:center; padding:20px; color:var(--text-muted);">Tu carrito está vacío.</p>';
-            } else {
-                carritoGlobal.forEach((item, idx) => {
-                    total += item.precioFinalCalculado;
-                    const reqs = obtenerListaRequisitos(item);
-                    const reqNote = reqs.length ? `<span style="font-size:0.7rem; color:var(--primary-color); font-weight:700;">✓ Requisitos verificados</span>` : '';
-                    container.innerHTML += `
-                        <div class="cart-item-row">
-                            <img src="${item.imagen || 'https://via.placeholder.com/100'}" alt="${item.nombre}" class="cart-item-thumb">
-                            <div class="cart-item-info">
-                                <span class="cart-item-title">${item.nombre}</span>
-                                <span class="cart-item-details">Cód: ${item.codigo_producto || item.id || 'N/A'} | $${item.precioFinalCalculado.toFixed(2)}</span>
-                                ${reqNote}
-                            </div>
-                            <button class="cart-item-remove" onclick="removerDelCarrito(${idx})" title="Eliminar" aria-label="Eliminar"><i class="fa-solid fa-trash"></i></button>
-                        </div>`;
-                });
+                container.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding: 20px;">Tu carrito está vacío.</p>';
+                document.getElementById('cart-total-text').innerText = 'Total: $0.00';
+                document.getElementById('cart-modal').classList.add('active');
+                document.body.style.overflow = 'hidden';
+                return;
             }
+
+            let html = '';
+            let total = 0;
+            carritoGlobal.forEach((item, index) => {
+                const subtotal = item.precio * item.cantidad;
+                total += subtotal;
+                html += `
+                    <div class="cart-item-row">
+                        <img src="${item.producto.imagen || ''}" class="cart-item-thumb" alt="">
+                        <div class="cart-item-info">
+                            <div class="cart-item-title">${item.producto.nombre}</div>
+                            <div class="cart-item-details">${item.cantidad} x $${item.precio.toFixed(2)} = <strong>$${subtotal.toFixed(2)}</strong></div>
+                        </div>
+                        <button class="cart-item-remove" onclick="removerItemCarrito(${index})"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
             document.getElementById('cart-total-text').innerText = `Total: $${total.toFixed(2)}`;
             document.getElementById('cart-modal').classList.add('active');
             document.body.style.overflow = 'hidden';
         }
-        function cerrarModalCarrito() { 
-            document.getElementById('cart-modal').classList.remove('active'); 
-            document.body.style.overflow = 'auto'; 
-        }
-        function removerDelCarrito(idx) { 
-            carritoGlobal.splice(idx, 1); 
-            actualizarBtnCarrito(); 
-            abrirModalCarrito(); 
+
+        function cerrarModalCarrito() {
+            document.getElementById('cart-modal').classList.remove('active');
+            document.body.style.overflow = 'auto';
         }
 
-        async function descargarCotizacionPDF() {
-            if (carritoGlobal.length === 0) { 
-                mostrarToast("El carrito está vacío", "fa-solid fa-triangle-exclamation", "#ef4444"); 
-                return; 
-            }
-            await asegurarJsPDF();
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            doc.setFont("Helvetica", "bold");
-            doc.setFontSize(18);
-            doc.text("Resumen de Cotización - Catálogo Digital", 14, 20);
-            
-            doc.setFontSize(10);
-            doc.setFont("Helvetica", "normal");
-            doc.text(`Fecha: ${new Date().toLocaleDateString()} | San José de Guanipa`, 14, 28);
-
-            doc.setTextColor(210, 210, 210);
-            doc.setFontSize(30);
-            doc.text("PRESUPUESTO INFORMATIVO", 20, 140, { angle: 45 });
-
-            doc.setTextColor(0, 0, 0);
-            doc.setFontSize(11);
-            let y = 42;
-            let total = 0;
-
-            carritoGlobal.forEach((item, index) => {
-                doc.text(`${index + 1}. ${item.nombre} - $${item.precioFinalCalculado.toFixed(2)}`, 14, y);
-                total += item.precioFinalCalculado;
-                y += 9;
-            });
-
-            doc.setFont("Helvetica", "bold");
-            doc.text(`Total General: $${total.toFixed(2)}`, 14, y + 8);
-            
-            doc.save("Cotizacion_CatalogoDigital.pdf");
-            mostrarToast("PDF generado exitosamente", "fa-solid fa-file-pdf", "#22c55e");
+        function removerItemCarrito(index) {
+            carritoGlobal.splice(index, 1);
+            actualizarContadorCarrito();
+            abrirModalCarrito();
         }
 
-        function abrirModalCheckout() { 
-            cerrarModalCarrito(); 
-            document.getElementById('checkout-modal').classList.add('active'); 
-            document.body.style.overflow = 'hidden'; 
+        function abrirModalCheckout() {
+            if (carritoGlobal.length === 0) return;
+            cerrarModalCarrito();
+            document.getElementById('checkout-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
         }
-        function cerrarModalCheckout() { 
-            document.getElementById('checkout-modal').classList.remove('active'); 
-            document.body.style.overflow = 'auto'; 
+
+        function cerrarModalCheckout() {
+            document.getElementById('checkout-modal').classList.remove('active');
+            document.body.style.overflow = 'auto';
         }
 
         function enviarPedidoConfirmado() {
             const nombre = document.getElementById('client-name').value.trim();
-            const dir = document.getElementById('client-address').value.trim();
-            if (!nombre) { 
-                mostrarToast("Por favor ingresa tu nombre", "fa-solid fa-circle-exclamation", "#ef4444"); 
-                return; 
+            const direccion = document.getElementById('client-address').value.trim();
+
+            if (!nombre) {
+                mostrarToast("Por favor ingresa tu nombre y apellido", "fa-solid fa-circle-exclamation", "#ef4444");
+                return;
             }
 
-            let msg = "";
-            if (productoIndividualPendiente) {
-                const p = productoIndividualPendiente;
-                const cod = p.codigo_producto || p.id || 'N/A';
-                const descLinea = (p.descripcion || '').trim() ? `\n*Descripción:* ${p.descripcion.trim()}` : '';
-                const fotoLinea = p.imagen ? `\n📸 *Foto:* ${p.imagen}` : '';
-                const reqs = obtenerListaRequisitos(p);
-                const reqsTexto = reqs.length ? `\n\n✅ *Requisitos confirmados por el cliente:* ${reqs.join(', ')}` : '';
+            let mensaje = `🛒 *NUEVO PEDIDO DESDE CATÁLOGO*\n` +
+                          `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                          `👤 *Cliente:* ${nombre}\n` +
+                          `📍 *Nota / Dirección:* ${direccion || 'Sin notas adicionales'}\n` +
+                          `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                          `📋 *DETALLE DE PRODUCTOS:*\n`;
 
-                if (esRecargaSaldo(p.categoria)) {
-                    msg = `Hola, mi nombre es *${nombre}*.\nQuiero procesar la recarga:\n*Código:* ${cod}\n*Producto:* ${p.nombre}${descLinea}\n*Total:* $${p.precioFinalCalculado.toFixed(2)}${fotoLinea}${reqsTexto}\n📍 *Nota:* ${dir || 'N/A'}`;
-                } else if (esStriming(p.categoria) || esServicioGeneral(p.categoria)) {
-                    msg = `Hola, mi nombre es *${nombre}*.\nSolicito el servicio:\n*Código:* ${cod}\n*Servicio:* ${p.nombre}${descLinea}\n*Precio:* $${p.precioFinalCalculado.toFixed(2)}${fotoLinea}${reqsTexto}\n📍 *Nota:* ${dir || 'N/A'}`;
-                } else {
-                    msg = `Hola, mi nombre es *${nombre}*.\nMe interesa:\n*Código:* ${cod}\n*Producto:* ${p.nombre}${descLinea}\n*Precio:* $${p.precioFinalCalculado.toFixed(2)}${fotoLinea}${reqsTexto}\n📍 *Dirección:* ${dir || 'N/A'}`;
-                }
-            } else if (carritoGlobal.length > 0) {
-                msg = `Hola, mi nombre es *${nombre}*.\n*Cotización de pedido:*\n\n`;
-                let t = 0;
-                let itemsConRequisitos = [];
+            let total = 0;
+            carritoGlobal.forEach((item, idx) => {
+                const sub = item.precio * item.cantidad;
+                total += sub;
+                mensaje += `${idx + 1}. ${item.producto.nombre} (Cant: ${item.cantidad}) - $${sub.toFixed(2)}\n`;
+            });
 
-                carritoGlobal.forEach((i, idx) => {
-                    t += i.precioFinalCalculado;
-                    const cod = i.codigo_producto || i.id || 'N/A';
-                    const descLinea = (i.descripcion || '').trim() ? `\n*Descripción:* ${i.descripcion.trim()}` : '';
-                    const fotoLinea = i.imagen ? `\n📸 *Foto:* ${i.imagen}` : '';
-                    const reqs = obtenerListaRequisitos(i);
-                    if (reqs.length) itemsConRequisitos.push(`- ${i.nombre} (${reqs.join(', ')})`);
-                    msg += `*${idx + 1}. ${i.nombre}*\n*Código:* ${cod}${descLinea}\n*Precio:* $${i.precioFinalCalculado.toFixed(2)}${fotoLinea}\n\n`;
-                });
+            mensaje += `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                       `💰 *TOTAL A PAGAR: $${total.toFixed(2)}*\n` +
+                       `Quedo atento para coordinar el pago y envío.`;
 
-                if (itemsConRequisitos.length > 0) {
-                    msg += `✅ *Requisitos leídos y listos para enviar:* \n${itemsConRequisitos.join('\n')}\n\n`;
-                }
-
-                msg += `💰 *Total General:* $${t.toFixed(2)}\n📍 *Dirección/Nota:* ${dir || 'N/A'}`;
-                carritoGlobal = []; 
-                actualizarBtnCarrito();
-            } else {
-                return cerrarModalCheckout();
-            }
-
-            window.open(`https://wa.me/584149956831?text=${encodeURIComponent(msg)}`, '_blank');
+            window.open(`https://wa.me/584149956831?text=${encodeURIComponent(mensaje)}`, '_blank');
+            carritoGlobal = [];
+            actualizarContadorCarrito();
             cerrarModalCheckout();
-            mostrarToast('Abriendo WhatsApp con tu pedido...', 'fa-brands fa-whatsapp', '#25d366', 5000);
+            mostrarToast("¡Pedido generado con éxito!", "fa-solid fa-circle-check", "#22c55e");
+        }
+
+        async function descargarCotizacionPDF() {
+            if (carritoGlobal.length === 0) return;
+            await asegurarJsPDF();
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(18);
+            doc.text("COTIZACIÓN - CATÁLOGO DIGITAL", 14, 20);
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+            doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 14, 28);
+            doc.text("Ubicación: San José de Guanipa, Anzoátegui", 14, 34);
+
+            let y = 46;
+            doc.setFont("helvetica", "bold");
+            doc.text("Cant", 14, y);
+            doc.text("Producto", 30, y);
+            doc.text("Subtotal", 170, y, { align: "right" });
+            
+            doc.line(14, y + 2, 196, y + 2);
+            y += 8;
+
+            doc.setFont("helvetica", "normal");
+            let total = 0;
+            carritoGlobal.forEach(item => {
+                const sub = item.precio * item.cantidad;
+                total += sub;
+                doc.text(item.cantidad.toString(), 14, y);
+                doc.text(item.producto.nombre.substring(0, 55), 30, y);
+                doc.text(`$${sub.toFixed(2)}`, 170, y, { align: "right" });
+                y += 8;
+            });
+
+            doc.line(14, y, 196, y);
+            y += 10;
+            doc.setFont("helvetica", "bold");
+            doc.text(`TOTAL: $${total.toFixed(2)}`, 170, y, { align: "right" });
+
+            doc.save("cotizacion_catalogo.pdf");
+            mostrarToast("PDF descargado correctamente", "fa-solid fa-file-pdf", "#dc2626");
         }
 
         function abrirModalInfo(tipo) {
-            const head = document.getElementById('info-modal-header');
+            const header = document.getElementById('info-modal-header');
             const body = document.getElementById('info-modal-body-content');
+
             if (tipo === 'pagos') {
-                head.innerHTML = `<h2 class="modal-title" style="color:var(--primary-color);"><i class="fa-solid fa-wallet"></i> Métodos de Pago</h2>`;
+                header.innerHTML = `<h2 class="modal-title" style="color:var(--primary-color); display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-wallet"></i> Métodos de Pago</h2>`;
                 body.innerHTML = `
-                    <ul class="req-bullet-list">
-                        <li><i class="fa-solid fa-money-bill-wave"></i> <span>Pago Móvil / Transferencia Nacional (Bs.)</span></li>
-                        <li><i class="fa-solid fa-dollar-sign"></i> <span>Divisas en efectivo ($ / €)</span></li>
-                        <li><i class="fa-brands fa-usdt"></i> <span>USDT / Binance Pay</span></li>
+                    <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.5; margin-bottom:12px;">Aceptamos múltiples formas de pago cómodas y seguras para ti:</p>
+                    <ul style="padding-left:18px; display:flex; flex-direction:column; gap:8px; font-size:0.88rem;">
+                        <li><strong>Pago Móvil</strong> (Tasas bancarias oficiales del día)</li>
+                        <li><strong>Zelle / Binance USDT</strong> (Divisas digitales)</li>
+                        <li><strong>Efectivo</strong> (Divisas en efectivo al retirar o por delivery)</li>
                     </ul>
                 `;
             } else if (tipo === 'delivery') {
-                head.innerHTML = `<h2 class="modal-title" style="color:var(--danger-color);"><i class="fa-solid fa-motorcycle"></i> Servicio de Delivery</h2>`;
+                header.innerHTML = `<h2 class="modal-title" style="color:var(--danger-color); display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-motorcycle"></i> Servicio de Delivery</h2>`;
                 body.innerHTML = `
-                    <ul class="req-bullet-list">
-                        <li><i class="fa-solid fa-location-crosshairs"></i> <span>Entregas en todo San José de Guanipa y zonas cercanas.</span></li>
-                        <li><i class="fa-solid fa-clock"></i> <span>Horario y costo de entrega coordinado por WhatsApp.</span></li>
-                        <li><i class="fa-solid fa-shield-halved"></i> <span>Garantía y verificación del producto al entregar.</span></li>
-                    </ul>
+                    <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.5; margin-bottom:12px;">Llevamos tus compras de forma rápida y segura en todo San José de Guanipa y sectores cercanos.</p>
+                    <div style="background:var(--warning-bg); border:1px solid var(--warning-border); padding:10px 12px; border-radius:10px; font-size:0.84rem; color:var(--warning-text);">
+                        <i class="fa-solid fa-circle-info"></i> Consulta la tarifa exacta de delivery para tu sector directamente al finalizar tu pedido por WhatsApp.
+                    </div>
                 `;
             }
+
             document.getElementById('info-modal').classList.add('active');
             document.body.style.overflow = 'hidden';
         }
-        function cerrarModalInfo() { 
-            document.getElementById('info-modal').classList.remove('active'); 
-            document.body.style.overflow = 'auto'; 
-        }
 
-        async function abrirModalUbicacion() {
-            document.getElementById('location-modal').classList.add('active');
-            document.body.style.overflow = 'hidden';
-            await asegurarLeaflet();
-            setTimeout(() => {
-                if (!leafletMap) {
-                    leafletMap = L.map('interactive-map').setView([8.8864, -64.1532], 16);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; OpenStreetMap'
-                    }).addTo(leafletMap);
-                    L.marker([8.8864, -64.1532]).addTo(leafletMap)
-                        .bindPopup('<b>📍 Tienda Principal</b><br>Calle Zea, frente a la Plaza Bolívar, al lado de Mi Plazita')
-                        .openPopup();
-                } else {
-                    leafletMap.invalidateSize();
-                }
-            }, 250);
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(pos => {
-                    const latUser = pos.coords.latitude;
-                    const lonUser = pos.coords.longitude;
-                    const distanciaKm = calcularDistanciaGeo(latUser, lonUser, 8.8864, -64.1532);
-                    document.getElementById('route-distance-label').innerText = `Estás a aprox. ${distanciaKm.toFixed(1)} km de la tienda.`;
-                }, () => {
-                    document.getElementById('route-distance-label').innerText = 'Calle Zea, frente a la Plaza Bolívar, al lado de Mi Plazita.';
-                });
-            } else {
-                document.getElementById('route-distance-label').innerText = 'Calle Zea, frente a la Plaza Bolívar, al lado de Mi Plazita.';
-            }
-        }
-
-        function calcularDistanciaGeo(lat1, lon1, lat2, lon2) {
-            const R = 6371;
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                      Math.sin(dLon/2) * Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
-        }
-
-        function cerrarModalUbicacion() {
-            document.getElementById('location-modal').classList.remove('active');
+        function cerrarModalInfo() {
+            document.getElementById('info-modal').classList.remove('active');
             document.body.style.overflow = 'auto';
         }
 
-        /* ================= CONTROL DEL BUZÓN DE SUGERENCIAS Y REPORTES (GUIADO) ================= */
-        const OPCIONES_SUGERENCIAS = {
-            error: {
-                titulo: "Fallo o Error en la Página Web",
-                descripcion: "Marca lo que no esté funcionando correctamente para corregirlo de inmediato:",
-                items: [
-                    { id: 'img', icon: 'fa-image', texto: 'Una foto o imagen no se ve o no carga' },
-                    { id: 'btn', icon: 'fa-hand-pointer', texto: 'Un botón o enlace no responde' },
-                    { id: 'precio', icon: 'fa-tag', texto: 'Un precio o detalle parece incorrecto' },
-                    { id: 'movil', icon: 'fa-mobile-screen-button', texto: 'Se ve desordenado o cortado en mi teléfono' },
-                    { id: 'lento', icon: 'fa-gauge-high', texto: 'La página tarda demasiado en cargar' }
-                ]
-            },
-            productos: {
-                titulo: "Sugerencia de Productos o Variedad",
-                descripcion: "Marca qué tipo de artículos te gustaría que incorporemos en la tienda:",
-                items: [
-                    { id: 'fundas', icon: 'fa-shield-halved', texto: 'Más forros, vidrios templados y protectores' },
-                    { id: 'cables', icon: 'fa-bolt', texto: 'Más cargadores rápidos, cables y powerbanks' },
-                    { id: 'audio', icon: 'fa-headphones', texto: 'Más modelos de audífonos y cornetas bluetooth' },
-                    { id: 'pc', icon: 'fa-laptop', texto: 'Accesorios o piezas de computación y oficina' },
-                    { id: 'gaming', icon: 'fa-gamepad', texto: 'Accesorios para videojuegos y consolas' },
-                    { id: 'combos', icon: 'fa-gift', texto: 'Crear más combos y promociones con descuento' }
-                ]
-            },
-            servicio: {
-                titulo: "Servicio, Pagos y Experiencia",
-                descripcion: "Dinos cómo podemos mejorar tu experiencia de compra:",
-                items: [
-                    { id: 'delivery', icon: 'fa-motorcycle', texto: 'Sugerir ampliar zonas de delivery a domicilio' },
-                    { id: 'pagos', icon: 'fa-credit-card', texto: 'Agregar más opciones de pago (Punto, Binance, etc.)' },
-                    { id: 'horario', icon: 'fa-clock', texto: 'Extender los horarios de atención al cliente' },
-                    { id: 'excelente', icon: 'fa-star', texto: '¡Excelente atención y catálogo muy fácil de usar!' }
-                ]
-            }
-        };
-
-        let tabSugerenciaActual = 'error';
-        let opcionesSugerenciasSeleccionadas = new Set();
-
         function abrirModalSugerencias() {
+            cambiarTabSugerencia('error');
             document.getElementById('sugerencias-modal').classList.add('active');
             document.body.style.overflow = 'hidden';
-            cambiarTabSugerencia(tabSugerenciaActual, false);
         }
 
         function cerrarModalSugerencias() {
@@ -2781,121 +2288,166 @@
             document.body.style.overflow = 'auto';
         }
 
-        function cambiarTabSugerencia(tab, resetSeleccion = true) {
-            tabSugerenciaActual = tab;
-            if (resetSeleccion) {
-                opcionesSugerenciasSeleccionadas.clear();
-            }
+        let sugTabActual = 'error';
+        let sugOpcionesSeleccionadas = [];
 
-            document.querySelectorAll('.sug-tab-btn').forEach(b => b.classList.remove('active'));
-            const activeBtn = document.getElementById(`sug-tab-${tab}`);
-            if (activeBtn) activeBtn.classList.add('active');
+        const opcionesSugerenciaData = {
+            error: [
+                { id: 'enlace_roto', text: 'Enlace o botón que no responde', icon: 'fa-link-slash' },
+                { id: 'carga_lenta', text: 'Problema cargando imágenes o datos', icon: 'fa-image' },
+                { id: 'error_pedido', text: 'Inconveniente al enviar pedido a WhatsApp', icon: 'fa-brands fa-whatsapp' },
+                { id: 'otro_error', text: 'Otro fallo técnico general en la web', icon: 'fa-bug' }
+            ],
+            productos: [
+                { id: 'prod_agotado', text: 'Consultar disponibilidad de un artículo', icon: 'fa-box' },
+                { id: 'solicitar_nuevo', text: 'Sugerir un nuevo producto o marca', icon: 'fa-plus' },
+                { id: 'duda_precio', text: 'Consulta sobre precio o tasa aplicable', icon: 'fa-dollar-sign' },
+                { id: 'otro_prod', text: 'Otra consulta sobre mercancía', icon: 'fa-boxes-stacked' }
+            ],
+            servicio: [
+                { id: 'demora_delivery', text: 'Consulta sobre tiempos de entrega o delivery', icon: 'fa-motorcycle' },
+                { id: 'atencion_pago', text: 'Duda o reporte sobre métodos de pago', icon: 'fa-credit-card' },
+                { id: 'sugerencia_atencion', text: 'Sugerencia para mejorar la atención', icon: 'fa-face-smile' },
+                { id: 'otro_serv', text: 'Otro comentario sobre el servicio', icon: 'fa-comment-dots' }
+            ]
+        };
 
-            const categoriaInfo = OPCIONES_SUGERENCIAS[tab] || OPCIONES_SUGERENCIAS.error;
-            const descEl = document.getElementById('sug-tab-desc');
-            if (descEl) descEl.innerText = categoriaInfo.descripcion;
+        function cambiarTabSugerencia(tab) {
+            sugTabActual = tab;
+            sugOpcionesSeleccionadas = [];
+            
+            ['error', 'productos', 'servicio'].forEach(t => {
+                const btn = document.getElementById(`sug-tab-${t}`);
+                if (btn) btn.classList.toggle('active', t === tab);
+            });
 
-            renderizarOpcionesSugerencias();
-        }
-
-        function toggleOpcionSugerencia(id) {
-            if (opcionesSugerenciasSeleccionadas.has(id)) {
-                opcionesSugerenciasSeleccionadas.delete(id);
-            } else {
-                opcionesSugerenciasSeleccionadas.add(id);
-            }
-            renderizarOpcionesSugerencias();
-        }
-
-        function renderizarOpcionesSugerencias() {
             const container = document.getElementById('sug-options-container');
-            if (!container) return;
-            const categoriaInfo = OPCIONES_SUGERENCIAS[tabSugerenciaActual] || OPCIONES_SUGERENCIAS.error;
-
+            const lista = opcionesSugerenciaData[tab] || [];
             let html = '';
-            categoriaInfo.items.forEach(item => {
-                const isSelected = opcionesSugerenciasSeleccionadas.has(item.id);
+
+            lista.forEach(item => {
                 html += `
-                    <div class="sug-chip-item ${isSelected ? 'selected' : ''}" onclick="toggleOpcionSugerencia('${item.id}')">
+                    <div class="sug-chip-item" onclick="toggleOpcionSugerencia(this, '${item.id}')">
                         <div class="sug-chip-check"><i class="fa-solid fa-check"></i></div>
                         <i class="fa-solid ${item.icon} chip-icon"></i>
-                        <span>${item.texto}</span>
+                        <span style="flex-grow:1;">${item.text}</span>
                     </div>
                 `;
             });
             container.innerHTML = html;
         }
 
+        function toggleOpcionSugerencia(element, id) {
+            element.classList.toggle('selected');
+            if (sugOpcionesSeleccionadas.includes(id)) {
+                sugOpcionesSeleccionadas = sugOpcionesSeleccionadas.filter(i => i !== id);
+            } else {
+                sugOpcionesSeleccionadas.push(id);
+            }
+        }
+
         function enviarSugerenciaWhatsApp() {
-            const categoriaInfo = OPCIONES_SUGERENCIAS[tabSugerenciaActual] || OPCIONES_SUGERENCIAS.error;
-            const detalle = (document.getElementById('sug-detail-input').value || '').trim();
-            const nombre = (document.getElementById('sug-name-input').value || '').trim();
-            const tlf = (document.getElementById('sug-phone-input').value || '').trim();
+            const detalle = document.getElementById('sug-detail-input').value.trim();
+            const nombre = document.getElementById('sug-name-input').value.trim();
+            const telefono = document.getElementById('sug-phone-input').value.trim();
 
-            const itemsSeleccionadosTextos = categoriaInfo.items
-                .filter(it => opcionesSugerenciasSeleccionadas.has(it.id))
-                .map(it => it.texto);
+            let txtOpciones = sugOpcionesSeleccionadas.map(id => {
+                const found = (opcionesSugerenciaData[sugTabActual] || []).find(o => o.id === id);
+                return found ? `• ${found.text}` : `• ${id}`;
+            }).join('\n');
 
-            if (itemsSeleccionadosTextos.length === 0 && !detalle) {
-                mostrarToast("Por favor marca al menos una opción o escribe un detalle", "fa-solid fa-circle-exclamation", "#ef4444");
-                return;
-            }
+            if (!txtOpciones) txtOpciones = '• Ninguna opción específica marcada';
 
-            let msg = `📬 *BUZÓN DE OPINIONES Y REPORTES*\n` +
+            let msg = `💬 *NUEVO REPORTE / SUGERENCIA*\n` +
                       `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-                      `📌 *Asunto:* ${categoriaInfo.titulo}\n`;
+                      `📂 *Categoría:* ${sugTabActual.toUpperCase()}\n` +
+                      `📌 *Selecciones:*\n${txtOpciones}\n`;
 
-            if (itemsSeleccionadosTextos.length > 0) {
-                msg += `📝 *Opciones marcadas:*\n`;
-                itemsSeleccionadosTextos.forEach(t => {
-                    msg += ` • ${t}\n`;
-                });
-            }
+            if (detalle) msg += `📝 *Detalle:* ${detalle}\n`;
+            if (nombre) msg += `👤 *Nombre:* ${nombre}\n`;
+            if (telefono) msg += `📱 *Teléfono:* ${telefono}\n`;
 
-            if (detalle) {
-                msg += `\n💬 *Detalle o comentario:*\n${detalle}\n`;
-            }
-
-            msg += `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-                   `👤 *Cliente:* ${nombre || 'Usuario del Catálogo Web'}\n` +
-                   `📱 *Contacto:* ${tlf || 'Por este chat'}\n` +
-                   `_Enviado desde el catálogo digital_`;
+            msg += `━━━━━━━━━━━━━━━━━━━━━━━━`;
 
             window.open(`https://wa.me/584149956831?text=${encodeURIComponent(msg)}`, '_blank');
             cerrarModalSugerencias();
-            mostrarToast("¡Gracias! Mensaje listo en WhatsApp", "fa-solid fa-paper-plane", "#25d366", 4000);
-
-            opcionesSugerenciasSeleccionadas.clear();
-            document.getElementById('sug-detail-input').value = '';
-            document.getElementById('sug-name-input').value = '';
-            document.getElementById('sug-phone-input').value = '';
+            mostrarToast("¡Mensaje enviado al WhatsApp de atención!", "fa-solid fa-circle-check", "#22c55e");
         }
 
-        function toggleZoom(e) {
-            const container = document.getElementById('modal-img-container');
-            const img = document.getElementById('modal-img');
-            isZoomed = !isZoomed;
-            if (isZoomed) {
-                container.classList.add('zoomed');
-                const rect = container.getBoundingClientRect();
-                const x = ((e.clientX - rect.left) / rect.width) * 100;
-                const y = ((e.clientY - rect.top) / rect.height) * 100;
-                img.style.transformOrigin = `${x}% ${y}%`;
-                img.style.transform = 'scale(2)';
+        async function abrirModalUbicacion() {
+            await asegurarLeaflet();
+            document.getElementById('location-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            setTimeout(() => {
+                if (!leafletMap) {
+                    leafletMap = L.map('interactive-map').setView([8.8864, -64.1532], 16);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; OpenStreetMap contributors'
+                    }).addTo(leafletMap);
+
+                    L.marker([8.8864, -64.1532]).addTo(leafletMap)
+                        .bindPopup('<b>Catálogo Digital Guanipa</b><br>Calle Zea, frente a Plaza Bolívar.')
+                        .openPopup();
+                } else {
+                    leafletMap.invalidateSize();
+                }
+                calcularDistanciaUsuario();
+            }, 300);
+        }
+
+        function cerrarModalUbicacion() {
+            document.getElementById('location-modal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function calcularDistanciaUsuario() {
+            const label = document.getElementById('route-distance-label');
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const lat1 = position.coords.latitude;
+                    const lon1 = position.coords.longitude;
+                    const lat2 = 8.8864;
+                    const lon2 = -64.1532;
+
+                    const R = 6371;
+                    const dLat = (lat2 - lat1) * Math.PI / 180;
+                    const dLon = (lon2 - lon1) * Math.PI / 180;
+                    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                              Math.sin(dLon/2) * Math.sin(dLon/2);
+                    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                    const d = (R * c).toFixed(1);
+
+                    label.innerText = `Estás a aproximadamente ${d} km de nuestra ubicación.`;
+                }, () => {
+                    label.innerText = "Calle Zea, frente a la Plaza Bolívar, San José de Guanipa.";
+                }, { timeout: 5000 });
             } else {
-                container.classList.remove('zoomed');
-                img.style.transform = 'scale(1)';
+                label.innerText = "Calle Zea, frente a la Plaza Bolívar, San José de Guanipa.";
             }
         }
 
-        window.onload = () => {
+        function mostrarToast(texto, icono = "fa-solid fa-check-circle", color = "#22c55e", duracion = 3000) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-text').innerText = texto;
+            const iconEl = document.getElementById('toast-icon');
+            iconEl.className = icono;
+            iconEl.style.color = color;
+
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duracion);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('footer-year').innerText = new Date().getFullYear();
             inicializarTema();
             aplicarCampanaTemporada();
             verificarNovedadesVisita();
             cargarCatalogo();
-            const footerYearEl = document.getElementById('footer-year');
-            if (footerYearEl) footerYearEl.innerText = new Date().getFullYear();
-        };
+        });
     </script>
 </body>
 </html>
