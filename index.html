@@ -44,7 +44,7 @@
   <script type="text/babel">
     const { useState, useEffect, useMemo } = React;
 
-    const GOOGLE_SHEET_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz4UyASJfyDih6_jQHYmhd0-eCmtp7r82FLoPH12_LOmp0cy0se4DNJdONL0BLkb7O_fg/exec';
+    const GOOGLE_SHEET_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz_qzzzwFK6szGI5zZRHoy_cFZC04PdakHSwZEqU3JaRUnkaAWGV1qhN261-8gUnBLM9g/exec';
     const GUANIPA_LAT = 8.8872;
     const GUANIPA_LON = -64.1672;
     const GOOGLE_MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${GUANIPA_LAT},${GUANIPA_LON}`;
@@ -65,7 +65,7 @@
       MessageCircle: () => <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
     };
 
-    // Productos iniciales por si no hay conexión
+    // Productos iniciales por defecto (evita pantalla en blanco si Sheets está vacío)
     const INITIAL_PRODUCTS = [
       { id: '1', nombre: 'Combo Escolar Primaria 2025', categoria: 'Escolar', precio: 25.00, descripcion: 'Cuadernos, lápices de colores, borrador, sacapuntas y morral.', imagen: 'https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=600', whatsapp: '584149956831', stock: true },
       { id: '2', nombre: 'Pantalla Netflix 1 Mes Ultra HD', categoria: 'Streaming', precio: 4.50, descripcion: 'Acceso directo a 1 perfil en Ultra HD 4K sin caídas.', imagen: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=600', whatsapp: '584149956831', stock: true, requisitos: 'Indicar correo donde desea recibir el perfil.' },
@@ -96,7 +96,7 @@
       const [copied, setCopied] = useState(false);
       const [whatsappNumber, setWhatsappNumber] = useState('584149956831');
 
-      // Carga automática desde tu Google Sheet
+      // Carga automática desde Google Sheet con tolerancia a fallos
       useEffect(() => {
         fetchSheetData();
       }, []);
@@ -125,7 +125,7 @@
             }
           }
         } catch (e) {
-          console.log('Cargando productos locales:', e);
+          console.log('Usando catálogo local de respaldo debido a:', e);
         } finally {
           setLoading(false);
         }
