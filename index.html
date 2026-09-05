@@ -1,22 +1,536 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Catálogo Digital Guanipa | Productos, Streaming y Recargas</title>
-    <meta name="description" content="Catálogo digital de productos, recargas, streaming y compras por encargo en San José de Guanipa con pedidos directos por WhatsApp." />
-    <meta property="og:title" content="Catálogo Digital Guanipa" />
-    <meta property="og:description" content="Catálogo digital de productos, recargas, streaming y compras por encargo en San José de Guanipa con pedidos directos por WhatsApp." />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="theme-color" content="#0f172a" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  </head>
-  <body class="bg-slate-950 text-slate-100 antialiased selection:bg-emerald-500 selection:text-white min-h-screen">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catálogo Guanipa - San José de Guanipa</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- React & ReactDOM CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- Babel standalone para JSX en el navegador -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    .scrollbar-none::-webkit-scrollbar { display: none; }
+    .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+    .theme-light { background-color: #f8fafc !important; color: #0f172a !important; }
+    .theme-light .card-bg { background-color: #ffffff !important; border-color: #e2e8f0 !important; }
+    .theme-light .text-muted { color: #64748b !important; }
+    .theme-light .text-main { color: #0f172a !important; }
+    .theme-light .input-bg { background-color: #f1f5f9 !important; border-color: #cbd5e1 !important; color: #0f172a !important; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans selection:bg-emerald-500 selection:text-white transition-colors duration-200">
+  <div id="root"></div>
 
+  <script type="text/babel">
+    const { useState, useEffect, useMemo } = React;
+
+    const GOOGLE_SHEET_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz4UyASJfyDih6_jQHYmhd0-eCmtp7r82FLoPH12_LOmp0cy0se4DNJdONL0BLkb7O_fg/exec';
+    const GUANIPA_LAT = 8.8872;
+    const GUANIPA_LON = -64.1672;
+    const GOOGLE_MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${GUANIPA_LAT},${GUANIPA_LON}`;
+
+    // SVG Icons
+    const Icons = {
+      Search: () => <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="8" strokeWidth="2"/><path strokeWidth="2" d="m21 21-4.35-4.35"/></svg>,
+      MapPin: () => <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeWidth="2" d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/><circle cx="12" cy="10" r="3" strokeWidth="2"/></svg>,
+      ShoppingBag: () => <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeWidth="2" d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path strokeWidth="2" d="M3 6h18"/><path strokeWidth="2" d="M16 10a4 4 0 0 1-8 0"/></svg>,
+      Sun: () => <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="4" strokeWidth="2"/><path strokeWidth="2" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41m14.14-14.14l-1.41 1.41"/></svg>,
+      Moon: () => <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeWidth="2" d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>,
+      Sparkles: () => <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeWidth="2" d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z"/></svg>,
+      Check: () => <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><polyline points="20 6 9 17 4 12" strokeWidth="2"/></svg>,
+      X: () => <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18" strokeWidth="2"/><line x1="6" y1="6" x2="18" y2="18" strokeWidth="2"/></svg>,
+      AlertCircle: () => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" strokeWidth="2"/><line x1="12" y1="8" x2="12" y2="12" strokeWidth="2"/><line x1="12" y1="16" x2="12.01" y2="16" strokeWidth="2"/></svg>,
+      RotateCw: () => <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeWidth="2" d="M21 12a9 9 0 1 1-9-9c2.52 0 4.85.83 6.72 2.24L21 8"/><path strokeWidth="2" d="M21 3v5h-5"/></svg>,
+      Copy: () => <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" strokeWidth="2"/><path strokeWidth="2" d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>,
+      MessageCircle: () => <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+    };
+
+    // Productos iniciales por si no hay conexión
+    const INITIAL_PRODUCTS = [
+      { id: '1', nombre: 'Combo Escolar Primaria 2025', categoria: 'Escolar', precio: 25.00, descripcion: 'Cuadernos, lápices de colores, borrador, sacapuntas y morral.', imagen: 'https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=600', whatsapp: '584149956831', stock: true },
+      { id: '2', nombre: 'Pantalla Netflix 1 Mes Ultra HD', categoria: 'Streaming', precio: 4.50, descripcion: 'Acceso directo a 1 perfil en Ultra HD 4K sin caídas.', imagen: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=600', whatsapp: '584149956831', stock: true, requisitos: 'Indicar correo donde desea recibir el perfil.' },
+      { id: '3', nombre: 'Recarga Saldo Movistar / Digitel', categoria: 'Recarga saldo', precio: 3.00, descripcion: 'Recargas al instante para Movistar, Digitel y Movilnet.', imagen: 'https://images.unsplash.com/photo-1580910051074-3eb694886505?w=600', whatsapp: '584149956831', stock: true, requisitos: 'Número de teléfono a recargar y operadora.' },
+      { id: '4', nombre: 'Taza Personalizada Sublimada', categoria: 'Tazas personalizadas', precio: 6.50, descripcion: 'Taza de cerámica blanca 11oz personalizada con tu foto o frase.', imagen: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600', whatsapp: '584149956831', stock: true, requisitos: 'Enviar imagen o diseño en alta resolución.' },
+      { id: '5', nombre: 'Diseño de Currículum Vitae Pro', categoria: 'Servicios', precio: 5.00, descripcion: 'Diseño moderno estilo Harvard en formato PDF listo para imprimir.', imagen: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=600', whatsapp: '584149956831', stock: true, requisitos: 'Datos personales, estudios y experiencia laboral.' },
+      { id: '6', nombre: 'Combo Pases Free Fire 1000 Diamantes', categoria: 'Juegos', precio: 9.99, descripcion: 'Recarga inmediata mediante ID de jugador oficial.', imagen: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600', whatsapp: '584149956831', stock: true, requisitos: 'ID de jugador y nombre de cuenta.' }
+    ];
+
+    const SUGGESTIONS = [
+      { label: 'Netflix', query: 'netflix', icon: '🍿' },
+      { label: 'Saldo', query: 'saldo', icon: '⚡' },
+      { label: 'Currículum', query: 'curriculum', icon: '📄' },
+      { label: 'Tazas', query: 'taza', icon: '☕' },
+      { label: 'Free Fire', query: 'free fire', icon: '🎮' }
+    ];
+
+    function App() {
+      const [products, setProducts] = useState(INITIAL_PRODUCTS);
+      const [loading, setLoading] = useState(false);
+      const [theme, setTheme] = useState('dark');
+      const [searchQuery, setSearchQuery] = useState('');
+      const [selectedCategory, setSelectedCategory] = useState('todos');
+      const [cart, setCart] = useState([]);
+      const [isCartOpen, setIsCartOpen] = useState(false);
+      const [isLocationOpen, setIsLocationOpen] = useState(false);
+      const [requirementsProduct, setRequirementsProduct] = useState(null);
+      const [copied, setCopied] = useState(false);
+      const [whatsappNumber, setWhatsappNumber] = useState('584149956831');
+
+      // Carga automática desde tu Google Sheet
+      useEffect(() => {
+        fetchSheetData();
+      }, []);
+
+      const fetchSheetData = async () => {
+        setLoading(true);
+        try {
+          const res = await fetch(GOOGLE_SHEET_ENDPOINT);
+          if (res.ok) {
+            const data = await res.json();
+            const items = Array.isArray(data) ? data : (data.products || data.items || []);
+            if (items.length > 0) {
+              const mapped = items.map((it, idx) => ({
+                id: String(it.id || it.codigo || idx + 1),
+                nombre: it.nombre || it.titulo || it.producto || 'Producto',
+                categoria: it.categoria || it.seccion || 'General',
+                precio: parseFloat(String(it.precio || it.precio_usd || it.precio_dolares || 0).replace(/[^0-9.]/g, '')) || 5.0,
+                descripcion: it.descripcion || it.detalles || '',
+                imagen: it.imagen || it.foto || it.url_imagen || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600',
+                whatsapp: it.whatsapp || '584149956831',
+                requisitos: it.requisitos || it.requisito || null,
+                stock: it.stock !== false && it.disponible !== false
+              }));
+              setProducts(mapped);
+              if (mapped[0]?.whatsapp) setWhatsappNumber(mapped[0].whatsapp);
+            }
+          }
+        } catch (e) {
+          console.log('Cargando productos locales:', e);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      const categories = useMemo(() => {
+        return ['todos', ...new Set(products.map(p => p.categoria))];
+      }, [products]);
+
+      const filteredProducts = useMemo(() => {
+        return products.filter(p => {
+          const matchesCat = selectedCategory === 'todos' || p.categoria.toLowerCase() === selectedCategory.toLowerCase();
+          const q = searchQuery.toLowerCase().trim();
+          const matchesQuery = !q || p.nombre.toLowerCase().includes(q) || (p.descripcion && p.descripcion.toLowerCase().includes(q));
+          return matchesCat && matchesQuery;
+        });
+      }, [products, selectedCategory, searchQuery]);
+
+      const addToCart = (product) => {
+        setCart(prev => {
+          const exist = prev.find(item => item.id === product.id);
+          if (exist) {
+            return prev.map(item => item.id === product.id ? { ...item, cantidad: item.cantidad + 1 } : item);
+          }
+          return [...prev, { ...product, cantidad: 1 }];
+        });
+        setIsCartOpen(true);
+      };
+
+      const handleDirectRequest = (product) => {
+        if (product.requisitos) {
+          setRequirementsProduct(product);
+        } else {
+          openWhatsAppProduct(product);
+        }
+      };
+
+      const openWhatsAppProduct = (product) => {
+        const text = `¡Hola! Vengo de su catálogo digital y deseo solicitar:\n\n*${product.nombre}*\n*Precio:* $${product.precio.toFixed(2)} USD\n*Ubicación:* Guanipa`;
+        window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`, '_blank');
+      };
+
+      const totalCart = cart.reduce((sum, it) => sum + it.precio * it.cantidad, 0);
+
+      const sendWhatsAppCart = () => {
+        let msg = `¡Hola! Deseo realizar el siguiente pedido en *Guanipa*:\n\n`;
+        cart.forEach(it => {
+          msg += `• *${it.cantidad}x* ${it.nombre} ($${(it.precio * it.cantidad).toFixed(2)} USD)\n`;
+        });
+        msg += `\n*TOTAL A PAGAR:* $${totalCart.toFixed(2)} USD\n(Consultar tasa oficial para Pago Móvil)\n\n¿Tienen disponibilidad para entrega o retiro en Calle Zea?`;
+        window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+      };
+
+      return (
+        <div className={`min-h-screen ${theme === 'light' ? 'theme-light bg-slate-50 text-slate-900' : 'bg-slate-950 text-slate-100'} pb-24`}>
+          {/* Header */}
+          <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 card-bg">
+            <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center font-black text-white text-lg shadow-md">
+                  G
+                </div>
+                <div>
+                  <h1 className="font-bold text-base text-main leading-tight flex items-center gap-1.5">
+                    <span>Catálogo Guanipa</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-semibold">$ USD</span>
+                  </h1>
+                  <p className="text-xs text-muted">San José de Guanipa • Entregas & Delivery</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setIsLocationOpen(true)}
+                  className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-700"
+                >
+                  <span className="text-red-400"><Icons.MapPin /></span>
+                  <span className="hidden sm:inline">Ubicación</span>
+                </button>
+
+                <button
+                  onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
+                  className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs transition-colors border border-slate-700"
+                  title="Cambiar tema claro / oscuro"
+                >
+                  {theme === 'dark' ? <Icons.Sun /> : <Icons.Moon />}
+                </button>
+
+                <button
+                  onClick={() => setIsCartOpen(true)}
+                  className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-2 shadow-lg active:scale-95 transition-all"
+                >
+                  <Icons.ShoppingBag />
+                  <span className="hidden sm:inline">Carrito</span>
+                  {cart.length > 0 && (
+                    <span className="w-5 h-5 rounded-full bg-white text-emerald-800 text-[11px] font-black flex items-center justify-center">
+                      {cart.reduce((a, b) => a + b.cantidad, 0)}
+                    </span>
+                  )}
+                </button>
+              </div>
+            </div>
+          </header>
+
+          {/* Contenido Principal */}
+          <main className="max-w-6xl mx-auto px-4 py-4 space-y-4">
+            {/* Buscador & Sugerencias */}
+            <div className="space-y-2">
+              <div className="relative">
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"><Icons.Search /></span>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Buscar productos, tazas, saldo, combos..."
+                  className="w-full pl-10 pr-10 py-2.5 rounded-2xl bg-slate-900 border border-slate-800 text-white placeholder:text-slate-500 text-sm focus:outline-none focus:border-emerald-500 input-bg text-main shadow-sm"
+                />
+                {searchQuery && (
+                  <button onClick={() => setSearchQuery('')} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-white">
+                    <Icons.X />
+                  </button>
+                )}
+              </div>
+
+              {/* Chips sugeridos */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                <span className="text-xs text-slate-400 font-semibold flex items-center gap-1 flex-shrink-0">
+                  <span className="text-amber-400"><Icons.Sparkles /></span> Sugerencias:
+                </span>
+                {SUGGESTIONS.map((sug, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setSearchQuery(sug.query === searchQuery ? '' : sug.query)}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1 flex-shrink-0 active:scale-95 ${
+                      searchQuery.toLowerCase() === sug.query.toLowerCase()
+                        ? 'bg-emerald-600 text-white ring-1 ring-emerald-400'
+                        : 'bg-slate-900 card-bg text-slate-300 border border-slate-800'
+                    }`}
+                  >
+                    <span>{sug.icon}</span>
+                    <span>{sug.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Categorías */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+              {categories.map((cat, i) => (
+                <button
+                  key={i}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold capitalize whitespace-nowrap transition-all flex-shrink-0 ${
+                    selectedCategory === cat
+                      ? 'bg-emerald-600 text-white shadow-md'
+                      : 'bg-slate-900 card-bg text-slate-300 border border-slate-800 hover:bg-slate-800'
+                  }`}
+                >
+                  {cat === 'todos' ? '🏪 Todos los productos' : cat}
+                </button>
+              ))}
+            </div>
+
+            {/* Contador y Actualizar */}
+            <div className="flex items-center justify-between text-xs text-muted">
+              <span>{filteredProducts.length} productos disponibles</span>
+              <button onClick={fetchSheetData} className="flex items-center gap-1 text-emerald-400 hover:underline">
+                <Icons.RotateCw /> {loading ? 'Actualizando...' : 'Actualizar catálogo'}
+              </button>
+            </div>
+
+            {/* Rejilla de Productos */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredProducts.map((prod) => (
+                <div key={prod.id} className="bg-slate-900 card-bg border border-slate-800 rounded-2xl overflow-hidden shadow-md flex flex-col justify-between hover:border-slate-700 transition-all">
+                  <div className="relative aspect-video w-full overflow-hidden bg-slate-950">
+                    <img src={prod.imagen} alt={prod.nombre} className="w-full h-full object-cover" />
+                    <span className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-lg bg-slate-950/80 backdrop-blur-md text-[11px] font-bold text-emerald-400 border border-slate-700">
+                      {prod.categoria}
+                    </span>
+                  </div>
+
+                  <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
+                    <div>
+                      <h3 className="font-bold text-base text-main">{prod.nombre}</h3>
+                      <p className="text-xs text-muted mt-1 line-clamp-2">{prod.descripcion}</p>
+                    </div>
+
+                    <div className="pt-2 border-t border-slate-800/60 flex items-center justify-between">
+                      <div>
+                        <div className="text-xs text-muted font-medium">Precio USD</div>
+                        <div className="text-xl font-black text-emerald-400">
+                          ${prod.precio.toFixed(2)}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => addToCart(prod)}
+                          className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-1 transition-colors border border-slate-700"
+                          title="Añadir al carrito"
+                        >
+                          <Icons.ShoppingBag />
+                        </button>
+                        <button
+                          onClick={() => handleDirectRequest(prod)}
+                          className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-md active:scale-95"
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </main>
+
+          {/* Pie de Página */}
+          <footer className="mt-12 py-8 text-center border-t border-slate-800/80 text-xs text-muted space-y-2">
+            <p className="font-semibold text-main">Catálogo Guanipa • San José de Guanipa, Anzoátegui</p>
+            <p>Atención directa por WhatsApp • Pagos en $ USD o en Bs por Pago Móvil a la tasa oficial</p>
+            <div className="flex items-center justify-center gap-3 pt-2">
+              <button onClick={() => setIsLocationOpen(true)} className="text-red-400 hover:underline flex items-center gap-1">
+                <Icons.MapPin /> Ver Ubicación en Guanipa
+              </button>
+            </div>
+          </footer>
+
+          {/* Modal de Ubicación */}
+          {isLocationOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+              <div className="bg-slate-900 border border-slate-800 card-bg rounded-2xl p-5 w-full max-w-md space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-red-400"><Icons.MapPin /></span>
+                    <h3 className="font-bold text-main text-base">Ubicación en San José de Guanipa</h3>
+                  </div>
+                  <button onClick={() => setIsLocationOpen(false)} className="text-slate-400 hover:text-white"><Icons.X /></button>
+                </div>
+
+                <div className="text-xs text-muted space-y-1 bg-slate-800/60 p-3 rounded-xl">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-main">📍 Dirección de entrega / retiro:</span>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard?.writeText(GOOGLE_MAPS_URL);
+                        setCopied(true);
+                        setTimeout(() => setCopied(false), 2000);
+                      }}
+                      className="text-[11px] text-emerald-400 hover:underline flex items-center gap-1"
+                    >
+                      {copied ? <Icons.Check /> : <Icons.Copy />}
+                      <span>{copied ? '¡Copiado!' : 'Copiar enlace'}</span>
+                    </button>
+                  </div>
+                  <p className="text-main font-semibold">Calle Zea, Sector Central, San José de Guanipa (El Tigrito).</p>
+                  <p>Referencia de fácil acceso para entregas personales y envíos motorizados.</p>
+                </div>
+
+                <div className="aspect-video w-full rounded-xl overflow-hidden border border-slate-800">
+                  <iframe
+                    title="Ubicación Guanipa"
+                    src={`https://www.openstreetmap.org/export/embed.html?bbox=-64.1800%2C8.8750%2C-64.1550%2C8.9000&layer=mapnik&marker=${GUANIPA_LAT}%2C${GUANIPA_LON}`}
+                    className="w-full h-full border-0"
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  <a
+                    href={GOOGLE_MAPS_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex-1 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-center font-bold text-xs text-white border border-slate-700"
+                  >
+                    Abrir en Google Maps
+                  </a>
+                  <button
+                    onClick={() => setIsLocationOpen(false)}
+                    className="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-bold text-xs text-white"
+                  >
+                    Entendido
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Modal de Requisitos Flotante */}
+          {requirementsProduct && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+              <div className="bg-slate-900 border border-slate-800 card-bg rounded-2xl p-5 w-full max-w-sm space-y-4">
+                <div className="flex items-center gap-2 text-amber-400">
+                  <Icons.AlertCircle />
+                  <h3 className="font-bold text-main text-base">Requisitos del Pedido</h3>
+                </div>
+
+                <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs space-y-2">
+                  <p className="font-bold text-amber-300">{requirementsProduct.nombre}</p>
+                  <p className="text-slate-300">{requirementsProduct.requisitos}</p>
+                  <p className="text-[11px] text-amber-400">Ten estos datos listos para enviarlos en tu mensaje de WhatsApp.</p>
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setRequirementsProduct(null)}
+                    className="flex-1 py-2 rounded-xl bg-slate-800 text-slate-300 font-bold text-xs"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={() => {
+                      const prod = requirementsProduct;
+                      setRequirementsProduct(null);
+                      openWhatsAppProduct(prod);
+                    }}
+                    className="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs"
+                  >
+                    Continuar a WhatsApp
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Carrito Lateral */}
+          {isCartOpen && (
+            <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/80 backdrop-blur-sm">
+              <div className="w-full max-w-md bg-slate-900 border-l border-slate-800 card-bg h-full flex flex-col justify-between p-5 overflow-y-auto">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                    <div className="flex items-center gap-2">
+                      <Icons.ShoppingBag />
+                      <h2 className="font-bold text-main text-base">Carrito de Compras</h2>
+                    </div>
+                    <button onClick={() => setIsCartOpen(false)} className="text-slate-400 hover:text-white"><Icons.X /></button>
+                  </div>
+
+                  {cart.length === 0 ? (
+                    <div className="py-12 text-center text-xs text-muted">
+                      Tu carrito está vacío. ¡Agrega productos del catálogo!
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {cart.map((item) => (
+                        <div key={item.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-800/60 card-bg border border-slate-800">
+                          <div>
+                            <div className="font-bold text-xs text-main">{item.nombre}</div>
+                            <div className="text-[11px] text-emerald-400">${item.precio.toFixed(2)} USD c/u</div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => setCart(c => c.map(it => it.id === item.id ? { ...it, cantidad: Math.max(1, it.cantidad - 1) } : it))}
+                              className="w-6 h-6 rounded bg-slate-700 text-white flex items-center justify-center text-xs font-bold"
+                            >
+                              -
+                            </button>
+                            <span className="text-xs font-bold text-main">{item.cantidad}</span>
+                            <button
+                              onClick={() => setCart(c => c.map(it => it.id === item.id ? { ...it, cantidad: it.cantidad + 1 } : it))}
+                              className="w-6 h-6 rounded bg-slate-700 text-white flex items-center justify-center text-xs font-bold"
+                            >
+                              +
+                            </button>
+                            <button
+                              onClick={() => setCart(c => c.filter(it => it.id !== item.id))}
+                              className="ml-2 text-red-400 hover:text-red-300"
+                            >
+                              <Icons.X />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {cart.length > 0 && (
+                  <div className="pt-4 border-t border-slate-800 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted">Total a pagar:</span>
+                      <span className="text-xl font-black text-emerald-400">${totalCart.toFixed(2)} USD</span>
+                    </div>
+                    <p className="text-[11px] text-muted">
+                      * El pago en Bolívares por Pago Móvil se calcula a la tasa oficial del día al enviar el mensaje.
+                    </p>
+                    <button
+                      onClick={sendWhatsAppCart}
+                      className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg flex items-center justify-center gap-2 transition-all active:scale-95"
+                    >
+                      <Icons.MessageCircle />
+                      <span>Pedir por WhatsApp</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
