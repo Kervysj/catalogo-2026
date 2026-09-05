@@ -2,600 +2,223 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>CATÁLOGO 2026 | Catálogo Digital de Productos y Servicios en San José de Guanipa</title>
-    <meta name="description" content="Catálogo digital de BRIDIGI MARKET en San José de Guanipa. Productos, recargas, streaming y servicios con pedidos directos por WhatsApp y delivery a domicilio.">
-
-    <!-- Open Graph / redes sociales -->
-    <meta property="og:title" content="CATÁLOGO | Catálogo Digital">
-    <meta property="og:description" content="Explora nuestro catálogo de productos y servicios en San José de Guanipa. Pide directo por WhatsApp con delivery a domicilio.">
-    <meta property="og:type" content="website">
-    <meta property="og:locale" content="es_VE">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="BRIDIGI MARKET | Catálogo Digital">
-    <meta name="twitter:description" content="Explora nuestro catálogo de productos y servicios en San José de Guanipa. Pide directo por WhatsApp con delivery a domicilio.">
-
-    <!-- Datos estructurados para buscadores -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "LocalBusiness",
-        "name": "BRIDIGI MARKET",
-        "telephone": "+584149956831",
-        "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "Calle Zea entre Unión y Democracia, frente a la Plaza Bolívar, al lado de Mi Plazita",
-            "addressLocality": "San José de Guanipa",
-            "addressRegion": "Anzoátegui",
-            "addressCountry": "VE"
-        },
-        "geo": {
-            "@type": "GeoCoordinates",
-            "latitude": 8.8864,
-            "longitude": -64.1532
-        }
-    }
-    </script>
-
-    <!-- Configuración para PWA -->
-    <meta name="theme-color" content="#2563eb">
-    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,{
-        %22name%22: %22Catálogo Digital%22,
-        %22short_name%22: %22Catálogo%22,
-        %22start_url%22: %22.%22,
-        %22display%22: %22standalone%22,
-        %22background_color%22: %22%23f8fafc%22,
-        %22theme_color%22: %22%232563eb%22,
-        %22icons%22: [{%22src%22: %22https://cdn-icons-png.flaticon.com/512/1170/1170576.png%22, %22sizes%22: %22512x512%22, %22type%22: %22image/png%22}]
-    }">
-    
-    <!-- Fuente moderna e iconos -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BridigiStore - Catálogo Digital</title>
+    <!-- FontAwesome para Iconos Modernos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
         :root {
-            --primary-color: #2563eb;       
-            --primary-hover: #1d4ed8;     
-            --danger-color: #dc2626;        
-            --danger-hover: #b91c1c;
-            --gaming-color: #06b6d4;        
-            --special-cat-color: #9333ea;   
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
-            --card-bg-rgb: 255, 255, 255;
-            --text-main: #0f172a;
+            --text-main: #1e293b;
             --text-muted: #64748b;
             --border-color: #e2e8f0;
-            --shadow-subtle: 0 4px 6px -1px rgb(0 0 0 / 0.04), 0 2px 4px -2px rgb(0 0 0 / 0.04);
-            --shadow-hover: 0 20px 25px -5px rgb(37 99 235 / 0.12), 0 8px 10px -6px rgb(37 99 235 / 0.08);
-            --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            --nav-height: 68px;
+            --danger-color: #ef4444;
+            --success-color: #22c55e;
+            --transition-smooth: all 0.25s ease;
         }
 
-        body.dark-mode {
-            --primary-color: #3b82f6;
-            --primary-hover: #60a5fa;
-            --danger-color: #ef4444;
-            --danger-hover: #f87171;
-            --special-cat-color: #a855f7;
+        [data-theme="dark"] {
+            --primary-color: #6366f1;
+            --primary-hover: #818cf8;
             --bg-color: #0f172a;
             --card-bg: #1e293b;
-            --card-bg-rgb: 30, 41, 59;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --border-color: #334155;
-            --shadow-subtle: 0 4px 6px -1px rgb(0 0 0 / 0.2), 0 2px 4px -2px rgb(0 0 0 / 0.2);
-            --shadow-hover: 0 20px 25px -5px rgb(59 130 246 / 0.15), 0 8px 10px -6px rgb(59 130 246 / 0.1);
         }
 
-        body.dark-mode .info-badge, 
-        body.dark-mode .search-input, 
-        body.dark-mode .filter-btn, 
-        body.dark-mode .modal-content, 
-        body.dark-mode .route-info-box, 
-        body.dark-mode .assistant-chat-container, 
-        body.dark-mode .assistant-chat-header, 
-        body.dark-mode .assistant-chat-body, 
-        body.dark-mode .assistant-product-card {
-            background-color: #1e293b;
-            color: #f8fafc;
-        }
-
-        body.dark-mode .filter-btn.special-filter {
-            background: linear-gradient(135deg, #1e293b 0%, #2e1065 100%);
-            color: #c084fc;
-        }
-
-        body.dark-mode .card, 
-        body.dark-mode .skeleton-card, 
-        body.dark-mode .cart-item-row, 
-        body.dark-mode .checkout-form-input, 
-        body.dark-mode .checkout-form-textarea {
-            border-color: #334155;
-            background-color: #1e293b;
-        }
-        
-        body.dark-mode .checkout-form-input, 
-        body.dark-mode .checkout-form-textarea {
-            color: #f8fafc;
-            background: #0f172a;
-        }
-
-        body.dark-mode .skeleton-img, 
-        body.dark-mode .skeleton-line, 
-        body.dark-mode .modal-img-container {
-            background-color: #334155;
-        }
-
-        body.dark-mode .recharge-alert-box {
-            background-color: #451a03;
-            border-color: #78350f;
-            color: #fde68a;
-        }
-
-        /* Tema Switch */
-        .theme-switch-container {
-            position: fixed;
-            top: 16px;
-            right: 16px;
-            z-index: 1001;
-        }
-
-        .theme-switch-btn {
-            background: var(--card-bg);
-            border: 2px solid var(--border-color);
-            color: var(--text-main);
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: var(--shadow-subtle);
-            transition: var(--transition-smooth);
-            font-size: 1.1rem;
-            backdrop-filter: blur(8px);
-            background: rgba(var(--card-bg-rgb), 0.85);
-        }
-
-        .theme-switch-btn:hover {
-            transform: scale(1.1) rotate(15deg);
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-        }
-
-        .theme-switch-btn:active {
-            transform: scale(0.92);
-        }
-
-        /* Temporadas */
-        body.season-valentines { --primary-color: #e11d48; --primary-hover: #be123c; --danger-color: #f43f5e; }
-        body.season-carnival { --primary-color: #7c3aed; --primary-hover: #6d28d9; --gaming-color: #db2777; }
-        body.season-christmas { --primary-color: #15803d; --primary-hover: #166534; --danger-color: #b91c1c; }
-
-        .seasonal-banner {
-            background: linear-gradient(135deg, var(--danger-color), var(--primary-color));
-            color: white;
-            text-align: center;
-            padding: 10px 15px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            position: relative;
-            z-index: 100;
-            animation: slideDown 0.5s ease;
-        }
-        .seasonal-banner.show { display: flex; }
-
-        @keyframes slideDown {
-            from { transform: translateY(-100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .news-banner-bar {
-            background: var(--primary-color);
-            color: white;
-            text-align: center;
-            padding: 8px 15px;
-            font-size: 0.85rem;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            position: relative;
-            z-index: 1002;
-            font-weight: 500;
-            animation: slideDown 0.5s ease;
-        }
-        .news-banner-bar.show { display: flex; }
-
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            font-family: 'Inter', sans-serif; 
-            -webkit-tap-highlight-color: transparent;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
-            padding: 16px;
-            padding-bottom: calc(var(--nav-height) + 20px);
-            opacity: 0;
-            animation: fadeInBody 0.6s ease forwards;
-            transition: background-color 0.3s ease, color 0.3s ease;
             min-height: 100vh;
-            min-height: 100dvh;
+            /* Padding inferior vital para que la barra inferior no tape contenido */
+            padding-bottom: 95px !important;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        @keyframes fadeInBody { 
-            to { opacity: 1; } 
-        }
-
-        header { 
-            text-align: center; 
-            margin-bottom: 20px; 
-            padding-top: 10px;
-        }
-
-        header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 6px;
-            letter-spacing: -0.02em;
-            background: linear-gradient(135deg, var(--danger-color) 0%, var(--primary-color) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        header p { 
-            color: var(--text-muted); 
-            font-size: 0.9rem;
-        }
-
-        .info-badges-container {
-            max-width: 800px;
-            margin: 0 auto 20px auto;
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 900;
             display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-            padding: 0 4px;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
 
-        .info-badge {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 8px 14px;
-            border-radius: 12px;
+        .logo-area {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 0.8rem;
-            font-weight: 600;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            background: none;
+            border: 1px solid var(--border-color);
             color: var(--text-main);
-            box-shadow: var(--shadow-subtle);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
             transition: var(--transition-smooth);
-            text-decoration: none;
-            flex: 1 1 auto;
-            min-width: 120px;
-            justify-content: center;
-            backdrop-filter: blur(4px);
-            background: rgba(var(--card-bg-rgb), 0.85);
         }
 
-        .info-badge:hover {
+        .icon-btn:hover {
             border-color: var(--primary-color);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.15);
+            color: var(--primary-color);
         }
 
-        .info-badge:active {
-            transform: scale(0.95);
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
         }
 
-        .info-badge i { 
-            font-size: 1rem; 
-            color: var(--primary-color); 
-        }
-        .info-badge.red-icon i { 
-            color: var(--danger-color); 
-        }
-
-        .info-badge.gaming-badge {
-            border-color: rgba(6, 182, 212, 0.4);
-            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(6, 182, 212, 0.08) 100%);
+        /* Buscador y Filtros */
+        .search-filter-container {
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .info-badge.gaming-badge i { 
-            color: #0891b2; 
-        }
-
-        /* Búsqueda */
-        .search-container {
-            max-width: 520px;
-            margin: 0 auto 12px auto;
+        .search-bar {
             position: relative;
-            transition: var(--transition-smooth);
-        }
-
-        .search-container:focus-within { 
-            transform: scale(1.01); 
-        }
-
-        .search-input {
             width: 100%;
-            padding: 13px 18px 13px 46px;
-            border-radius: 30px;
-            border: 2px solid var(--border-color);
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 16px 12px 42px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-main);
             font-size: 0.95rem;
             outline: none;
             transition: var(--transition-smooth);
-            background-color: var(--card-bg);
-            box-shadow: var(--shadow-subtle);
-            color: var(--text-main);
-            backdrop-filter: blur(4px);
-            background: rgba(var(--card-bg-rgb), 0.85);
         }
 
-        .search-input:focus {
+        .search-bar input:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1), var(--shadow-subtle);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
         }
 
-        .search-icon {
+        .search-bar i {
             position: absolute;
-            left: 18px;
+            left: 15px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-muted);
-            font-size: 1rem;
-            transition: var(--transition-smooth);
-            pointer-events: none;
         }
 
-        .search-input:focus ~ .search-icon {
-            color: var(--primary-color);
-            transform: translateY(-50%) scale(1.1);
-        }
-
-        .subcategory-container {
-            max-width: 520px;
-            margin: 0 auto 18px auto;
-        }
-
-        .subcategory-select {
-            width: 100%;
-            padding: 11px 18px;
-            border-radius: 25px;
-            border: 2px solid var(--border-color);
-            font-size: 0.9rem;
-            outline: none;
-            transition: var(--transition-smooth);
-            background-color: var(--card-bg);
-            box-shadow: var(--shadow-subtle);
-            color: var(--text-main);
-            cursor: pointer;
-            backdrop-filter: blur(4px);
-            background: rgba(var(--card-bg-rgb), 0.85);
-        }
-
-        .subcategory-select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1), var(--shadow-subtle);
-        }
-
-        .filters {
+        .categories-scroll {
             display: flex;
-            justify-content: center;
             gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 28px;
-            padding: 0 4px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: none;
         }
 
-        .filter-btn {
-            background-color: var(--card-bg);
-            border: 2px solid var(--border-color);
-            padding: 8px 16px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.8rem;
+        .categories-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .cat-chip {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
             color: var(--text-muted);
-            transition: var(--transition-smooth);
-            box-shadow: var(--shadow-subtle);
-            backdrop-filter: blur(4px);
-            background: rgba(var(--card-bg-rgb), 0.85);
-            white-space: nowrap;
-        }
-
-        .filter-btn:hover {
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-            transform: translateY(-2px);
-        }
-
-        .filter-btn:active {
-            transform: scale(0.95);
-        }
-
-        .filter-btn.active {
-            background-color: var(--primary-color);
-            color: #ffffff;
-            border-color: var(--primary-color);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-        }
-
-        .filter-btn.special-filter {
-            border-color: rgba(147, 51, 234, 0.4);
-            color: var(--special-cat-color);
-            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(147, 51, 234, 0.08) 100%);
-        }
-
-        .filter-btn.special-filter.active {
-            background-color: var(--special-cat-color);
-            color: #ffffff;
-            border-color: var(--special-cat-color);
-        }
-
-        .filter-btn.fav-filter {
-            border-color: rgba(245, 158, 11, 0.4);
-            color: #d97706;
-            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(245, 158, 11, 0.08) 100%);
-        }
-
-        .filter-btn.fav-filter.active {
-            background-color: #d97706;
-            color: #ffffff;
-            border-color: #d97706;
-        }
-
-        .filter-btn.recent-filter {
-            border-color: rgba(6, 182, 212, 0.4);
-            color: #0891b2;
-            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(6, 182, 212, 0.08) 100%);
-        }
-
-        .filter-btn.recent-filter.active {
-            background-color: #0891b2;
-            color: #ffffff;
-            border-color: #0891b2;
-        }
-
-        /* Grid */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .subcat-group-title {
-            grid-column: 1 / -1;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
             font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--text-main);
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            padding: 6px 4px;
-            margin-top: 6px;
-            border-bottom: 2px solid var(--border-color);
-        }
-        .subcat-group-title i { 
-            color: var(--primary-color); 
-        }
-        .subcat-group-title:first-child { 
-            margin-top: 0; 
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: var(--transition-smooth);
         }
 
-        @keyframes cardEntrance {
-            from { opacity: 0; transform: translateY(20px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+        .cat-chip.active, .cat-chip:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
         }
 
-        .card {
-            background-color: var(--card-bg);
+        /* Grid de Productos */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                gap: 1.5rem;
+            }
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
             border-radius: 16px;
             overflow: hidden;
-            box-shadow: var(--shadow-subtle);
-            transition: var(--transition-smooth);
-            cursor: pointer;
             display: flex;
             flex-direction: column;
+            transition: var(--transition-smooth);
             position: relative;
-            border: 1px solid var(--border-color);
-            animation: cardEntrance 0.5s ease forwards;
-            will-change: transform;
-            contain: layout style;
-            backdrop-filter: blur(4px);
-            background: rgba(var(--card-bg-rgb), 0.9);
         }
 
-        .card:hover {
-            transform: translateY(-6px);
-            box-shadow: var(--shadow-hover);
-            border-color: rgba(37, 99, 235, 0.3);
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
         }
 
-        .card:active {
-            transform: scale(0.98);
-        }
-
-        .card-img-container {
+        .product-img-container {
             width: 100%;
-            height: 200px;
-            overflow: hidden;
-            background: var(--border-color);
+            height: 160px;
+            background: #e2e8f0;
             position: relative;
+            overflow: hidden;
         }
 
-        .card img {
+        .product-img-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            will-change: transform;
+            transition: transform 0.3s ease;
         }
 
-        .card:hover img { 
-            transform: scale(1.05); 
+        .product-card:hover .product-img-container img {
+            transform: scale(1.05);
         }
 
-        .card-top-actions {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            display: flex;
-            gap: 6px;
-            z-index: 5;
-        }
-
-        .card-action-icon-btn {
-            background: rgba(15, 23, 42, 0.7);
-            color: #ffffff;
-            border: none;
-            border-radius: 50%;
-            width: 34px;
-            height: 34px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: var(--transition-smooth);
-            backdrop-filter: blur(4px);
-            font-size: 0.9rem;
-        }
-
-        .card-action-icon-btn:hover {
-            background: var(--primary-color);
-            transform: scale(1.1);
-        }
-
-        .card-action-icon-btn:active {
-            transform: scale(0.9);
-        }
-
-        .card-action-icon-btn.fav-active { 
-            color: #f59e0b; 
-        }
-
-        .card-body {
-            padding: 16px;
+        .product-info {
+            padding: 12px;
             display: flex;
             flex-direction: column;
             flex-grow: 1;
@@ -603,417 +226,498 @@
             gap: 8px;
         }
 
-        .card-category {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: var(--danger-color);
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .card-subcat {
-            color: var(--text-muted);
+        .product-title {
+            font-size: 0.95rem;
             font-weight: 600;
-        }
-
-        .card-title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 4px;
             color: var(--text-main);
-            transition: color 0.2s;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
 
-        .card:hover .card-title { 
-            color: var(--primary-color); 
-        }
-
-        .card-price {
-            font-size: 1.2rem;
+        .product-price {
+            font-size: 1.05rem;
             font-weight: 700;
-            color: #059669;
-            margin-bottom: 4px;
+            color: var(--primary-color);
         }
 
-        .card-hint {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-align: center;
+        .btn-add {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+        }
+
+        .btn-add:hover {
+            background: var(--primary-hover);
+        }
+
+        /* --- NUEVA BARRA DE NAVEGACIÓN INFERIOR (Estilo App Nativa) --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background: var(--card-bg);
             border-top: 1px solid var(--border-color);
-            padding-top: 8px;
-            font-weight: 500;
-            transition: color 0.2s;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+            padding: 0 10px;
         }
 
-        .card:hover .card-hint { 
-            color: var(--primary-color); 
-        }
-
-        /* Skeleton */
-        @keyframes pulseSkeleton {
-            0% { opacity: 0.5; transform: scale(0.98); }
-            50% { opacity: 1; transform: scale(1); }
-            100% { opacity: 0.5; transform: scale(0.98); }
-        }
-
-        .skeleton-card {
-            background-color: var(--card-bg);
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-            height: 340px;
+        .bottom-nav-item {
+            background: none;
+            border: none;
             display: flex;
             flex-direction: column;
-            animation: pulseSkeleton 1.8s infinite ease-in-out;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            flex-grow: 1;
+            height: 100%;
+            position: relative;
         }
 
-        .skeleton-img { 
-            width: 100%; 
-            height: 200px; 
-            background-color: var(--border-color); 
+        .bottom-nav-item i {
+            font-size: 1.25rem;
+            transition: transform 0.2s ease;
         }
-        .skeleton-body { 
-            padding: 16px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px; 
-            flex-grow: 1; 
-        }
-        .skeleton-line { 
-            height: 12px; 
-            background-color: var(--border-color); 
-            border-radius: 4px; 
-        }
-        .skeleton-line.short { width: 35%; }
-        .skeleton-line.medium { width: 65%; }
-        .skeleton-line.long { width: 100%; }
 
-        /* Modales */
-        .modal {
-            display: none;
+        .bottom-nav-item:hover, .bottom-nav-item.active {
+            color: var(--primary-color);
+        }
+
+        .bottom-nav-item:active i {
+            transform: scale(0.9);
+        }
+
+        .bottom-nav-badge {
+            position: absolute;
+            top: 10px;
+            right: calc(50% - 16px);
+            background: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.65rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        /* Modales Generales */
+        .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(10px);
-            justify-content: center;
-            align-items: center;
-            padding: 16px;
-            z-index: 1000;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: flex-end;
+            z-index: 2000;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            visibility: hidden;
+            transition: all 0.3s ease;
         }
 
-        .modal.active { 
-            display: flex; 
-            opacity: 1; 
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
         }
 
-        .modal-content {
-            background-color: var(--card-bg);
-            color: var(--text-main);
-            border-radius: 20px;
-            max-width: 480px;
+        @media (min-width: 768px) {
+            .modal-overlay {
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        .modal-container {
+            background: var(--card-bg);
             width: 100%;
-            overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.35);
-            transform: scale(0.92) translateY(20px);
-            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-            max-height: 95vh;
+            max-height: 90vh;
+            border-radius: 20px 20px 0 0;
+            padding: 1.5rem;
             display: flex;
             flex-direction: column;
-            backdrop-filter: blur(4px);
-            background: rgba(var(--card-bg-rgb), 0.95);
-        }
-
-        .modal.active .modal-content { 
-            transform: scale(1) translateY(0); 
-        }
-
-        .modal-img-container {
-            width: 100%;
-            height: 260px;
-            background: var(--border-color);
-            overflow: hidden;
-            position: relative;
-            cursor: zoom-in;
-            flex-shrink: 0;
-        }
-
-        .modal-img-container.zoomed { 
-            cursor: zoom-out; 
-        }
-
-        .modal-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            transform-origin: center center;
-            will-change: transform;
-        }
-
-        .zoom-hint-badge {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(15, 23, 42, 0.7);
-            color: #fff;
-            padding: 4px 10px;
-            border-radius: 16px;
-            font-size: 0.7rem;
-            font-weight: 500;
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            backdrop-filter: blur(4px);
-        }
-
-        .modal-body {
-            padding: 20px;
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: rgba(15, 23, 42, 0.7);
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            cursor: pointer;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition-smooth);
-            z-index: 10;
-            backdrop-filter: blur(4px);
-        }
-
-        .modal-close:hover {
-            background: var(--danger-color);
-            transform: rotate(90deg) scale(1.1);
-        }
-
-        .modal-close:active {
-            transform: scale(0.9);
-        }
-
-        .modal-title { 
-            font-size: 1.3rem; 
-            font-weight: 700; 
-            margin-bottom: 4px; 
-            color: var(--text-main); 
-        }
-        .modal-code { 
-            font-size: 0.8rem; 
-            color: var(--text-muted); 
-            margin-bottom: 8px; 
-            font-weight: 600; 
-        }
-        .modal-price { 
-            font-size: 1.3rem; 
-            color: #059669; 
-            font-weight: 700; 
-            margin-bottom: 12px; 
-        }
-        .modal-desc {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-bottom: 16px;
-            line-height: 1.6;
-            max-height: 120px;
+            gap: 1rem;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             overflow-y: auto;
         }
 
-        .recharge-alert-box {
-            background-color: #fffbeb;
-            border: 1px solid #fde68a;
-            border-radius: 10px;
-            padding: 10px 14px;
-            margin-bottom: 16px;
-            font-size: 0.85rem;
-            color: #92400e;
+        @media (min-width: 768px) {
+            .modal-container {
+                max-width: 500px;
+                border-radius: 20px;
+                transform: translateY(20px);
+            }
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: translateY(0);
+        }
+
+        .modal-header {
             display: flex;
-            gap: 10px;
-            align-items: flex-start;
-        }
-
-        .recharge-alert-box i { 
-            color: #d97706; 
-            font-size: 1rem; 
-            margin-top: 2px; 
-        }
-
-        .modal-actions { 
-            display: flex; 
-            gap: 8px; 
-            flex-direction: column; 
-        }
-        .modal-actions-row { 
-            display: flex; 
-            gap: 8px; 
-        }
-
-        .whatsapp-btn, .cart-add-btn, .pdf-btn {
-            display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            gap: 8px;
-            flex-grow: 1;
-            text-align: center;
-            padding: 12px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.95rem;
-            transition: var(--transition-smooth);
-            border: none;
-            cursor: pointer;
-            color: white;
-            will-change: transform;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
         }
 
-        .whatsapp-btn { 
-            background-color: #25d366; 
-            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); 
-        }
-        .whatsapp-btn:hover { 
-            background-color: #20ba5a; 
-            transform: translateY(-2px); 
-        }
-        .whatsapp-btn:active { 
-            transform: scale(0.97); 
-        }
-
-        .cart-add-btn { 
-            background-color: var(--primary-color); 
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); 
-        }
-        .cart-add-btn:hover { 
-            background-color: var(--primary-hover); 
-            transform: translateY(-2px); 
-        }
-        .cart-add-btn:active { 
-            transform: scale(0.97); 
-        }
-
-        .pdf-btn { 
-            background-color: var(--danger-color); 
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3); 
-        }
-        .pdf-btn:hover { 
-            background-color: var(--danger-hover); 
-            transform: translateY(-2px); 
-        }
-        .pdf-btn:active { 
-            transform: scale(0.97); 
-        }
-
-        .modal-share-btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0 14px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: var(--transition-smooth);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-        }
-        .modal-share-btn:hover { 
-            background-color: var(--primary-hover); 
-            transform: translateY(-2px); 
-        }
-        .modal-share-btn:active { 
-            transform: scale(0.95); 
-        }
-
-        .modal-fav-btn {
-            background-color: var(--card-bg);
+        .modal-header h3 {
+            font-size: 1.2rem;
             color: var(--text-main);
-            border: 2px solid var(--border-color);
-            padding: 0 14px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: var(--transition-smooth);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(4px);
-            background: rgba(var(--card-bg-rgb), 0.85);
-        }
-        .modal-fav-btn:hover { 
-            border-color: #f59e0b; 
-            transform: translateY(-2px); 
-        }
-        .modal-fav-btn:active { 
-            transform: scale(0.95); 
-        }
-        .modal-fav-btn.fav-active { 
-            color: #f59e0b; 
-            border-color: #f59e0b; 
         }
 
-        .modal-tiktok-btn {
-            background-color: #000000;
+        /* Aviso de conexión red (Mejora PWA util) */
+        #offline-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: var(--danger-color);
             color: white;
-            border: none;
-            padding: 0 14px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: var(--transition-smooth);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            text-align: center;
+            font-size: 0.8rem;
+            padding: 4px;
+            z-index: 3000;
+            display: none;
+            font-weight: 600;
         }
-        .modal-tiktok-btn:hover { 
-            background-color: #25f4ee; 
-            color: #000000; 
-            transform: translateY(-2px); 
-        }
-        .modal-tiktok-btn:active { 
-            transform: scale(0.95); 
+    </style>
+</head>
+<body data-theme="light">
+
+    <div id="offline-banner">Sin conexión a Internet. Estás viendo el modo offline.</div>
+
+    <!-- Cabecera -->
+    <header>
+        <div class="logo-area">
+            <i class="fa-solid fa-store"></i>
+            <span>BridigiStore</span>
+        </div>
+        <div class="header-actions">
+            <button class="icon-btn" onclick="toggleTheme()" aria-label="Cambiar Tema" title="Cambiar Tema">
+                <i id="theme-icon" class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="container">
+        <!-- Buscador y Filtros -->
+        <div class="search-filter-container">
+            <div class="search-bar">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" placeholder="Buscar productos en el catálogo..." oninput="filtrarProductos()">
+            </div>
+            <div class="categories-scroll" id="categoriesContainer">
+                <button class="cat-chip active" onclick="filtrarPorCategoria('todos', this)">Todos</button>
+                <button class="cat-chip" onclick="filtrarPorCategoria('sublimacion', this)">Sublimación</button>
+                <button class="cat-chip" onclick="filtrarPorCategoria('papeleria', this)">Papelería</button>
+                <button class="cat-chip" onclick="filtrarPorCategoria('accesorios', this)">Accesorios</button>
+            </div>
+        </div>
+
+        <!-- Grid de Productos -->
+        <div class="products-grid" id="productsGrid">
+            <!-- Los productos se cargan dinámicamente o por defecto -->
+        </div>
+    </main>
+
+    <!-- Barra de Navegación Inferior (Optimizada y Ergonómica) -->
+    <nav class="bottom-nav" aria-label="Navegación principal">
+        <button class="bottom-nav-item active" onclick="resetFiltrosYScroll()">
+            <i class="fa-solid fa-house"></i>
+            <span>Inicio</span>
+        </button>
+        <button class="bottom-nav-item" onclick="abrirModalAsistente()">
+            <i class="fa-solid fa-robot"></i>
+            <span>Asistente</span>
+        </button>
+        <button class="bottom-nav-item" onclick="abrirModalCarrito()">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span>Carrito</span>
+            <span id="bottom-cart-badge" class="bottom-nav-badge" style="display: none;">0</span>
+        </button>
+        <button class="bottom-nav-item" onclick="abrirModalUbicacion()">
+            <i class="fa-solid fa-location-dot"></i>
+            <span>Ubicación</span>
+        </button>
+        <button class="bottom-nav-item" onclick="window.open('https://wa.me/+584149956831?text=Hola,%20vengo%20desde%20el%20catálogo%20digital', '_blank')">
+            <i class="fa-brands fa-whatsapp" style="color: #25d366;"></i>
+            <span>WhatsApp</span>
+        </button>
+    </nav>
+
+    <!-- Modal Carrito -->
+    <div class="modal-overlay" id="modalCarrito">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>Tu Carrito de Compras</h3>
+                <button class="icon-btn" onclick="cerrarModalCarrito()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="contenidoCarrito" style="display: flex; flex-direction: column; gap: 10px; max-height: 50vh; overflow-y: auto;">
+                <!-- Items del carrito -->
+            </div>
+            <div style="border-top: 1px solid var(--border-color); padding-top: 10px; display: flex; justify-content: space-between; font-weight: 700; font-size: 1.1rem;">
+                <span>Total:</span>
+                <span id="totalCarritoVal">$0.00</span>
+            </div>
+            <button class="btn-add" style="background: var(--success-color); padding: 12px;" onclick="enviarPedidoWhatsApp()">
+                <i class="fa-brands fa-whatsapp"></i> Finalizar Pedido por WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal Asistente -->
+    <div class="modal-overlay" id="modalAsistente">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>Asistente Virtual BridigiStore</h3>
+                <button class="icon-btn" onclick="cerrarModalAsistente()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">¿Tienes dudas sobre algún diseño, servicio o presupuesto? Escríbenos directamente o consulta las opciones rápidas.</p>
+            <button class="btn-add" onclick="window.open('https://wa.me/+584149956831?text=Hola,%20necesito%20soporte%20del%20asistente', '_blank')">
+                <i class="fa-brands fa-whatsapp"></i> Chatear con Soporte
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal Ubicación -->
+    <div class="modal-overlay" id="modalUbicacion">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>Ubicación de la Tienda</h3>
+                <button class="icon-btn" onclick="cerrarModalUbicacion()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p style="color: var(--text-main); font-size: 0.95rem; line-height: 1.5;">
+                <i class="fa-solid fa-map-pin" style="color: var(--primary-color);"></i> <strong>Dirección física:</strong><br>
+                Calle Zea, en frente de Plaza Bolívar, al lado de Mi Plazita, El Tigrito, San José de Guanipa, Anzoátegui.
+            </p>
+            <button class="btn-add" onclick="cerrarModalUbicacion()">Entendido</button>
+        </div>
+    </div>
+
+    <script>
+        // --- BASE DE DATOS DE PRODUCTOS DE EJEMPLO (Compatible con tu catálogo) ---
+        const productos = [
+            { id: 1, nombre: "Taza Mágica Sublimada Personalizada", categoria: "sublimacion", precio: 8.50, imagen: "https://images.unsplash.com/photo-1514228742587-6b1558fcca13?w=500" },
+            { id: 2, nombre: "Mousepad Ergonómico con Diseño", categoria: "accesorios", precio: 5.00, imagen: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=500" },
+            { id: 3, nombre: "Combo Papelería Escolar Completo", categoria: "papeleria", precio: 12.00, imagen: "https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=500" },
+            { id: 4, nombre: "Gorra Trucker Personalizada", categoria: "sublimacion", precio: 7.00, imagen: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=500" }
+        ];
+
+        let carrito = [];
+        let categoriaActual = 'todos';
+
+        // Inicializar renderizado al cargar
+        document.addEventListener('DOMContentLoaded', () => {
+            renderizarProductos(productos);
+            actualizarContadorCarrito();
+            chequearConexion();
+            window.addEventListener('online', chequearConexion);
+            window.addEventListener('offline', chequearConexion);
+        });
+
+        function renderizarProductos(lista) {
+            const grid = document.getElementById('productsGrid');
+            if (lista.length === 0) {
+                grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 2rem;">No se encontraron productos.</p>`;
+                return;
+            }
+            grid.innerHTML = lista.map(p => `
+                <div class="product-card">
+                    <div class="product-img-container">
+                        <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
+                    </div>
+                    <div class="product-info">
+                        <span class="product-title">${p.nombre}</span>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+                            <span class="product-price">$${p.precio.toFixed(2)}</span>
+                        </div>
+                        <button class="btn-add" onclick="agregarAlCarrito(${p.id})">
+                            <i class="fa-solid fa-cart-plus"></i> Comprar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        .modal-related-container { 
-            margin-top: 16px; 
+        function filtrarProductos() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtrados = productos.filter(p => {
+                const coincideTexto = p.nombre.toLowerCase().includes(query);
+                const coincideCat = categoriaActual === 'todos' || p.categoria === categoriaActual;
+                return coincideTexto && coincideCat;
+            });
+            renderizarProductos(filtrados);
         }
-        .modal-related-title {
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            border-top: 1px solid var(--border-color);
-            padding-top: 12px;
+
+        function filtrarPorCategoria(cat, elemento) {
+            categoriaActual = cat;
+            document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+            elemento.classList.add('active');
+            filtrarProductos();
         }
-        .modal-related-list {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-            scrollbar-width: thin;
+
+        function resetFiltrosYScroll() {
+            document.getElementById('searchInput').value = '';
+            categoriaActual = 'todos';
+            document.querySelectorAll('.cat-chip').forEach((c, idx) => {
+                if(idx === 0) c.classList.add('active');
+                else c.classList.remove('active');
+            });
+            renderizarProductos(productos);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-        .modal-related-card {
-            flex:
+
+        // --- LÓGICA DEL CARRITO ---
+        function agregarAlCarrito(id) {
+            const producto = productos.find(p => p.id === id);
+            const index = carrito.findIndex(item => item.id === id);
+            if (index > -1) {
+                carrito[index].cantidad += 1;
+            } else {
+                carrito.push({ ...producto, cantidad: 1 });
+            }
+            actualizarContadorCarrito();
+            
+            // Feedback visual sutil de éxito al agregar
+            const badge = document.getElementById('bottom-cart-badge');
+            badge.style.transform = 'scale(1.3)';
+            setTimeout(() => badge.style.transform = 'scale(1)', 200);
+        }
+
+        function actualizarContadorCarrito() {
+            const totalItems = carrito.reduce((acc, item) => acc + item.cantidad, 0);
+            const bottomBadge = document.getElementById('bottom-cart-badge');
+            if (bottomBadge) {
+                if (totalItems > 0) {
+                    bottomBadge.innerText = totalItems;
+                    bottomBadge.style.display = 'flex';
+                } else {
+                    bottomBadge.style.display = 'none';
+                }
+            }
+        }
+
+        function abrirModalCarrito() {
+            const contenedor = document.getElementById('contenidoCarrito');
+            const totalVal = document.getElementById('totalCarritoVal');
+            
+            if (carrito.length === 0) {
+                contenedor.innerHTML = `<p style="text-align: center; color: var(--text-muted); padding: 1.5rem;">Tu carrito está vacío.</p>`;
+                totalVal.innerText = "$0.00";
+            } else {
+                let total = 0;
+                contenedor.innerHTML = carrito.map(item => {
+                    const subtotal = item.precio * item.cantidad;
+                    total += subtotal;
+                    return `
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                            <div>
+                                <h4 style="font-size: 0.9rem; color: var(--text-main);">${item.nombre}</h4>
+                                <small style="color: var(--text-muted);">$${item.precio.toFixed(2)} x ${item.cantidad}</small>
+                            </div>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <span style="font-weight: 700; font-size: 0.95rem;">$${subtotal.toFixed(2)}</span>
+                                <button class="icon-btn" style="width: 28px; height: 28px;" onclick="cambiarCantidad(${item.id}, -1)"><i class="fa-solid fa-minus"></i></button>
+                                <button class="icon-btn" style="width: 28px; height: 28px;" onclick="cambiarCantidad(${item.id}, 1)"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                totalVal.innerText = `$${total.toFixed(2)}`;
+            }
+            document.getElementById('modalCarrito').classList.add('active');
+        }
+
+        function cerrarModalCarrito() {
+            document.getElementById('modalCarrito').classList.remove('active');
+        }
+
+        function cambiarCantidad(id, delta) {
+            const index = carrito.findIndex(item => item.id === id);
+            if (index > -1) {
+                carrito[index].cantidad += delta;
+                if (carrito[index].cantidad <= 0) {
+                    carrito.splice(index, 1);
+                }
+            }
+            actualizarContadorCarrito();
+            abrirModalCarrito();
+        }
+
+        function enviarPedidoWhatsApp() {
+            if (carrito.length === 0) return;
+            let mensaje = "¡Hola BridigiStore! Quisiera realizar el siguiente pedido desde el catálogo digital:%0A%0A";
+            let total = 0;
+            carrito.forEach(item => {
+                const sub = item.precio * item.cantidad;
+                total += sub;
+                mensaje += `- ${item.nombre} (Cant: ${item.cantidad}) - $%0A`;
+            });
+            mensaje += `%0A*Total a pagar: $${total.toFixed(2)}*`;
+            window.open(`https://wa.me/+584149956831?text=${mensaje}`, '_blank');
+        }
+
+        // --- GESTIÓN DE MODALES ADICIONALES ---
+        function abrirModalAsistente() { document.getElementById('modalAsistente').classList.add('active'); }
+        function cerrarModalAsistente() { document.getElementById('modalAsistente').classList.remove('active'); }
+        function abrirModalUbicacion() { document.getElementById('modalUbicacion').classList.add('active'); }
+        function cerrarModalUbicacion() { document.getElementById('modalUbicacion').classList.remove('active'); }
+
+        // --- TEMA OSCURO / CLARO ---
+        function toggleTheme() {
+            const body = document.body;
+            const icon = document.getElementById('theme-icon');
+            if (body.getAttribute('data-theme') === 'light') {
+                body.setAttribute('data-theme', 'dark');
+                icon.className = 'fa-solid fa-sun';
+            } else {
+                body.setAttribute('data-theme', 'light');
+                icon.className = 'fa-solid fa-moon';
+            }
+        }
+
+        // --- CONTROL DE CONEXIÓN PWA ---
+        function chequearConexion() {
+            const banner = document.getElementById('offline-banner');
+            if (!navigator.onLine) {
+                banner.style.display = 'block';
+            } else {
+                banner.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
