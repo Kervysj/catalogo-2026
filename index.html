@@ -1208,6 +1208,99 @@
             box-shadow: var(--shadow-subtle);
         }
         .footer-note { color: var(--text-muted); font-size: 0.75rem; }
+
+        /* ================= MODAL DE SUGERENCIAS Y REPORTES (GUIADO) ================= */
+        .sug-category-tabs {
+            display: flex;
+            gap: 6px;
+            background: var(--bg-color);
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 14px;
+            border: 1px solid var(--border-color);
+        }
+        .sug-tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 9px 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            text-align: center;
+            line-height: 1.2;
+        }
+        .sug-tab-btn.active {
+            background: var(--card-bg);
+            color: var(--primary-color);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+        }
+        .sug-options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+            max-height: 280px;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+        .sug-chip-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-color);
+            border: 1.5px solid var(--border-color);
+            padding: 10px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.86rem;
+            font-weight: 600;
+            color: var(--text-main);
+            transition: var(--transition-smooth);
+            user-select: none;
+            text-align: left;
+        }
+        .sug-chip-item:hover {
+            border-color: var(--primary-color);
+        }
+        .sug-chip-item.selected {
+            background: rgba(37, 99, 235, 0.08);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        .sug-chip-check {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            border: 1.5px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: transparent;
+            flex-shrink: 0;
+            transition: var(--transition-smooth);
+            background: var(--card-bg);
+        }
+        .sug-chip-item.selected .sug-chip-check {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: #ffffff;
+        }
+        .sug-chip-item i.chip-icon {
+            font-size: 1rem;
+            opacity: 0.85;
+            width: 18px;
+            text-align: center;
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body id="main-body">
@@ -1253,6 +1346,9 @@
                 <div class="info-badge" onclick="filtrarOfertasYTendencias()">
                     <i class="fa-solid fa-fire" style="color:#f97316;"></i> Ofertas
                 </div>
+                <div class="info-badge" onclick="abrirModalSugerencias()">
+                    <i class="fa-solid fa-comments" style="color:#9333ea;"></i> Sugerencias y Reportes
+                </div>
                 <a href="https://soygamers.com/firestore" target="_blank" class="info-badge gaming-badge">
                     <i class="fa-solid fa-gem"></i> Diamantes Free Fire <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.7rem;"></i>
                 </a>
@@ -1293,9 +1389,9 @@
                 <a href="https://tinyurl.com/pageimc" target="_blank" class="footer-link">
                     <i class="fa-brands fa-facebook-f" style="color:#1877f2;"></i> Facebook
                 </a>
-                <a href="https://wa.me/584149956831?text=Hola,%20vengo%20de%20su%20catálogo%20web%20y%20tengo%20la%20siguiente%20sugerencia:" target="_blank" class="footer-link">
-                    <i class="fa-solid fa-lightbulb" style="color:#9333ea;"></i> Enviar Sugerencia
-                </a>
+                <button type="button" onclick="abrirModalSugerencias()" class="footer-link" style="cursor:pointer; background:none; border:1px solid var(--border-color);">
+                    <i class="fa-solid fa-comments" style="color:#9333ea;"></i> Sugerencias y Reportes
+                </button>
                 <button type="button" onclick="cambiarCategoria('encargos', null); irInicio();" class="footer-link" style="cursor:pointer; background:none; border:1px solid var(--border-color);">
                     <i class="fa-solid fa-boxes-packing" style="color:#6366f1;"></i> Ver Encargos (Meta 25)
                 </button>
@@ -1303,6 +1399,71 @@
             <p class="footer-note">© <span id="footer-year"></span> Catálogo Digital · San José de Guanipa, Anzoátegui</p>
         </footer>
 
+    </div>
+
+    <!-- MODAL DE BUZÓN DE SUGERENCIAS Y REPORTES (GUIADO) -->
+    <div class="modal" id="sugerencias-modal" onclick="if(event.target === this) cerrarModalSugerencias()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close-btn" onclick="cerrarModalSugerencias()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-scrollable-body" style="padding-top:22px;">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+                    <div style="width:42px; height:42px; border-radius:12px; background:rgba(147, 51, 234, 0.12); color:#9333ea; display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0;">
+                        <i class="fa-solid fa-comments"></i>
+                    </div>
+                    <div>
+                        <span style="font-size:0.72rem; text-transform:uppercase; font-weight:800; color:#9333ea; letter-spacing:0.04em;">Tu opinión cuenta</span>
+                        <h2 class="modal-title" style="font-size:1.1rem; line-height:1.25;">Buzón de Opiniones y Reportes</h2>
+                    </div>
+                </div>
+                <p style="font-size:0.83rem; color:var(--text-muted); margin-bottom:12px; line-height:1.4;" id="sug-tab-desc">
+                    Selecciona una categoría y marca las opciones que correspondan. ¡Llega directo a nuestro WhatsApp para atenderte rápido!
+                </p>
+
+                <!-- Pestañas de categoría -->
+                <div class="sug-category-tabs">
+                    <button type="button" class="sug-tab-btn active" id="sug-tab-error" onclick="cambiarTabSugerencia('error')">
+                        <i class="fa-solid fa-wrench"></i>
+                        <span>Fallo en Web</span>
+                    </button>
+                    <button type="button" class="sug-tab-btn" id="sug-tab-productos" onclick="cambiarTabSugerencia('productos')">
+                        <i class="fa-solid fa-boxes-stacked"></i>
+                        <span>Productos</span>
+                    </button>
+                    <button type="button" class="sug-tab-btn" id="sug-tab-servicio" onclick="cambiarTabSugerencia('servicio')">
+                        <i class="fa-solid fa-motorcycle"></i>
+                        <span>Servicio</span>
+                    </button>
+                </div>
+
+                <!-- Contenedor dinámico de opciones predefinidas con selección táctil -->
+                <div id="sug-options-container" class="sug-options-grid"></div>
+
+                <!-- Campo de comentario adicional opcional -->
+                <div class="checkout-form-group" style="margin-top:4px; margin-bottom:10px;">
+                    <label for="sug-detail-input" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                        <span>Comentario o detalle adicional:</span>
+                        <span style="font-size:0.72rem; color:var(--text-muted); font-weight:normal;">Opcional</span>
+                    </label>
+                    <textarea id="sug-detail-input" class="checkout-form-input" rows="2" style="resize:none; padding:8px 10px; font-size:0.85rem;" placeholder="¿Deseas especificar algo más? (opcional)"></textarea>
+                </div>
+
+                <!-- Nombre y WhatsApp opcionales -->
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+                    <div class="checkout-form-group" style="margin-bottom:0;">
+                        <label for="sug-name-input" style="font-size:0.78rem;">Tu Nombre (opcional):</label>
+                        <input type="text" id="sug-name-input" class="checkout-form-input" style="font-size:0.85rem; padding:8px 10px;" placeholder="Ej. Juan">
+                    </div>
+                    <div class="checkout-form-group" style="margin-bottom:0;">
+                        <label for="sug-phone-input" style="font-size:0.78rem;">Teléfono (opcional):</label>
+                        <input type="tel" id="sug-phone-input" class="checkout-form-input" style="font-size:0.85rem; padding:8px 10px;" placeholder="Ej. 0414...">
+                    </div>
+                </div>
+
+                <button type="button" class="whatsapp-btn" style="width:100%;" onclick="enviarSugerenciaWhatsApp()">
+                    <i class="fa-brands fa-whatsapp" style="font-size:1.15rem;"></i> Enviar al WhatsApp de Atención
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- MODAL DE REGISTRO EN LISTA DE ESPERA POR ENCARGO (META 25 PERSONAS) -->
@@ -2567,6 +2728,147 @@
         function cerrarModalUbicacion() {
             document.getElementById('location-modal').classList.remove('active');
             document.body.style.overflow = 'auto';
+        }
+
+        /* ================= CONTROL DEL BUZÓN DE SUGERENCIAS Y REPORTES (GUIADO) ================= */
+        const OPCIONES_SUGERENCIAS = {
+            error: {
+                titulo: "Fallo o Error en la Página Web",
+                descripcion: "Marca lo que no esté funcionando correctamente para corregirlo de inmediato:",
+                items: [
+                    { id: 'img', icon: 'fa-image', texto: 'Una foto o imagen no se ve o no carga' },
+                    { id: 'btn', icon: 'fa-hand-pointer', texto: 'Un botón o enlace no responde' },
+                    { id: 'precio', icon: 'fa-tag', texto: 'Un precio o detalle parece incorrecto' },
+                    { id: 'movil', icon: 'fa-mobile-screen-button', texto: 'Se ve desordenado o cortado en mi teléfono' },
+                    { id: 'lento', icon: 'fa-gauge-high', texto: 'La página tarda demasiado en cargar' }
+                ]
+            },
+            productos: {
+                titulo: "Sugerencia de Productos o Variedad",
+                descripcion: "Marca qué tipo de artículos te gustaría que incorporemos en la tienda:",
+                items: [
+                    { id: 'fundas', icon: 'fa-shield-halved', texto: 'Más forros, vidrios templados y protectores' },
+                    { id: 'cables', icon: 'fa-bolt', texto: 'Más cargadores rápidos, cables y powerbanks' },
+                    { id: 'audio', icon: 'fa-headphones', texto: 'Más modelos de audífonos y cornetas bluetooth' },
+                    { id: 'pc', icon: 'fa-laptop', texto: 'Accesorios o piezas de computación y oficina' },
+                    { id: 'gaming', icon: 'fa-gamepad', texto: 'Accesorios para videojuegos y consolas' },
+                    { id: 'combos', icon: 'fa-gift', texto: 'Crear más combos y promociones con descuento' }
+                ]
+            },
+            servicio: {
+                titulo: "Servicio, Pagos y Experiencia",
+                descripcion: "Dinos cómo podemos mejorar tu experiencia de compra:",
+                items: [
+                    { id: 'delivery', icon: 'fa-motorcycle', texto: 'Sugerir ampliar zonas de delivery a domicilio' },
+                    { id: 'pagos', icon: 'fa-credit-card', texto: 'Agregar más opciones de pago (Punto, Binance, etc.)' },
+                    { id: 'horario', icon: 'fa-clock', texto: 'Extender los horarios de atención al cliente' },
+                    { id: 'excelente', icon: 'fa-star', texto: '¡Excelente atención y catálogo muy fácil de usar!' }
+                ]
+            }
+        };
+
+        let tabSugerenciaActual = 'error';
+        let opcionesSugerenciasSeleccionadas = new Set();
+
+        function abrirModalSugerencias() {
+            document.getElementById('sugerencias-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            cambiarTabSugerencia(tabSugerenciaActual, false);
+        }
+
+        function cerrarModalSugerencias() {
+            document.getElementById('sugerencias-modal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function cambiarTabSugerencia(tab, resetSeleccion = true) {
+            tabSugerenciaActual = tab;
+            if (resetSeleccion) {
+                opcionesSugerenciasSeleccionadas.clear();
+            }
+
+            document.querySelectorAll('.sug-tab-btn').forEach(b => b.classList.remove('active'));
+            const activeBtn = document.getElementById(`sug-tab-${tab}`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            const categoriaInfo = OPCIONES_SUGERENCIAS[tab] || OPCIONES_SUGERENCIAS.error;
+            const descEl = document.getElementById('sug-tab-desc');
+            if (descEl) descEl.innerText = categoriaInfo.descripcion;
+
+            renderizarOpcionesSugerencias();
+        }
+
+        function toggleOpcionSugerencia(id) {
+            if (opcionesSugerenciasSeleccionadas.has(id)) {
+                opcionesSugerenciasSeleccionadas.delete(id);
+            } else {
+                opcionesSugerenciasSeleccionadas.add(id);
+            }
+            renderizarOpcionesSugerencias();
+        }
+
+        function renderizarOpcionesSugerencias() {
+            const container = document.getElementById('sug-options-container');
+            if (!container) return;
+            const categoriaInfo = OPCIONES_SUGERENCIAS[tabSugerenciaActual] || OPCIONES_SUGERENCIAS.error;
+
+            let html = '';
+            categoriaInfo.items.forEach(item => {
+                const isSelected = opcionesSugerenciasSeleccionadas.has(item.id);
+                html += `
+                    <div class="sug-chip-item ${isSelected ? 'selected' : ''}" onclick="toggleOpcionSugerencia('${item.id}')">
+                        <div class="sug-chip-check"><i class="fa-solid fa-check"></i></div>
+                        <i class="fa-solid ${item.icon} chip-icon"></i>
+                        <span>${item.texto}</span>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function enviarSugerenciaWhatsApp() {
+            const categoriaInfo = OPCIONES_SUGERENCIAS[tabSugerenciaActual] || OPCIONES_SUGERENCIAS.error;
+            const detalle = (document.getElementById('sug-detail-input').value || '').trim();
+            const nombre = (document.getElementById('sug-name-input').value || '').trim();
+            const tlf = (document.getElementById('sug-phone-input').value || '').trim();
+
+            const itemsSeleccionadosTextos = categoriaInfo.items
+                .filter(it => opcionesSugerenciasSeleccionadas.has(it.id))
+                .map(it => it.texto);
+
+            if (itemsSeleccionadosTextos.length === 0 && !detalle) {
+                mostrarToast("Por favor marca al menos una opción o escribe un detalle", "fa-solid fa-circle-exclamation", "#ef4444");
+                return;
+            }
+
+            let msg = `📬 *BUZÓN DE OPINIONES Y REPORTES*\n` +
+                      `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                      `📌 *Asunto:* ${categoriaInfo.titulo}\n`;
+
+            if (itemsSeleccionadosTextos.length > 0) {
+                msg += `📝 *Opciones marcadas:*\n`;
+                itemsSeleccionadosTextos.forEach(t => {
+                    msg += ` • ${t}\n`;
+                });
+            }
+
+            if (detalle) {
+                msg += `\n💬 *Detalle o comentario:*\n${detalle}\n`;
+            }
+
+            msg += `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                   `👤 *Cliente:* ${nombre || 'Usuario del Catálogo Web'}\n` +
+                   `📱 *Contacto:* ${tlf || 'Por este chat'}\n` +
+                   `_Enviado desde el catálogo digital_`;
+
+            window.open(`https://wa.me/584149956831?text=${encodeURIComponent(msg)}`, '_blank');
+            cerrarModalSugerencias();
+            mostrarToast("¡Gracias! Mensaje listo en WhatsApp", "fa-solid fa-paper-plane", "#25d366", 4000);
+
+            opcionesSugerenciasSeleccionadas.clear();
+            document.getElementById('sug-detail-input').value = '';
+            document.getElementById('sug-name-input').value = '';
+            document.getElementById('sug-phone-input').value = '';
         }
 
         function toggleZoom(e) {
