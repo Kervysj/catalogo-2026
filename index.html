@@ -103,7 +103,7 @@
         }
         header.app-header p { color: var(--text-muted); font-size: clamp(0.8rem, 2vw, 0.92rem); }
 
-        /* TASA DE CAMBIO BCV / BS */
+        /* TASA DE CAMBIO BCV / BS (SUGERENCIA CLAVE 1) */
         .tasa-bcv-bar {
             max-width: 680px; margin: 0 auto 12px auto; background: var(--bg-card);
             border: 1px solid var(--border-ui); border-radius: 12px; padding: 7px 12px;
@@ -118,7 +118,7 @@
         }
         .btn-edit-tasa:hover { color: var(--primary); }
 
-        /* Accesos Rápidos (Free Fire destacado sin scroll) */
+        /* Accesos Rápidos (Free Fire en primer lugar sin scroll) */
         .quick-badges-box { width: 100%; margin-bottom: 14px; }
         .quick-badges-grid {
             display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
@@ -173,7 +173,7 @@
             font-weight: 600; text-align: left; padding: 0 4px;
         }
 
-        /* Barra de Categorías Unificada (Aquí residen Ofertas y Por Encargo) */
+        /* Barra de Categorías Unificada (Aquí viven Ofertas y Por Encargo) */
         .categories-scroll { position: relative; width: 100%; margin-bottom: 18px; }
         .categories-inner {
             display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
@@ -207,10 +207,24 @@
         @media (min-width: 900px) { .product-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; } }
         @media (min-width: 1100px) { .product-grid { grid-template-columns: repeat(5, 1fr); gap: 18px; } }
 
+        /* Animación suave de entrada Fade-In y Slide-Up */
+        @keyframes cardFadeSlideUp {
+            0% {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .prod-card {
             background-color: var(--bg-card); border-radius: var(--radius-box); overflow: hidden;
-            box-shadow: var(--shadow-card); transition: var(--transition); cursor: pointer;
+            box-shadow: var(--shadow-card); transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s ease; cursor: pointer;
             display: flex; flex-direction: column; border: 1px solid var(--border-ui); position: relative;
+            animation: cardFadeSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+            will-change: opacity, transform;
         }
         .prod-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: rgba(37, 99, 235, 0.3); }
         .prod-img-box { width: 100%; aspect-ratio: 1 / 1; overflow: hidden; background: var(--border-ui); position: relative; }
@@ -248,7 +262,7 @@
             padding: 6px 10px; border-radius: 8px;
         }
 
-        /* Skeleton Loaders */
+        /* Skeleton Loaders (SUGERENCIA 4) */
         .skeleton-card {
             background-color: var(--bg-card); border-radius: var(--radius-box); overflow: hidden;
             border: 1px solid var(--border-ui); height: 260px; display: flex; flex-direction: column;
@@ -353,7 +367,7 @@
             <p>Productos, recargas, trámites y compras por encargo en San José de Guanipa</p>
         </header>
 
-        <!-- BARRA DE TASA DE CAMBIO BCV / BS -->
+        <!-- BARRA DE TASA DE CAMBIO BCV / BS (SUGERENCIA 1) -->
         <div class="tasa-bcv-bar">
             <div class="tasa-bcv-info">
                 <i class="fa-solid fa-calculator" style="color:var(--primary);"></i>
@@ -395,13 +409,14 @@
         </div>
         <div class="search-results-counter" id="search-results-counter"></div>
 
-        <!-- BARRA DE CATEGORÍAS UNIFICADA -->
+        <!-- BARRA DE CATEGORÍAS UNIFICADA (LUGAR ÚNICO PARA OFERTAS Y POR ENCARGO) -->
         <div class="categories-scroll">
             <div class="categories-inner" id="categories-bar"></div>
         </div>
 
         <!-- Cuadrícula de Productos -->
         <div class="product-grid" id="product-grid">
+            <!-- Esqueletos iniciales mientras carga -->
             <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line" style="width:50%;"></div><div class="skeleton-line" style="width:80%;"></div><div class="skeleton-line" style="width:40%;"></div></div></div>
             <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line" style="width:50%;"></div><div class="skeleton-line" style="width:80%;"></div><div class="skeleton-line" style="width:40%;"></div></div></div>
             <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line" style="width:50%;"></div><div class="skeleton-line" style="width:80%;"></div><div class="skeleton-line" style="width:40%;"></div></div></div>
@@ -409,7 +424,7 @@
         </div>
     </div>
 
-    <!-- MODAL 1: DETALLE DE PRODUCTO CON COMPARTIR -->
+    <!-- MODAL 1: DETALLE DE PRODUCTO CON BOTÓN DE COMPARTIR -->
     <div class="modal-overlay" id="modal-producto" onclick="if(event.target === this) cerrarModal('modal-producto')">
         <div class="modal-sheet" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModal('modal-producto')"><i class="fa-solid fa-xmark"></i></button>
@@ -484,7 +499,7 @@
         </div>
     </div>
 
-    <!-- MODAL 3: CARRITO / COTIZADOR -->
+    <!-- MODAL 3: CARRITO / COTIZADOR CON TOTAL EN DÓLARES Y BOLÍVARES -->
     <div class="modal-overlay" id="modal-cart" onclick="if(event.target === this) cerrarModal('modal-cart')">
         <div class="modal-sheet" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="cerrarModal('modal-cart')"><i class="fa-solid fa-xmark"></i></button>
@@ -775,16 +790,17 @@
                 return;
             }
 
-            grid.innerHTML = productos.map(prod => {
+            grid.innerHTML = productos.map((prod, idx) => {
                 const id = getProdId(prod);
                 const reqs = obtenerListaRequisitos(prod);
                 const isFav = favoritos.includes(id);
                 const numPrecio = parseFloat(prod.precio);
                 const precioUsd = numPrecio ? `$${calcularPrecioFinalUSD(prod).toFixed(2)}` : 'Consultar';
                 const precioBs = numPrecio ? `≈ Bs. ${calcularPrecioFinalBs(prod).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : '';
+                const delay = Math.min(idx * 30, 240);
                 
                 return `
-                    <div class="prod-card" onclick="abrirDetalleProducto('${id}')">
+                    <div class="prod-card" style="animation-delay: ${delay}ms;" onclick="abrirDetalleProducto('${id}')">
                         <div class="prod-img-box">
                             <img src="${prod.imagen || 'https://via.placeholder.com/300'}" alt="${prod.nombre}" loading="lazy">
                             ${reqs.length > 0 ? `<div class="tag-req"><i class="fa-solid fa-clipboard-check"></i> Requisitos</div>` : ''}
@@ -1098,7 +1114,7 @@
                 alert('Por favor escribe un breve comentario.');
                 return;
             }
-            const msg = `📬 *BUZÓN DE OPINIONES Y REPORTES*\n━━━━━━━━━━━━━━━━━━━━\n👤 *Cliente:* ${nombre}\n💬 *Comentario:*\n${texto}\n━━━━━━━━━━━━━━━━━━━━\n_Enviado desde el Catálogo Digital_`;
+            const msg = `📬 *BUZÓN DE OPINIONES Y REPORTES*\n━━━━━━━━━━━━━━━━━━━━\n👤 *Cliente:* ${nombre}\n💬 *Comentario:*\n${texto}\n━━━━━━━━━━━━━━━━━━━━\n_Enviado desde el Catálogo Digital de Guanipa_`;
             window.open(`https://wa.me/584149956831?text=${encodeURIComponent(msg)}`, '_blank');
             cerrarModal('modal-sugerencias');
             document.getElementById('sug-textarea').value = '';
