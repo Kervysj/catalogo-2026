@@ -314,6 +314,30 @@
         }
 
         /* Barra horizontal de Categorías (Pills con scroll táctil suave) */
+        .categories-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin: 2px 4px 6px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .categories-heading span { display: inline-flex; align-items: center; gap: 6px; }
+        .categories-heading button {
+            border: 0;
+            background: transparent;
+            color: var(--primary-color);
+            font-weight: 800;
+            font-size: 0.76rem;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 8px;
+        }
+        .categories-heading button:hover { background: rgba(37, 99, 235, 0.08); }
         .categories-scroll-wrapper {
             position: relative;
             width: 100%;
@@ -356,6 +380,15 @@
             color: #ffffff;
             border-color: var(--primary-color);
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        .filter-btn.all-products-filter {
+            font-weight: 800;
+            padding-left: 18px;
+            padding-right: 18px;
+        }
+        .filter-btn.all-products-filter:not(.active) {
+            border-color: rgba(37, 99, 235, 0.35);
+            color: var(--primary-color);
         }
         .filter-btn.special-filter {
             border-color: rgba(147, 51, 234, 0.35);
@@ -1003,6 +1036,23 @@
             padding: 0;
         }
         .cart-float-btn:hover { color: #fff; transform: translateY(-2px); }
+        @keyframes cartFeedback {
+            0% { transform: translateY(0) scale(1); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4); }
+            25% { transform: translateY(-4px) scale(1.08) rotate(-3deg); box-shadow: 0 12px 28px rgba(37, 99, 235, 0.55), 0 0 0 8px rgba(37, 99, 235, 0.10); }
+            50% { transform: translateY(0) scale(1.12) rotate(3deg); box-shadow: 0 12px 30px rgba(37, 99, 235, 0.60), 0 0 0 12px rgba(37, 99, 235, 0.06); }
+            75% { transform: translateY(-2px) scale(1.05) rotate(-1deg); }
+            100% { transform: translateY(0) scale(1) rotate(0); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4); }
+        }
+        .cart-float-btn.cart-feedback { animation: cartFeedback 700ms cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .cart-float-btn.cart-feedback .cart-badge { animation: cartBadgePop 500ms ease-out; }
+        @keyframes cartBadgePop {
+            0% { transform: scale(0.7); }
+            55% { transform: scale(1.25); }
+            100% { transform: scale(1); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .cart-float-btn.cart-feedback, .cart-float-btn.cart-feedback .cart-badge { animation: none; }
+        }
         .cart-badge {
             position: absolute;
             top: -2px;
@@ -1369,6 +1419,12 @@
         </div>
 
         <!-- Barra scrollable horizontal de Categorías -->
+        <div class="categories-heading">
+            <span><i class="fa-solid fa-layer-group"></i> Categorías</span>
+            <button type="button" onclick="cambiarCategoria('todos', null)" title="Mostrar todos los productos">
+                <i class="fa-solid fa-border-all"></i> Ver todos
+            </button>
+        </div>
         <div class="categories-scroll-wrapper">
             <div class="categories-scroll-container" id="filters-container">
                 <!-- Filtros generados dinámicamente -->
@@ -2163,7 +2219,7 @@
             const container = document.getElementById('filters-container');
             const cats = [...new Set(productos.map(p => p.categoria ? p.categoria.trim() : 'General'))];
             
-            let html = `<button class="filter-btn ${categoriaSeleccionada === 'todos' ? 'active' : ''}" onclick="cambiarCategoria('todos', this)"><i class="fa-solid fa-border-all"></i> Todos</button>
+            let html = `<button class="filter-btn all-products-filter ${categoriaSeleccionada === 'todos' ? 'active' : ''}" onclick="cambiarCategoria('todos', this)" title="Ver todos los productos" aria-label="Ver todos los productos"><i class="fa-solid fa-border-all"></i> Todos los productos</button>
                         <button class="filter-btn fav-filter ${categoriaSeleccionada === 'favoritos' ? 'active' : ''}" onclick="cambiarCategoria('favoritos', this)"><i class="fa-solid fa-star"></i> Favoritos</button>
                         <button class="filter-btn recent-filter ${categoriaSeleccionada === 'recientes' ? 'active' : ''}" onclick="cambiarCategoria('recientes', this)"><i class="fa-solid fa-clock-rotate-left"></i> Recientes</button>`;
             
@@ -2365,12 +2421,14 @@
                 `Mira este producto en nuestro catálogo digital.`;
 
             try {
-                if (navigator.share) {
-                    await navigator.share({
-                        title: prod.nombre,
-                        text: shareText,
-                        url: shareUrl
-                    });
+                const shareData = {
+                    title: prod.nombre,
+                    text: shareText,
+                    url: shareUrl
+                };
+
+                if (navigator.share && (!navigator.canShare || navigator.canShare(shareData))) {
+                    await navigator.share(shareData);
                     mostrarToast('Producto compartido', 'fa-solid fa-share-nodes', '#2563eb', 1800);
                     return;
                 }
@@ -2649,8 +2707,11 @@
             }));
             setTimeout(() => { 
                 img.remove(); 
-                cartBtn.style.transform = 'scale(1.18)'; 
-                setTimeout(() => cartBtn.style.transform = 'scale(1)', 200); 
+                cartBtn.classList.remove('cart-feedback');
+                void cartBtn.offsetWidth;
+                cartBtn.classList.add('cart-feedback');
+                clearTimeout(cartBtn._feedbackTimer);
+                cartBtn._feedbackTimer = setTimeout(() => cartBtn.classList.remove('cart-feedback'), 750);
             }, 750);
         }
 
@@ -2662,13 +2723,22 @@
         
         function agregarAlCarrito(prod) { 
             carritoGlobal.push({ ...prod, precioFinalCalculado: calcularPrecioFinal(prod) }); 
-            actualizarBtnCarrito(); 
+            actualizarBtnCarrito(true);
         }
-        function actualizarBtnCarrito() {
-            document.getElementById('cart-count').innerText = carritoGlobal.length;
-            carritoGlobal.length > 0 
-                ? document.getElementById('cart-float-btn').classList.add('show') 
-                : document.getElementById('cart-float-btn').classList.remove('show');
+        function actualizarBtnCarrito(animar = false) {
+            const cartBtn = document.getElementById('cart-float-btn');
+            const countEl = document.getElementById('cart-count');
+            if (!cartBtn || !countEl) return;
+            countEl.innerText = carritoGlobal.length;
+            cartBtn.classList.toggle('show', carritoGlobal.length > 0);
+
+            if (animar && carritoGlobal.length > 0) {
+                cartBtn.classList.remove('cart-feedback');
+                void cartBtn.offsetWidth;
+                cartBtn.classList.add('cart-feedback');
+                clearTimeout(cartBtn._feedbackTimer);
+                cartBtn._feedbackTimer = setTimeout(() => cartBtn.classList.remove('cart-feedback'), 750);
+            }
         }
 
         function abrirModalCarrito() {
