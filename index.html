@@ -995,6 +995,18 @@
                 box-shadow: 0 10px 30px rgba(0,0,0,0.18);
             }
         }
+        /* Seis accesos en la barra inferior: mantenerlos compactos en móviles. */
+        @media (max-width: 520px) {
+            .bottom-nav-item {
+                min-width: 0;
+                padding-left: 4px;
+                padding-right: 4px;
+                font-size: 0.68rem;
+            }
+            .bottom-nav-item i { font-size: 1rem; }
+            .bottom-nav-item span { white-space: nowrap; }
+        }
+
         .bottom-nav-item {
             background: none;
             border: none;
@@ -1127,6 +1139,92 @@
             background: #6366f1;
             color: #ffffff;
             border-color: #6366f1;
+        }
+
+        /* ========================================================
+           INDICADORES DE OFERTAS Y POR ENCARGO
+           Los botones siempre permanecen visibles. Solo titilan
+           cuando existe al menos un producto marcado en Google Sheets.
+           ======================================================== */
+        .bottom-nav-item.ofertas-con-ofertas,
+        .bottom-nav-item.encargos-con-encargos {
+            position: relative;
+        }
+
+        .bottom-nav-item.ofertas-con-ofertas .fa-fire {
+            animation: ofertaFirePulse 1.05s ease-in-out infinite;
+            filter: drop-shadow(0 0 7px rgba(249, 115, 22, 0.72));
+        }
+
+        .bottom-nav-item.ofertas-con-ofertas {
+            animation: ofertaItemPulse 1.6s ease-in-out infinite;
+        }
+
+        .bottom-nav-item.ofertas-con-ofertas::after,
+        .bottom-nav-item.encargos-con-encargos::after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            animation: navDotPulse 1.05s ease-in-out infinite;
+        }
+
+        .bottom-nav-item.ofertas-con-ofertas::after {
+            background: #f97316;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.16);
+        }
+
+        .bottom-nav-item.encargos-con-encargos .fa-boxes-packing {
+            animation: encargoBoxPulse 1.05s ease-in-out infinite;
+            filter: drop-shadow(0 0 7px rgba(99, 102, 241, 0.72));
+        }
+
+        .bottom-nav-item.encargos-con-encargos {
+            animation: encargoItemPulse 1.6s ease-in-out infinite;
+        }
+
+        .bottom-nav-item.encargos-con-encargos::after {
+            background: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.16);
+        }
+
+        @keyframes ofertaFirePulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.25); opacity: 0.68; }
+        }
+
+        @keyframes encargoBoxPulse {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+            50% { transform: scale(1.18) rotate(-3deg); opacity: 0.72; }
+        }
+
+        @keyframes ofertaItemPulse {
+            0%, 100% { box-shadow: 0 0 0 rgba(249, 115, 22, 0); }
+            50% { box-shadow: 0 0 14px rgba(249, 115, 22, 0.24); }
+        }
+
+        @keyframes encargoItemPulse {
+            0%, 100% { box-shadow: 0 0 0 rgba(99, 102, 241, 0); }
+            50% { box-shadow: 0 0 14px rgba(99, 102, 241, 0.24); }
+        }
+
+        @keyframes navDotPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.42; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .bottom-nav-item.ofertas-con-ofertas,
+            .bottom-nav-item.ofertas-con-ofertas .fa-fire,
+            .bottom-nav-item.ofertas-con-ofertas::after,
+            .bottom-nav-item.encargos-con-encargos,
+            .bottom-nav-item.encargos-con-encargos .fa-boxes-packing,
+            .bottom-nav-item.encargos-con-encargos::after {
+                animation: none;
+            }
         }
 
         /* Bloque de Compra por Encargo (Meta 25 personas) */
@@ -1393,7 +1491,10 @@
                 <div class="info-badge" onclick="cambiarCategoria('encargos', null)">
                     <i class="fa-solid fa-boxes-packing" style="color:#6366f1;"></i> Por Encargo
                 </div>
-                <a href="https://soygamers.com/firestore" target="_blank" class="info-badge gaming-badge">
+                <a href="https://tinyurl.com/pageimc" target="_blank" rel="noopener noreferrer" class="info-badge">
+                    <i class="fa-brands fa-facebook-f" style="color:#1877f2;"></i> Facebook
+                </a>
+                <a href="https://soygamers.com/firestore" target="_blank" rel="noopener noreferrer" class="info-badge gaming-badge">
                     <i class="fa-solid fa-gem"></i> Diamantes Free Fire <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.7rem;"></i>
                 </a>
             </div>
@@ -1436,14 +1537,8 @@
         <!-- Footer -->
         <footer class="site-footer">
             <div class="footer-links">
-                <a href="https://tinyurl.com/pageimc" target="_blank" class="footer-link">
-                    <i class="fa-brands fa-facebook-f" style="color:#1877f2;"></i> Facebook
-                </a>
                 <button type="button" onclick="abrirModalSugerencias()" class="footer-link" style="cursor:pointer; background:none; border:1px solid var(--border-color);">
                     <i class="fa-solid fa-comments" style="color:#9333ea;"></i> Sugerencias y Reportes
-                </button>
-                <button type="button" onclick="cambiarCategoria('encargos', null); irInicio();" class="footer-link" style="cursor:pointer; background:none; border:1px solid var(--border-color);">
-                    <i class="fa-solid fa-boxes-packing" style="color:#6366f1;"></i> Ver Encargos (Meta 25)
                 </button>
             </div>
             <p class="footer-note">© <span id="footer-year"></span> Catálogo Digital · San José de Guanipa, Anzoátegui</p>
@@ -1796,9 +1891,13 @@
             <i class="fa-brands fa-whatsapp"></i>
             <span>WhatsApp</span>
         </a>
-        <button type="button" class="bottom-nav-item" id="nav-btn-ofertas" onclick="filtrarOfertasYTendencias()" aria-label="Ofertas y Tendencias">
+        <button type="button" class="bottom-nav-item" id="nav-btn-ofertas" onclick="filtrarOfertasYTendencias()" aria-label="Ofertas">
             <i class="fa-solid fa-fire" style="color:#f97316;"></i>
             <span>Ofertas</span>
+        </button>
+        <button type="button" class="bottom-nav-item" id="nav-btn-encargos" onclick="filtrarEncargos()" aria-label="Por Encargo">
+            <i class="fa-solid fa-boxes-packing" style="color:#6366f1;"></i>
+            <span>Encargos</span>
         </button>
     </nav>
 
@@ -1976,11 +2075,9 @@
 
         // ================= GESTIÓN DE OFERTAS, TENDENCIAS Y ENCARGOS (META 25) =================
         function esPorEncargo(prod) {
-            if (!prod) return false;
-            const texto = [prod.categoria, prod.subcategoria, prod.nombre, prod.descripcion, prod.etiquetas, prod.mas_detalles, prod.tipo]
-                .filter(Boolean).join(' ').toLowerCase();
-            return texto.includes('encargo') || texto.includes('preventa') || texto.includes('reserva') || 
-                   texto.includes('por pedido') || texto.includes('pedido previo') || prod.por_encargo === true || prod.por_encargo === 'true';
+            // Por Encargo se controla exclusivamente desde Google Sheets.
+            // Columna recomendada: por_encargo → SI / NO.
+            return !!(prod && prod.por_encargo === true);
         }
 
         function esOfertaOTendencia(prod) {
@@ -2158,6 +2255,13 @@
             ].includes(v);
         }
 
+        function normalizarMarcador(valor) {
+            if (typeof valor === 'boolean') return valor;
+            const v = normalizarTexto(valor).toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            return ['si', 'sí', 'true', '1', 'oferta', 'en oferta', 'promocion', 'promo', 'encargo', 'por encargo'].includes(v);
+        }
+
         function obtenerCampo(obj, aliases, fallback = '') {
             for (const key of aliases) {
                 if (Object.prototype.hasOwnProperty.call(obj, key) && obj[key] !== '' && obj[key] != null) {
@@ -2197,8 +2301,8 @@
                 status: estado || 'disponible',
                 // Acepta una columna llamada en_oferta, oferta o es_oferta.
                 // También acepta valores como SI, TRUE, 1, OFERTA o EN OFERTA.
-                en_oferta: normalizarBooleano(obtenerCampo(raw, ['en_oferta','oferta','es_oferta'], false), false),
-                por_encargo: normalizarBooleano(obtenerCampo(raw, ['por_encargo','encargo','pedido'], false), false),
+                en_oferta: normalizarMarcador(obtenerCampo(raw, ['en_oferta','oferta','es_oferta'], false)),
+                por_encargo: normalizarMarcador(obtenerCampo(raw, ['por_encargo','encargo','pedido'], false)),
                 video_tiktok: normalizarTexto(obtenerCampo(raw, ['video_tiktok','tiktok','video'], ''))
             };
         }
@@ -2289,6 +2393,34 @@
             if (!estado) return true;
             return !['agotado','no disponible','no_disponible','inactivo','oculto','false','0'].includes(estado);
         }
+
+        function actualizarIndicadoresNavegacion() {
+            const btnOfertas = document.getElementById('nav-btn-ofertas');
+            const btnEncargos = document.getElementById('nav-btn-encargos');
+
+            const hayOfertas = Array.isArray(listaProductosGlobal) &&
+                listaProductosGlobal.some(prod => prod && prod.en_oferta === true);
+            const hayEncargos = Array.isArray(listaProductosGlobal) &&
+                listaProductosGlobal.some(prod => prod && prod.por_encargo === true);
+
+            if (btnOfertas) {
+                btnOfertas.classList.toggle('ofertas-con-ofertas', hayOfertas);
+                btnOfertas.setAttribute('aria-label', hayOfertas ? 'Ofertas: hay ofertas disponibles' : 'Ofertas');
+                btnOfertas.title = hayOfertas ? 'Hay ofertas disponibles' : 'Ofertas';
+            }
+
+            if (btnEncargos) {
+                btnEncargos.classList.toggle('encargos-con-encargos', hayEncargos);
+                btnEncargos.setAttribute('aria-label', hayEncargos ? 'Por Encargo: hay productos disponibles' : 'Por Encargo');
+                btnEncargos.title = hayEncargos ? 'Hay productos por encargo' : 'Por Encargo';
+            }
+        }
+
+        // Compatibilidad con cualquier llamada anterior.
+        function actualizarIndicadorOfertas() {
+            actualizarIndicadoresNavegacion();
+        }
+
 
         async function cargarCatalogo(silencioso = false) {
             cargarFavoritosStorage();
@@ -2395,6 +2527,7 @@
         function procesarYRenderizarDatos(data) {
             const normalized = normalizarRespuestaCatalogo(data);
             listaProductosGlobal = normalized.filter(productoEstaDisponible);
+            actualizarIndicadorOfertas();
 
             loadSubcategories(listaProductosGlobal);
             construirBotonesCategorias(listaProductosGlobal);
@@ -2408,6 +2541,20 @@
 
         function esStriming(cat) { return cat && (cat.toLowerCase().trim() === 'striming' || cat.toLowerCase().includes('streaming')); }
         function esRecargaSaldo(cat) { return cat && (cat.toLowerCase().trim() === 'recarga saldo' || (cat.toLowerCase().includes('recarga') && cat.toLowerCase().includes('saldo'))); }
+        function filtrarEncargos() {
+            categoriaSeleccionada = 'encargos';
+
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) searchInput.value = '';
+
+            const subcategory = document.getElementById('filter-subcategory');
+            if (subcategory) subcategory.value = 'all';
+
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            filtrarCombinado();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         function debeOcultarseEnPrincipal(cat) { return esStriming(cat) || esRecargaSaldo(cat); }
         function esServicioGeneral(cat) { return cat && cat.toLowerCase().includes('servicio'); }
 
@@ -2505,7 +2652,7 @@
             
             const esEncargoProd = esPorEncargo(prod);
             // La etiqueta "Oferta" solo aparece si la columna en_oferta del Google Sheet está activa.
-            const esOfertaProd = !esEncargoProd && prod.en_oferta === true;
+            const esOfertaProd = prod.en_oferta === true;
             
             let statusBadgeHtml = '';
             let hintBtnHtml = `<div class="card-hint-btn"><i class="fa-solid fa-eye"></i> Ver detalle</div>`;
