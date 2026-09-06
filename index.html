@@ -1499,6 +1499,14 @@
             background:#111827;
         }
         .share-preview-help { color:var(--text-muted); font-size:.76rem; line-height:1.35; text-align:center; padding:4px 22px 10px; }
+        .share-status-link-box { margin:4px 18px 0; padding:11px 12px; border:1px solid var(--border-color); border-radius:13px; background:rgba(37,99,235,.055); }
+        .share-status-link-title { font-size:.75rem; font-weight:800; margin-bottom:7px; color:var(--text-main); }
+        .share-status-link-title i { color:var(--primary-color); margin-right:5px; }
+        .share-status-link-row { display:flex; align-items:center; gap:7px; }
+        .share-status-link { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--primary-color); font-size:.72rem; font-weight:700; text-decoration:none; }
+        .share-status-link:hover { text-decoration:underline; }
+        .share-copy-link-btn { width:34px; height:34px; border:1px solid var(--border-color); border-radius:9px; background:var(--card-bg); color:var(--text-main); cursor:pointer; flex-shrink:0; }
+        .share-status-link-box small { display:block; margin-top:6px; color:var(--text-muted); font-size:.67rem; line-height:1.3; }
         .share-preview-actions { display:grid; gap:8px; padding:10px 18px 18px; }
         .share-primary-btn { background:var(--primary-color); color:white; border-color:var(--primary-color); justify-content:center; text-align:center; }
         .share-secondary-btn { justify-content:center; text-align:center; }
@@ -1966,9 +1974,18 @@
             <div class="share-preview-wrap">
                 <img id="share-preview-image" class="share-preview-image" alt="Vista previa para Estado de WhatsApp">
             </div>
-            <p class="share-preview-help">En teléfonos compatibles, WhatsApp aparecerá en el menú de compartir y podrás elegir <strong>Mi estado</strong>. Si el navegador no permite compartir la imagen, podrás guardarla.</p>
+            <div class="share-status-link-box">
+                <div class="share-status-link-title"><i class="fa-solid fa-link"></i> Enlace del producto</div>
+                <div class="share-status-link-row">
+                    <a id="share-status-link" class="share-status-link" href="#" target="_blank" rel="noopener">Abrir producto</a>
+                    <button type="button" class="share-copy-link-btn" id="share-copy-status-link-btn" title="Copiar enlace"><i class="fa-regular fa-copy"></i></button>
+                </div>
+                <small>Puedes compartir la imagen y luego pegar este enlace en el Estado para que el cliente pueda tocarlo.</small>
+            </div>
+            <p class="share-preview-help">En teléfonos compatibles, el menú de compartir puede permitir enviar la imagen y el texto/enlace. Si WhatsApp no conserva el enlace al publicar el Estado, cópialo con el botón de arriba y pégalo como enlace en el Estado.</p>
             <div class="share-preview-actions">
-                <button type="button" class="share-option-btn share-primary-btn" id="share-status-now-btn"><i class="fa-brands fa-whatsapp"></i> Compartir esta imagen</button>
+                <button type="button" class="share-option-btn share-primary-btn" id="share-status-now-btn"><i class="fa-brands fa-whatsapp"></i> Compartir imagen + enlace</button>
+                <button type="button" class="share-option-btn share-secondary-btn" id="share-status-copy-link-btn"><i class="fa-solid fa-link"></i> Copiar enlace para el Estado</button>
                 <button type="button" class="share-option-btn share-secondary-btn" onclick="cerrarVistaPreviaCompartir()">Cerrar</button>
             </div>
         </div>
@@ -3098,6 +3115,62 @@
             });
         }
 
+        function obtenerUrlCompartirProducto(prod) {
+            const id = obtenerIdentificadorProducto(prod);
+            return `${window.location.origin}${window.location.pathname}#producto-${encodeURIComponent(id)}`;
+        }
+
+        async function copiarEnlaceEstado(prod) {
+            if (!prod) return;
+            const url = obtenerUrlCompartirProducto(prod);
+            try {
+                if (navigator.clipboard?.writeText) {
+                    await navigator.clipboard.writeText(url);
+                } else {
+                    const area = document.createElement('textarea');
+                    area.value = url;
+                    area.style.position = 'fixed';
+                    area.style.opacity = '0';
+                    document.body.appendChild(area);
+                    area.select();
+                    document.execCommand('copy');
+                    area.remove();
+                }
+                mostrarToast('Enlace del producto copiado', 'fa-solid fa-link', '#22c55e', 2200);
+            } catch (error) {
+                mostrarToast('No se pudo copiar el enlace', 'fa-solid fa-circle-exclamation', '#f97316', 2500);
+            }
+        }
+
+        async function prepararTextoEnlaceEstado(prod) {
+            if (!prod) return;
+            const url = obtenerUrlCompartirProducto(prod);
+            const precioTxt = parseFloat(prod.precio)
+                ? `$${calcularPrecioFinal(prod).toFixed(2)}`
+                : (esPorEncargo(prod) ? 'Precio según lote' : 'Consultar');
+            const etiquetas = [];
+            if (prod.en_oferta === true) etiquetas.push('🔥 OFERTA');
+            if (prod.por_encargo === true) etiquetas.push('📦 POR ENCARGO');
+            const texto = [
+                etiquetas.join(' · '),
+                `📌 ${prod.nombre || 'Producto'}`,
+                `💰 ${precioTxt}`,
+                '📲 Mira el producto y pide información:',
+                url
+            ].filter(Boolean).join('\n');
+            try {
+                if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(texto);
+                else {
+                    const area = document.createElement('textarea');
+                    area.value = texto; area.style.position='fixed'; area.style.opacity='0';
+                    document.body.appendChild(area); area.select(); document.execCommand('copy'); area.remove();
+                }
+                mostrarToast('Texto + enlace copiados para tu Estado', 'fa-solid fa-copy', '#22c55e', 2800);
+            } catch (error) {
+                mostrarToast('No se pudo copiar el texto', 'fa-solid fa-circle-exclamation', '#f97316', 2500);
+            }
+        }
+
         async function prepararEstadoWhatsApp(prod) {
             cerrarModalCompartir();
             mostrarToast('Preparando imagen para tu Estado...', 'fa-brands fa-whatsapp', '#25d366', 2200);
@@ -3106,9 +3179,17 @@
                 if (posterCompartirUrl) URL.revokeObjectURL(posterCompartirUrl);
                 posterCompartirUrl = URL.createObjectURL(posterCompartirBlob);
                 document.getElementById('share-preview-image').src = posterCompartirUrl;
+                const shareStatusLink = document.getElementById('share-status-link');
+                if (shareStatusLink) {
+                    const url = obtenerUrlCompartirProducto(prod);
+                    shareStatusLink.href = url;
+                    shareStatusLink.textContent = url;
+                }
                 document.getElementById('share-preview-modal').classList.add('active');
                 document.body.style.overflow = 'hidden';
                 document.getElementById('share-status-now-btn').onclick = () => compartirPosterEstado(prod);
+                document.getElementById('share-copy-status-link-btn').onclick = () => copiarEnlaceEstado(prod);
+                document.getElementById('share-status-copy-link-btn').onclick = () => prepararTextoEnlaceEstado(prod);
             } catch (error) {
                 console.error('Error generando poster de Estado:', error);
                 mostrarToast('No se pudo preparar la imagen. Inténtalo de nuevo.', 'fa-solid fa-circle-exclamation', '#ef4444', 3000);
@@ -3119,9 +3200,23 @@
             if (!posterCompartirBlob) return;
             const safeName = String(prod?.nombre || 'producto').replace(/[^a-z0-9áéíóúüñ_-]+/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').slice(0, 55) || 'producto';
             const file = new File([posterCompartirBlob], `${safeName}-estado.png`, { type: 'image/png' });
+            const shareUrl = obtenerUrlCompartirProducto(prod);
+            const precioTxt = parseFloat(prod?.precio)
+                ? `$${calcularPrecioFinal(prod).toFixed(2)}`
+                : (esPorEncargo(prod) ? 'Precio según lote' : 'Consultar');
+            const etiquetas = [];
+            if (prod?.en_oferta === true) etiquetas.push('🔥 OFERTA');
+            if (prod?.por_encargo === true) etiquetas.push('📦 POR ENCARGO');
+            const shareText = [
+                etiquetas.join(' · '),
+                `📌 ${prod?.nombre || 'Producto'}`,
+                `💰 ${precioTxt}`,
+                '📲 Mira el producto y pide información:'
+            ].filter(Boolean).join('\n');
             const shareData = {
                 title: prod?.nombre || 'Producto',
-                text: 'Mira este producto de nuestro catálogo digital.',
+                text: shareText,
+                url: shareUrl,
                 files: [file]
             };
 
@@ -3143,15 +3238,18 @@
             document.body.appendChild(link);
             link.click();
             link.remove();
-            mostrarToast('Imagen guardada. Ahora puedes subirla a tu Estado de WhatsApp.', 'fa-solid fa-image', '#22c55e', 3500);
+            try {
+                const textoEstado = `${shareText}\n${shareUrl}`;
+                if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(textoEstado);
+            } catch (e) {}
+            mostrarToast('Imagen guardada y enlace copiado. Súbela al Estado y pega el enlace.', 'fa-solid fa-image', '#22c55e', 4200);
         }
 
         async function compartirProducto(evt, prod) {
             if (evt) evt.stopPropagation();
             if (!prod) return;
 
-            const id = obtenerIdentificadorProducto(prod);
-            const shareUrl = `${window.location.origin}${window.location.pathname}#producto-${encodeURIComponent(id)}`;
+            const shareUrl = obtenerUrlCompartirProducto(prod);
             const precioTxt = parseFloat(prod.precio)
                 ? `$${calcularPrecioFinal(prod).toFixed(2)}`
                 : (esPorEncargo(prod) ? 'Precio según lote' : 'Consultar');
