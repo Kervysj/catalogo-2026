@@ -1393,9 +1393,6 @@
                 <div class="info-badge" onclick="cambiarCategoria('encargos', null)">
                     <i class="fa-solid fa-boxes-packing" style="color:#6366f1;"></i> Por Encargo
                 </div>
-                <div class="info-badge" onclick="filtrarOfertasYTendencias()">
-                    <i class="fa-solid fa-fire" style="color:#f97316;"></i> Ofertas
-                </div>
                 <a href="https://soygamers.com/firestore" target="_blank" class="info-badge gaming-badge">
                     <i class="fa-solid fa-gem"></i> Diamantes Free Fire <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.7rem;"></i>
                 </a>
@@ -2020,13 +2017,27 @@
         }
 
         function filtrarOfertasYTendencias() {
+            // Ir directamente a Ofertas sin llamar a irInicio(), porque irInicio()
+            // restablece el filtro a "Todos". Esto hacía que Ofertas se mostrara
+            // y se reseteara inmediatamente.
             categoriaSeleccionada = 'ofertas';
+
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) searchInput.value = '';
+
+            const subcategory = document.getElementById('filter-subcategory');
+            if (subcategory) subcategory.value = 'all';
+
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+
+            // Puede no existir un botón de filtro específico para ofertas;
+            // en ese caso la navegación inferior sigue funcionando.
             const ofertaBtn = document.querySelector('.filter-btn.oferta-filter');
             if (ofertaBtn) ofertaBtn.classList.add('active');
+
             filtrarCombinado();
-            irInicio();
-            mostrarToast('🔥 Mostrando artículos en Oferta y Tendencia', 'fa-solid fa-fire', '#f97316');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            mostrarToast('🔥 Mostrando artículos en oferta', 'fa-solid fa-fire', '#f97316');
         }
 
         let productoParaEncargoActual = null;
@@ -2419,11 +2430,25 @@
 
         function cambiarCategoria(cat, btn) {
             categoriaSeleccionada = cat;
+
+            // Al elegir "Todos los productos" se limpian también la búsqueda
+            // y la subcategoría para volver realmente al catálogo completo.
+            if (cat === 'todos') {
+                const searchInput = document.getElementById('search-input');
+                if (searchInput) searchInput.value = '';
+
+                const subcategory = document.getElementById('filter-subcategory');
+                if (subcategory) subcategory.value = 'all';
+            }
+
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             if(btn) {
                 btn.classList.add('active');
             } else {
-                const found = Array.from(document.querySelectorAll('.filter-btn')).find(b => b.innerText.toLowerCase().includes(cat.toLowerCase()));
+                const found = Array.from(document.querySelectorAll('.filter-btn')).find(b => {
+                    if (cat === 'todos') return b.classList.contains('all-products-filter');
+                    return b.innerText.toLowerCase().includes(cat.toLowerCase());
+                });
                 if (found) found.classList.add('active');
             }
             filtrarCombinado();
