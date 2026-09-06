@@ -1396,9 +1396,6 @@
                 <div class="info-badge" onclick="filtrarOfertasYTendencias()">
                     <i class="fa-solid fa-fire" style="color:#f97316;"></i> Ofertas
                 </div>
-                <div class="info-badge" onclick="abrirModalSugerencias()">
-                    <i class="fa-solid fa-comments" style="color:#9333ea;"></i> Sugerencias y Reportes
-                </div>
                 <a href="https://soygamers.com/firestore" target="_blank" class="info-badge gaming-badge">
                     <i class="fa-solid fa-gem"></i> Diamantes Free Fire <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.7rem;"></i>
                 </a>
@@ -1849,6 +1846,32 @@
         }
 
         function irInicio() {
+            // Inicio siempre vuelve al catálogo completo, no solo al principio
+            // de la página con el filtro anterior.
+            categoriaSeleccionada = 'todos';
+
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) searchInput.value = '';
+
+            const subcategory = document.getElementById('filter-subcategory');
+            if (subcategory) subcategory.value = 'all';
+
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            const allBtn = document.querySelector('.all-products-filter');
+            if (allBtn) allBtn.classList.add('active');
+
+            // Si se estaba viendo un producto, regresar a Inicio también cierra su modal.
+            const productModal = document.getElementById('product-modal');
+            if (productModal && productModal.classList.contains('active')) {
+                productModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                modalHistoryPushed = false;
+                if (window.location.hash.indexOf('#producto-') === 0) {
+                    history.replaceState(history.state, '', window.location.pathname + window.location.search);
+                }
+            }
+
+            filtrarCombinado();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -2637,15 +2660,32 @@
             const listEl = document.getElementById('confirm-req-list');
             listEl.innerHTML = reqs.map(r => `<li><i class="fa-solid fa-circle-check"></i> <span>${r}</span></li>`).join('');
 
-            accionPendienteRequisitos = onConfirmar;
-            document.getElementById('btn-confirm-requisitos-proceder').onclick = () => {
-                // Guardamos la acción ANTES de cerrar el modal, porque cerrarConfirmacionRequisitos()
-                // limpia accionPendienteRequisitos. Esto garantiza que "Sí, los leí y los tengo listos"
-                // continúe correctamente hacia WhatsApp o hacia la acción del carrito.
+            accionPendienteRequisitos = typeof onConfirmar === 'function' ? onConfirmar : null;
+
+            const btnProceder = document.getElementById('btn-confirm-requisitos-proceder');
+            btnProceder.onclick = (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                // Tomamos la acción antes de cerrar el modal porque la función de cierre
+                // limpia la referencia. La ejecutamos inmediatamente dentro del clic del usuario
+                // para que WhatsApp no sea bloqueado por el navegador.
                 const accionConfirmada = accionPendienteRequisitos;
                 accionPendienteRequisitos = null;
-                cerrarConfirmacionRequisitos();
-                if (accionConfirmada) accionConfirmada();
+
+                document.getElementById('confirm-requisitos-modal').classList.remove('active');
+                document.body.style.overflow = 'hidden';
+
+                if (accionConfirmada) {
+                    try {
+                        accionConfirmada();
+                    } catch (error) {
+                        console.error('Error al continuar después de confirmar requisitos:', error);
+                        mostrarToast('No se pudo continuar. Inténtalo nuevamente.', 'fa-solid fa-circle-exclamation', '#ef4444', 3000);
+                    }
+                } else {
+                    mostrarToast('Requisitos confirmados.', 'fa-solid fa-check-circle', '#22c55e', 1800);
+                }
             };
 
             document.getElementById('confirm-requisitos-modal').classList.add('active');
@@ -2654,9 +2694,6 @@
         function enviarProductoConRequisitosPorWhatsApp(prod) {
             if (!prod) return;
 
-            // Abrimos la pestaña durante el clic del usuario para evitar que el navegador
-            // bloquee WhatsApp mientras mostramos una transición breve.
-            const waWindow = window.open('', '_blank');
             const cod = prod.codigo_producto || prod.id || 'N/A';
             const precio = parseFloat(prod.precio) ? `$${calcularPrecioFinal(prod).toFixed(2)}` : 'Consultar';
             const descLinea = (prod.descripcion || '').trim() ? `\n*Descripción:* ${prod.descripcion.trim()}` : '';
@@ -2669,16 +2706,24 @@
             const msg = `Hola, vengo del catálogo web.\n\nQuiero solicitar información para:\n*Producto:* ${prod.nombre}\n*Código:* ${cod}${descLinea}\n*Precio:* ${precio}${fotoLinea}${reqsTexto}\n\nConfirmo que ya leí y tengo listos los requisitos indicados.`;
             const urlWhatsApp = `https://wa.me/584149956831?text=${encodeURIComponent(msg)}`;
 
-            cerrarModal();
-            mostrarToast('Requisitos confirmados. Preparando WhatsApp...', 'fa-brands fa-whatsapp', '#25d366', 1200);
+            // Se abre directamente durante el clic de confirmación para evitar que el navegador
+            // bloquee la ventana por considerarla un popup automático.
+            let waWindow = null;
+            try {
+                waWindow = window.open(urlWhatsApp, '_blank', 'noopener,noreferrer');
+            } catch (error) {
+                console.warn('No fue posible abrir WhatsApp en una nueva pestaña:', error);
+            }
 
-            setTimeout(() => {
-                if (waWindow && !waWindow.closed) {
-                    waWindow.location.href = urlWhatsApp;
-                } else {
+            cerrarModal();
+            mostrarToast('Requisitos confirmados. Abriendo WhatsApp...', 'fa-brands fa-whatsapp', '#25d366', 1600);
+
+            // Si el navegador bloqueó la pestaña, usamos la misma ventana como respaldo.
+            if (!waWindow) {
+                setTimeout(() => {
                     window.location.href = urlWhatsApp;
-                }
-            }, 750);
+                }, 150);
+            }
         }
 
         function cerrarConfirmacionRequisitos() {
