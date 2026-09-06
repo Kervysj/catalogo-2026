@@ -1552,6 +1552,24 @@
         }
 
     
+        /* ================= TASA USD / BOLÍVAR ================= */
+        .rate-badge{display:none;border-color:rgba(5,150,105,.28);background:rgba(5,150,105,.07);color:var(--text-main);}
+        .rate-badge.active{display:inline-flex;}
+        .rate-badge.inactive{display:inline-flex;border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.08);}
+        .rate-badge i{color:var(--success-color)!important;}
+        .rate-badge.inactive i{color:#d97706!important;}
+        .price-stack{display:flex;flex-direction:column;gap:2px;}
+        .price-usd{font-weight:800;color:var(--success-color);}
+        .price-bs{font-size:.72rem;font-weight:700;color:var(--text-muted);}
+        .modal-price.price-stack{font-size:1.3rem;margin-bottom:12px;}
+        .modal-price .price-bs{font-size:.78rem;margin-top:3px;}
+        .assistant-budget-title{grid-column:1/-1;font-size:.72rem;font-weight:800;text-transform:uppercase;color:var(--text-muted);letter-spacing:.04em;margin-top:4px;}
+        .assistant-budget-action{border-color:rgba(37,99,235,.25);background:rgba(37,99,235,.055);}
+        .assistant-result-list{display:flex;flex-direction:column;gap:7px;margin-top:9px;}
+        .assistant-result-btn{width:100%;text-align:left;border:1px solid var(--border-color);background:var(--card-bg);color:var(--text-main);border-radius:10px;padding:9px 10px;cursor:pointer;font-size:.75rem;font-weight:700;display:flex;justify-content:space-between;gap:8px;}
+        .assistant-result-btn small{color:var(--success-color);font-weight:800;white-space:nowrap;}
+        @media(max-width:520px){.rate-badge{font-size:.74rem;padding:7px 11px}.price-bs{font-size:.68rem}}
+
         /* ================= ASISTENTE DE COMPRA ================= */
         .assistant-fab{position:fixed;right:18px;bottom:92px;z-index:1200;width:58px;height:58px;border:0;border-radius:50%;background:#25d366;color:#fff;box-shadow:0 10px 28px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.35rem}
         .assistant-fab span{position:absolute;right:-3px;top:-4px;background:var(--primary-color);color:#fff;border-radius:999px;padding:3px 6px;font-size:.58rem;font-weight:800}
@@ -1606,6 +1624,9 @@
                 </div>
                 <div class="info-badge" onclick="cambiarCategoria('encargos', null)">
                     <i class="fa-solid fa-boxes-packing" style="color:#6366f1;"></i> Por Encargo
+                </div>
+                <div class="info-badge rate-badge" id="rate-indicator" title="Tasa de referencia usada para convertir precios a bolívares">
+                    <i class="fa-solid fa-money-bill-transfer"></i> <span id="rate-indicator-text">Tasa: —</span>
                 </div>
                 <a href="https://tinyurl.com/pageimc" target="_blank" rel="noopener noreferrer" class="info-badge">
                     <i class="fa-brands fa-facebook-f" style="color:#1877f2;"></i> Facebook
@@ -2061,6 +2082,10 @@
           <button class="assistant-action" onclick="asistenteAccion('requisitos')"><i class="fa-solid fa-list-check"></i><span>Requisitos</span></button>
           <button class="assistant-action" onclick="asistenteAccion('compra')"><i class="fa-solid fa-cart-shopping"></i><span>¿Cómo comprar?</span></button>
           <button class="assistant-action" onclick="asistenteAccion('delivery')"><i class="fa-solid fa-motorcycle"></i><span>Delivery</span></button>
+          <div class="assistant-budget-title">Encuentra algo según lo que necesitas</div>
+          <button class="assistant-action assistant-budget-action" onclick="asistenteAccion('presupuesto10')"><i class="fa-solid fa-coins"></i><span>Tengo menos de $10</span></button>
+          <button class="assistant-action assistant-budget-action" onclick="asistenteAccion('regalo')"><i class="fa-solid fa-gift"></i><span>Busco regalo</span></button>
+          <button class="assistant-action assistant-budget-action" onclick="asistenteAccion('telefono')"><i class="fa-solid fa-mobile-screen-button"></i><span>Accesorios para mi teléfono</span></button>
           <button class="assistant-action" onclick="asistenteAccion('ofertas')"><i class="fa-solid fa-fire"></i><span>Ver ofertas</span></button>
           <button class="assistant-action" onclick="asistenteAccion('encargos')"><i class="fa-solid fa-box"></i><span>Por encargo</span></button>
           <button class="assistant-action" onclick="asistenteAccion('whatsapp')"><i class="fa-brands fa-whatsapp"></i><span>Hablar por WhatsApp</span></button>
@@ -2103,10 +2128,11 @@
         // ============================================================
         const urlAPI = 'https://script.google.com/macros/s/AKfycbz_qzzzwFK6szGI5zZRHoy_cFZC04PdakHSwZEqU3JaRUnkaAWGV1qhN261-8gUnBLM9g/exec';
         const API_TIMEOUT_MS = 15000;
-        // Actualización automática del catálogo: cada 8 segundos.
-        const AUTO_REFRESH_MS = 8000;
+        // Actualización periódica moderada: al volver a la pestaña también se comprueba.
+        const AUTO_REFRESH_MS = 5 * 60 * 1000;
 
-        const CACHE_KEY = 'kervys_catalogo_cache_data_v2';
+        const CACHE_KEY = 'kervys_catalogo_cache_data_v3';
+        const CONFIG_CACHE_KEY = 'kervys_catalogo_config_cache_v1';
         const FAVS_KEY = 'kervys_catalogo_favoritos';
         const RECENT_KEY = 'kervys_catalogo_recientes';
 
@@ -2125,6 +2151,14 @@
         let jsPDFCargado = false;
         let accionPendienteRequisitos = null; // Callback tras confirmar requisitos
         let ultimaFirmaCatalogo = '';
+        let ultimaFirmaConfiguracion = '';
+        let configuracionCatalogo = {
+            tasa_usd: 0,
+            tasa_activa: false,
+            ultima_actualizacion: '',
+            horas_desde_actualizacion: null,
+            vigencia_horas: 24
+        };
         let actualizacionAutomaticaIniciada = false;
         let actualizacionEnCurso = false;
 
@@ -2339,10 +2373,8 @@
             productoParaEncargoActual = productoActualModal;
             document.getElementById('encargo-prod-title').innerText = productoActualModal.nombre;
             
-            const count = obtenerInteresadosEncargo(productoActualModal);
-            const pct = Math.min(100, Math.round((count / 25) * 100));
-            document.getElementById('encargo-form-counter').innerText = `${count} / 25 personas`;
-            document.getElementById('encargo-form-progress-bar').style.width = `${pct}%`;
+            document.getElementById('encargo-form-counter').innerText = 'Meta: 25 personas';
+            document.getElementById('encargo-form-progress-bar').style.width = '0%';
 
             document.getElementById('encargo-modal').classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -2385,12 +2417,15 @@
 
             const cod = prod.codigo_producto || prod.id || 'N/A';
             const precioRef = parseFloat(prod.precio) ? `$${calcularPrecioFinal(prod).toFixed(2)}` : 'A definir según lote';
+            const precioWhatsApp = obtenerTextoPrecioWhatsApp(prod, 'Precio estimado');
+            const imagenLinea = obtenerLineaImagenWhatsApp(prod);
 
             const msg = `📦 *REGISTRO EN LISTA DE ENCARGO (META 25)*\n` +
                         `━━━━━━━━━━━━━━━━━━━━━━━━\n` +
                         `🛍️ *Producto:* ${prod.nombre}\n` +
                         `🆔 *Código:* ${cod}\n` +
-                        `💰 *Precio estimado:* ${precioRef}\n` +
+                        `${precioWhatsApp.trim()}\n` +
+                        `${imagenLinea.trim()}\n` +
                         `👤 *Cliente:* ${nombre}\n` +
                         `📱 *WhatsApp:* ${tlf}\n` +
                         `🔢 *Cantidad a reservar:* ${cantidad} unidad(es)\n` +
@@ -2527,15 +2562,9 @@
                 rawItems = data;
             } else if (data && typeof data === 'object') {
                 const posibles = [
-                    data.products,
-                    data.items,
-                    data.data,
-                    data.result,
-                    data.results,
-                    data.rows,
-                    data.values,
-                    data.catalogo,
-                    data.catalog
+                    data.productos, data.products, data.items, data.data,
+                    data.result, data.results, data.rows, data.values,
+                    data.catalogo, data.catalog
                 ];
                 rawItems = posibles.find(Array.isArray) || [];
             }
@@ -2544,43 +2573,149 @@
             return rawItems.map((item, index) => normalizarProductoDesdeSheet(item, index));
         }
 
+        function normalizarConfiguracionCatalogo(data) {
+            const cfg = data && typeof data === 'object' && data.configuracion
+                ? data.configuracion
+                : (data && typeof data === 'object' && data.tasa_usd !== undefined ? data : {});
+
+            const tasa = convertirNumeroLocal(cfg.tasa_usd);
+            const vigencia = Number(cfg.vigencia_horas) > 0 ? Number(cfg.vigencia_horas) : 24;
+
+            return {
+                tasa_usd: tasa > 0 ? tasa : 0,
+                tasa_activa: cfg.tasa_activa === true || cfg.tasa_activa === 'true',
+                ultima_actualizacion: cfg.ultima_actualizacion || '',
+                horas_desde_actualizacion: cfg.horas_desde_actualizacion ?? null,
+                vigencia_horas: vigencia,
+                mensaje: cfg.mensaje || ''
+            };
+        }
+
+        function convertirNumeroLocal(valor) {
+            if (typeof valor === 'number') return Number.isFinite(valor) ? valor : 0;
+            if (valor === null || valor === undefined) return 0;
+            let s = String(valor).trim().replace(/\s/g, '');
+            if (!s) return 0;
+            if (s.includes(',') && s.includes('.')) {
+                if (s.lastIndexOf(',') > s.lastIndexOf('.')) s = s.replace(/\./g, '').replace(',', '.');
+                else s = s.replace(/,/g, '');
+            } else if (s.includes(',')) s = s.replace(',', '.');
+            const n = Number(s);
+            return Number.isFinite(n) ? n : 0;
+        }
+
+        function esTasaUsable() {
+            const cfg = configuracionCatalogo || {};
+            if (!(cfg.tasa_usd > 0) || !cfg.tasa_activa) return false;
+            if (cfg.ultima_actualizacion) {
+                const fecha = new Date(cfg.ultima_actualizacion);
+                if (!Number.isNaN(fecha.getTime())) {
+                    const vigenciaMs = (Number(cfg.vigencia_horas) || 24) * 60 * 60 * 1000;
+                    if ((Date.now() - fecha.getTime()) > vigenciaMs) return false;
+                }
+            }
+            return true;
+        }
+
+        function formatearBolivares(valor) {
+            return `Bs ${Number(valor || 0).toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+        }
+
+        function obtenerHtmlPrecio(prod, clase = '') {
+            if (!parseFloat(prod?.precio)) {
+                return `<div class="price-stack ${clase}"><div class="price-usd">${esPorEncargo(prod) ? 'Por Encargo' : 'Consultar'}</div></div>`;
+            }
+            const usd = calcularPrecioFinal(prod);
+            const bs = esTasaUsable() ? usd * configuracionCatalogo.tasa_usd : null;
+            return `<div class="price-stack ${clase}">
+                <div class="price-usd">$${usd.toFixed(2)}</div>
+                ${bs !== null ? `<div class="price-bs">${formatearBolivares(bs)}</div>` : ''}
+            </div>`;
+        }
+
+        function obtenerTextoPrecioWhatsApp(prod, etiqueta = 'Precio') {
+            if (!prod || !parseFloat(prod.precio)) return `\n💰 *${etiqueta}:* Consultar`;
+            const usd = calcularPrecioFinal(prod);
+            let texto = `\n💰 *${etiqueta}:* $${usd.toFixed(2)}`;
+            if (esTasaUsable()) {
+                texto += `\n🇻🇪 *Equivalente:* ${formatearBolivares(usd * configuracionCatalogo.tasa_usd)}\n📈 *Tasa de referencia usada:* ${configuracionCatalogo.tasa_usd}`;
+            }
+            return texto;
+        }
+
+        function actualizarIndicadorTasa() {
+            const badge = document.getElementById('rate-indicator');
+            const textEl = document.getElementById('rate-indicator-text');
+            if (!badge || !textEl) return;
+            if (esTasaUsable()) {
+                badge.classList.add('active'); badge.classList.remove('inactive');
+                textEl.textContent = `Tasa ref.: ${configuracionCatalogo.tasa_usd} Bs/$`;
+                badge.title = 'Tasa de referencia usada para convertir precios a bolívares';
+            } else if (configuracionCatalogo.tasa_usd > 0) {
+                badge.classList.add('active','inactive');
+                textEl.textContent = 'Bs temporalmente desactivados';
+                badge.title = 'La tasa necesita ser confirmada/actualizada en Google Sheets';
+            } else {
+                badge.classList.remove('active','inactive');
+            }
+        }
+
+        function aplicarConfiguracionCatalogo(config) {
+            configuracionCatalogo = normalizarConfiguracionCatalogo({configuracion: config});
+            ultimaFirmaConfiguracion = JSON.stringify(configuracionCatalogo);
+            actualizarIndicadorTasa();
+        }
+
+        function leerEstadoCacheCatalogo() {
+            let productos = [];
+            let configuracion = null;
+            const cached = localStorage.getItem(CACHE_KEY);
+            if (cached) {
+                try {
+                    const cacheData = JSON.parse(cached);
+                    productos = normalizarRespuestaCatalogo(cacheData);
+                    if (cacheData && !Array.isArray(cacheData) && cacheData.configuracion) configuracion = normalizarConfiguracionCatalogo(cacheData);
+                } catch (_) { localStorage.removeItem(CACHE_KEY); }
+            }
+            if (!configuracion) {
+                const cachedConfig = localStorage.getItem(CONFIG_CACHE_KEY);
+                if (cachedConfig) {
+                    try { configuracion = normalizarConfiguracionCatalogo(JSON.parse(cachedConfig)); }
+                    catch (_) { localStorage.removeItem(CONFIG_CACHE_KEY); }
+                }
+            }
+            return {productos, configuracion};
+        }
+
+        function guardarEstadoCacheCatalogo(productos, configuracion) {
+            localStorage.setItem(CACHE_KEY, JSON.stringify({productos, configuracion:configuracion||null, guardado_en:new Date().toISOString()}));
+            if (configuracion) localStorage.setItem(CONFIG_CACHE_KEY, JSON.stringify(configuracion));
+        }
+
+        function obtenerFirmaConfiguracion(config) {
+            return JSON.stringify(normalizarConfiguracionCatalogo({configuracion:config||{}}));
+        }
+
         function crearControlAbortable(ms) {
             const controller = new AbortController();
             const timer = setTimeout(() => controller.abort(), ms);
-            return { controller, timer };
+            return {controller,timer};
         }
 
         async function obtenerCatalogoDesdeAPI() {
             const control = crearControlAbortable(API_TIMEOUT_MS);
             try {
-                // cache-buster: obliga a Apps Script a entregar la versión actual.
                 const separador = urlAPI.includes('?') ? '&' : '?';
                 const urlSolicitud = `${urlAPI}${separador}t=${Date.now()}`;
-
-                const res = await fetch(urlSolicitud, {
-                    method: 'GET',
-                    cache: 'no-store',
-                    redirect: 'follow',
-                    headers: { 'Accept': 'application/json' },
-                    signal: control.controller.signal
-                });
-
+                const res = await fetch(urlSolicitud,{method:'GET',cache:'no-store',redirect:'follow',headers:{'Accept':'application/json'},signal:control.controller.signal});
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
                 const texto = await res.text();
                 if (!texto || !texto.trim()) throw new Error('Respuesta vacía del Google Sheet');
-
                 let data;
-                try {
-                    data = JSON.parse(texto);
-                } catch (error) {
-                    throw new Error('Google Apps Script no devolvió JSON válido');
-                }
-
+                try { data = JSON.parse(texto); }
+                catch (error) { throw new Error('Google Apps Script no devolvió JSON válido'); }
                 return data;
-            } finally {
-                clearTimeout(control.timer);
-            }
+            } finally { clearTimeout(control.timer); }
         }
 
         function productoEstaDisponible(prod) {
@@ -2621,117 +2756,96 @@
             cargarFavoritosStorage();
             cargarRecientesStorage();
 
-            const cached = localStorage.getItem(CACHE_KEY);
-            if (cached) {
-                try {
-                    const cacheData = JSON.parse(cached);
-                    const cacheNormalized = normalizarRespuestaCatalogo(cacheData);
-                    if (cacheNormalized.length) {
-                        ultimaFirmaCatalogo = JSON.stringify(cacheNormalized);
-                        procesarYRenderizarDatos(cacheNormalized);
-                    } else {
-                        localStorage.removeItem(CACHE_KEY);
-                    }
-                } catch (_) {
-                    localStorage.removeItem(CACHE_KEY);
-                }
+            const cacheEstado = leerEstadoCacheCatalogo();
+            const cachedProductos = cacheEstado.productos;
+            const cachedConfig = cacheEstado.configuracion;
+
+            if (cachedConfig) aplicarConfiguracionCatalogo(cachedConfig);
+            if (cachedProductos.length) {
+                ultimaFirmaCatalogo = JSON.stringify(cachedProductos);
+                procesarYRenderizarDatos(cachedProductos, cachedConfig || configuracionCatalogo);
             }
 
             try {
                 const data = await obtenerCatalogoDesdeAPI();
                 const normalized = normalizarRespuestaCatalogo(data);
-
-                if (!normalized.length) {
-                    throw new Error('El endpoint no devolvió productos reconocibles');
-                }
+                const config = normalizarConfiguracionCatalogo(data);
+                if (!normalized.length) throw new Error('El endpoint no devolvió productos reconocibles');
 
                 const firmaNueva = JSON.stringify(normalized);
-                const huboCambios = firmaNueva !== ultimaFirmaCatalogo;
+                const firmaConfigNueva = obtenerFirmaConfiguracion(config);
+                const huboCambiosProductos = firmaNueva !== ultimaFirmaCatalogo;
+                const huboCambiosConfig = firmaConfigNueva !== ultimaFirmaConfiguracion;
+                const huboCambios = huboCambiosProductos || huboCambiosConfig;
 
-                localStorage.setItem(CACHE_KEY, JSON.stringify(normalized));
+                guardarEstadoCacheCatalogo(normalized,config);
                 ultimaFirmaCatalogo = firmaNueva;
-                procesarYRenderizarDatos(normalized);
+                ultimaFirmaConfiguracion = firmaConfigNueva;
+                aplicarConfiguracionCatalogo(config);
+                procesarYRenderizarDatos(normalized,config);
 
-                // En la carga inicial mostramos confirmación; en las actualizaciones
-                // automáticas solo avisamos cuando realmente cambió el catálogo.
-                if (!silencioso && huboCambios) {
-                    mostrarToast('Catálogo actualizado correctamente', 'fa-solid fa-circle-check', '#22c55e', 1800);
-                }
+                if (!silencioso && huboCambios) mostrarToast('Catálogo y configuración actualizados correctamente','fa-solid fa-circle-check','#22c55e',2000);
             } catch (error) {
-                console.error('Error conectando con Google Sheets / Apps Script:', error);
-
-                if (!cached && !silencioso) {
+                console.error('Error conectando con Google Sheets / Apps Script:',error);
+                if (!cachedProductos.length && !silencioso) {
                     document.getElementById('product-grid').innerHTML = `
-                        <div style="grid-column:1/-1; text-align:center; padding:42px 20px; color:var(--text-muted);">
-                            <i class="fa-solid fa-cloud-arrow-down" style="font-size:2rem; margin-bottom:12px;"></i>
-                            <h3 style="color:var(--text-main); margin-bottom:8px;">No se pudo cargar el catálogo</h3>
-                            <p style="max-width:520px; margin:0 auto 16px; line-height:1.5;">
-                                Verifica que la aplicación web de Google Apps Script esté publicada y permita el acceso necesario.
-                            </p>
-                            <button class="filter-btn" type="button" onclick="cargarCatalogo(false)" style="margin:auto;">
-                                <i class="fa-solid fa-rotate"></i> Intentar nuevamente
-                            </button>
+                        <div style="grid-column:1/-1;text-align:center;padding:42px 20px;color:var(--text-muted);">
+                            <i class="fa-solid fa-cloud-arrow-down" style="font-size:2rem;margin-bottom:12px;"></i>
+                            <h3 style="color:var(--text-main);margin-bottom:8px;">No se pudo cargar el catálogo</h3>
+                            <p style="max-width:520px;margin:0 auto 16px;line-height:1.5;">Verifica que la aplicación web de Google Apps Script esté publicada y permita el acceso necesario.</p>
+                            <button class="filter-btn" type="button" onclick="cargarCatalogo(false)" style="margin:auto;"><i class="fa-solid fa-rotate"></i> Intentar nuevamente</button>
                         </div>`;
                 } else if (!silencioso) {
-                    mostrarToast('Sin conexión: mostrando los datos guardados', 'fa-solid fa-cloud', '#f59e0b', 2600);
+                    mostrarToast('Sin conexión: mostrando los datos guardados','fa-solid fa-cloud','#f59e0b',2600);
                 }
             }
         }
 
         async function actualizarCatalogoAutomaticamente() {
-            // Evita dos consultas simultáneas si una petición tarda más de 8 segundos.
             if (actualizacionEnCurso) return;
             actualizacionEnCurso = true;
-
             try {
                 const data = await obtenerCatalogoDesdeAPI();
                 const normalized = normalizarRespuestaCatalogo(data);
+                const config = normalizarConfiguracionCatalogo(data);
                 if (!normalized.length) return;
 
                 const firmaNueva = JSON.stringify(normalized);
-                const huboCambios = firmaNueva !== ultimaFirmaCatalogo;
+                const firmaConfigNueva = obtenerFirmaConfiguracion(config);
+                const huboCambiosProductos = firmaNueva !== ultimaFirmaCatalogo;
+                const huboCambiosConfig = firmaConfigNueva !== ultimaFirmaConfiguracion;
 
-                if (huboCambios) {
-                    localStorage.setItem(CACHE_KEY, JSON.stringify(normalized));
+                if (huboCambiosProductos || huboCambiosConfig) {
+                    guardarEstadoCacheCatalogo(normalized,config);
                     ultimaFirmaCatalogo = firmaNueva;
-                    procesarYRenderizarDatos(normalized);
-                    mostrarToast('Catálogo actualizado', 'fa-solid fa-arrows-rotate', '#2563eb', 1800);
-                }
+                    ultimaFirmaConfiguracion = firmaConfigNueva;
+                    aplicarConfiguracionCatalogo(config);
+                    procesarYRenderizarDatos(normalized,config);
+                    mostrarToast(huboCambiosProductos?'Catálogo actualizado':'Tasa de referencia actualizada','fa-solid fa-arrows-rotate','#2563eb',1800);
+                } else actualizarIndicadorTasa();
             } catch (error) {
-                // El catálogo continúa funcionando con los datos actuales si una
-                // actualización automática falla temporalmente.
-                console.warn('Actualización automática no disponible:', error);
-            } finally {
-                actualizacionEnCurso = false;
-            }
+                console.warn('Actualización automática no disponible:',error);
+                actualizarIndicadorTasa();
+            } finally { actualizacionEnCurso = false; }
         }
 
         function iniciarActualizacionAutomatica() {
             if (actualizacionAutomaticaIniciada) return;
             actualizacionAutomaticaIniciada = true;
-
-            // Consulta Google Sheets cada 8 segundos sin recargar toda la página.
-            setInterval(actualizarCatalogoAutomaticamente, AUTO_REFRESH_MS);
-
-            // Si la persona vuelve a la pestaña, comprobamos inmediatamente.
-            document.addEventListener('visibilitychange', () => {
-                if (!document.hidden) actualizarCatalogoAutomaticamente();
-            });
+            setInterval(actualizarCatalogoAutomaticamente,AUTO_REFRESH_MS);
+            document.addEventListener('visibilitychange',() => { if (!document.hidden) actualizarCatalogoAutomaticamente(); });
         }
 
-        function procesarYRenderizarDatos(data) {
-            const normalized = normalizarRespuestaCatalogo(data);
+        function procesarYRenderizarDatos(data,config=null) {
+            const normalized = Array.isArray(data) ? data : normalizarRespuestaCatalogo(data);
+            if (config) aplicarConfiguracionCatalogo(config);
             listaProductosGlobal = normalized.filter(productoEstaDisponible);
             actualizarIndicadorOfertas();
-
+            actualizarIndicadorTasa();
             loadSubcategories(listaProductosGlobal);
             construirBotonesCategorias(listaProductosGlobal);
             filtrarCombinado();
-
-            if (!hashInicialProcesado) {
-                hashInicialProcesado = true;
-                abrirProductoDesdeHash();
-            }
+            if (!hashInicialProcesado) { hashInicialProcesado=true; abrirProductoDesdeHash(); }
         }
 
         function esStriming(cat) { return cat && (cat.toLowerCase().trim() === 'striming' || cat.toLowerCase().includes('streaming')); }
@@ -2830,6 +2944,11 @@
             return esRecargaSaldo(prod.categoria) ? (parseFloat(prod.precio) || 0) * 1.12 : (parseFloat(prod.precio) || 0); 
         }
 
+        function calcularPrecioBolivares(prod) {
+            if (!prod || !parseFloat(prod.precio) || !esTasaUsable()) return null;
+            return calcularPrecioFinal(prod) * configuracionCatalogo.tasa_usd;
+        }
+
         function obtenerListaRequisitos(prod) {
             if (!prod || !prod.requisitos) return [];
             return prod.requisitos.toString().split('|').map(r => r.trim()).filter(Boolean);
@@ -2853,14 +2972,14 @@
             let hintBtnHtml = `<div class="card-hint-btn"><i class="fa-solid fa-eye"></i> Ver detalle</div>`;
             
             if (esEncargoProd) {
-                const count = obtenerInteresadosEncargo(prod);
-                statusBadgeHtml = `<div class="card-encargo-badge"><i class="fa-solid fa-boxes-packing"></i> Encargo (${count}/25)</div>`;
+                // El contador compartido real requiere un dato centralizado en Apps Script.
+                statusBadgeHtml = `<div class="card-encargo-badge"><i class="fa-solid fa-boxes-packing"></i> Por Encargo · Meta 25</div>`;
                 hintBtnHtml = `<div class="card-hint-btn" style="background:rgba(99,102,241,0.12); color:#4f46e5; border-color:#c7d2fe;"><i class="fa-solid fa-user-plus"></i> Ver Encargo</div>`;
             } else if (esOfertaProd) {
                 statusBadgeHtml = `<div class="card-oferta-badge"><i class="fa-solid fa-fire"></i> Oferta</div>`;
             }
 
-            const precioDisplay = parseFloat(prod.precio) ? `$${calcularPrecioFinal(prod).toFixed(2)}` : (esEncargoProd ? 'Por Encargo' : 'Consultar');
+            const precioDisplay = obtenerHtmlPrecio(prod);
 
             card.innerHTML = `
                 <div class="card-img-container">
@@ -2868,6 +2987,7 @@
                     <button class="card-fav-btn ${isFav ? 'fav-active' : ''}" onclick="toggleFavoritoPorId(event, '${idProdEncoded}')" aria-label="Favorito">
                         <i class="fa-${isFav ? 'solid' : 'regular'} fa-star"></i>
                     </button>
+                    ${statusBadgeHtml}
                     ${reqBadgeHtml}
                 </div>
                 <div class="card-body">
@@ -3484,20 +3604,64 @@
             if(ans){ans.classList.remove('active');ans.innerHTML='';} document.getElementById('assistant-modal').classList.add('active');document.body.style.overflow='hidden';
         }
         function cerrarAsistenteCompra(){const m=document.getElementById('assistant-modal');if(m)m.classList.remove('active');document.body.style.overflow='auto';}
+        function obtenerResultadosAsistente(tipo) {
+            const productos = Array.isArray(listaProductosGlobal) ? listaProductosGlobal.filter(productoEstaDisponible) : [];
+            if (tipo === 'presupuesto10') return productos.filter(p => parseFloat(p.precio) && calcularPrecioFinal(p) < 10).sort((a,b) => calcularPrecioFinal(a)-calcularPrecioFinal(b)).slice(0,8);
+            const textoProducto = p => [p.nombre,p.categoria,p.subcategoria,p.descripcion,p.mas_detalles,p.etiquetas,p.tags].filter(Boolean).join(' ').toLowerCase();
+            if (tipo === 'regalo') {
+                const palabras=['regalo','gift','detalle','obsequio','combo','peluche','juguete','accesorio','audifono','audífono','corneta','reloj'];
+                return productos.filter(p => palabras.some(k => textoProducto(p).includes(k))).slice(0,8);
+            }
+            if (tipo === 'telefono') {
+                const palabras=['telefono','teléfono','celular','smartphone','iphone','samsung','xiaomi','redmi','motorola','funda','forro','vidrio','templado','cargador','cable','powerbank','audifono','audífono'];
+                return productos.filter(p => palabras.some(k => textoProducto(p).includes(k))).slice(0,8);
+            }
+            return [];
+        }
+
+        function mostrarResultadosAsistente(tipo) {
+            const answer=document.getElementById('assistant-answer');
+            if(!answer)return;
+            const resultados=obtenerResultadosAsistente(tipo);
+            const titulos={presupuesto10:'💵 Opciones por menos de $10',regalo:'🎁 Ideas para regalar',telefono:'📱 Accesorios para tu teléfono'};
+            if(!resultados.length){
+                answer.innerHTML=`<strong>${titulos[tipo]||'🔎 Resultados'}</strong><div style="margin-top:6px">No encontré opciones con los datos actuales del catálogo. Puedes probar otra categoría o consultar por WhatsApp.</div>`;
+                answer.classList.add('active'); return;
+            }
+            const listaHtml=resultados.map(p=>{
+                const id=encodeURIComponent(obtenerIdentificadorProducto(p));
+                const precio=parseFloat(p.precio)?`$${calcularPrecioFinal(p).toFixed(2)}`:'Consultar';
+                return `<button class="assistant-result-btn" onclick="abrirResultadoAsistente('${id}')"><span>${p.nombre}</span><small>${precio}</small></button>`;
+            }).join('');
+            answer.innerHTML=`<strong>${titulos[tipo]||'🔎 Resultados'}</strong><div style="margin-top:6px">Estas son algunas opciones encontradas en el catálogo:</div><div class="assistant-result-list">${listaHtml}</div>`;
+            answer.classList.add('active');
+        }
+
+        function abrirResultadoAsistente(idEncoded) {
+            const prod=buscarProductoPorId(decodeURIComponent(idEncoded));
+            if(!prod){mostrarToast('Ese producto ya no está disponible en el catálogo.','fa-solid fa-circle-exclamation','#ef4444',2500);return;}
+            cerrarAsistenteCompra(); abrirModal(prod);
+        }
+
         function asistenteAccion(tipo){
-            const prod=obtenerProductoContextoAsistente(),answer=document.getElementById('assistant-answer'); if(!answer)return;
-            if(tipo==='ofertas'){cerrarAsistenteCompra();filtrarOfertasYTendencias();return;} if(tipo==='encargos'){cerrarAsistenteCompra();filtrarEncargos();return;}
+            const prod=obtenerProductoContextoAsistente(),answer=document.getElementById('assistant-answer');
+            if(!answer)return;
+            if(['presupuesto10','regalo','telefono'].includes(tipo)){mostrarResultadosAsistente(tipo);return;}
+            if(tipo==='ofertas'){cerrarAsistenteCompra();filtrarOfertasYTendencias();return;}
+            if(tipo==='encargos'){cerrarAsistenteCompra();filtrarEncargos();return;}
             let titulo='',contenido='';
             if(prod){
-                const precio=prod.precio?`$${calcularPrecioFinal(prod).toFixed(2)}`:'Consultar',reqs=obtenerListaRequisitos(prod),disponible=productoEstaDisponible(prod);
-                if(tipo==='precio'){titulo='💰 Precio';contenido=`<strong>${prod.nombre}</strong><br>Precio: <strong>${precio}</strong>${prod.en_oferta?' 🔥 Este producto está en oferta.':''}`;}
+                const precio=prod.precio?obtenerHtmlPrecio(prod):'Consultar',reqs=obtenerListaRequisitos(prod),disponible=productoEstaDisponible(prod);
+                if(tipo==='precio'){titulo='💰 Precio';contenido=`<strong>${prod.nombre}</strong><br>${precio}${prod.en_oferta?' 🔥 Este producto está en oferta.':''}`;}
                 else if(tipo==='disponibilidad'){titulo='📦 Disponibilidad';contenido=disponible?`<strong>${prod.nombre}</strong> aparece como disponible en el catálogo. Si quieres confirmar existencia inmediata, podemos consultarlo por WhatsApp.`:`<strong>${prod.nombre}</strong> no aparece disponible actualmente.`;}
                 else if(tipo==='requisitos'){titulo='📋 Requisitos';contenido=reqs.length?`<strong>Para ${prod.nombre}:</strong><br>${reqs.map(r=>`• ${r}`).join('<br>')}`:'Este producto no tiene requisitos registrados en Google Sheets.';}
                 else if(tipo==='compra'){titulo='🛒 ¿Cómo comprar?';contenido='Revisa el producto, confirma los requisitos si aparecen y luego puedes enviarlo directamente por WhatsApp.';}
                 else if(tipo==='delivery'){titulo='🚚 Delivery';contenido='Hacemos entregas en San José de Guanipa y zonas cercanas. El horario y costo se coordinan por WhatsApp.';}
                 else if(tipo==='whatsapp'){
-                    titulo='📲 WhatsApp'; const msg=`Hola 👋 Vengo del catálogo web.\n\nQuiero consultar sobre:\n*Producto:* ${prod.nombre}\n*Código:* ${prod.codigo_producto||prod.id||'N/A'}\n*Precio mostrado:* ${precio}\n🔗 *Link del producto:* ${obtenerUrlProductoDirecto(prod)}${obtenerLineaImagenWhatsApp(prod)}\n\n¿Me pueden ayudar con este producto?`; const url=`https://wa.me/${prod.whatsapp||'584149956831'}?text=${encodeURIComponent(msg)}`;
-                    contenido=`Te preparé el mensaje con el <strong>producto, código, enlace del producto y enlace de la imagen</strong>, para que sepas exactamente qué está consultando el cliente.<div class="assistant-answer-actions"><button class="assistant-mini-btn" onclick="window.open('${url}','_blank')">📲 Abrir WhatsApp</button></div>`;
+                    titulo='📲 WhatsApp';
+                    const msg=`Hola 👋 Vengo del catálogo web.\n\nQuiero consultar sobre:\n*Producto:* ${prod.nombre}\n*Código:* ${prod.codigo_producto||prod.id||'N/A'}${obtenerTextoPrecioWhatsApp(prod,'Precio mostrado')}\n🔗 *Link del producto:* ${obtenerUrlProductoDirecto(prod)}${obtenerLineaImagenWhatsApp(prod)}\n\n¿Me pueden ayudar con este producto?`;
+                    const url=`https://wa.me/${prod.whatsapp||'584149956831'}?text=${encodeURIComponent(msg)}`;
+                    contenido=`Te preparé el mensaje con el <strong>producto, código, precio, enlace del producto y enlace directo de la imagen</strong>.<div class="assistant-answer-actions"><button class="assistant-mini-btn" onclick="window.open('${url}','_blank')">📲 Abrir WhatsApp</button></div>`;
                 }
             }else{
                 if(tipo==='delivery'){titulo='🚚 Delivery';contenido='Hacemos entregas en San José de Guanipa y zonas cercanas. El horario y costo se coordinan por WhatsApp.';}
@@ -3514,13 +3678,14 @@
             const cod = prod.codigo_producto || prod.id || 'N/A';
             const precio = parseFloat(prod.precio) ? `$${calcularPrecioFinal(prod).toFixed(2)}` : 'Consultar';
             const descLinea = (prod.descripcion || '').trim() ? `\n*Descripción:* ${prod.descripcion.trim()}` : '';
-            const fotoLinea = prod.imagen ? `\n🖼️ *Imagen del producto:* ${prod.imagen}` : '';
+            const fotoLinea = obtenerLineaImagenWhatsApp(prod);
+            const precioWhatsApp = obtenerTextoPrecioWhatsApp(prod, 'Precio');
             const reqs = obtenerListaRequisitos(prod);
             const reqsTexto = reqs.length
                 ? `\n\n✅ *Requisitos leídos y listos para enviar:*\n${reqs.map(r => `• ${r}`).join('\n')}`
                 : '';
 
-            const msg = `Hola, vengo del catálogo web.\n\nQuiero solicitar información para:\n*Producto:* ${prod.nombre}\n*Código:* ${cod}${descLinea}\n*Precio:* ${precio}\n🔗 *Link del producto:* ${obtenerUrlProductoDirecto(prod)}${fotoLinea}${reqsTexto}\n\nConfirmo que ya leí y tengo listos los requisitos indicados.`;
+            const msg = `Hola, vengo del catálogo web.\n\nQuiero solicitar información para:\n*Producto:* ${prod.nombre}\n*Código:* ${cod}${descLinea}${precioWhatsApp}\n🔗 *Link del producto:* ${obtenerUrlProductoDirecto(prod)}${fotoLinea}${reqsTexto}\n\nConfirmo que ya leí y tengo listos los requisitos indicados.`;
             const urlWhatsApp = `https://wa.me/584149956831?text=${encodeURIComponent(msg)}`;
 
             // Se abre directamente durante el clic de confirmación para evitar que el navegador
@@ -3559,7 +3724,7 @@
             document.getElementById('modal-category').innerText = prod.subcategoria ? `${prod.categoria || ''} • ${prod.subcategoria}` : (prod.categoria || '');
             document.getElementById('modal-title').innerText = prod.nombre;
             document.getElementById('modal-code').innerText = `Código: ${prod.codigo_producto || prod.id || 'N/A'}`;
-            document.getElementById('modal-price').innerText = parseFloat(prod.precio) ? `$${calcularPrecioFinal(prod).toFixed(2)}` : (esPorEncargo(prod) ? 'Precio según lote' : 'Consultar');
+            document.getElementById('modal-price').innerHTML = obtenerHtmlPrecio(prod, 'modal-price');
             
             const alert = document.getElementById('recharge-alert-container');
             if (esRecargaSaldo(prod.categoria)) {
@@ -3579,10 +3744,9 @@
                 encargoSec.style.display = 'block';
                 regularActions.style.display = 'none';
                 
-                const count = obtenerInteresadosEncargo(prod);
-                const pct = Math.min(100, Math.round((count / 25) * 100));
-                document.getElementById('modal-encargo-badge-count').innerText = `${count} / 25 personas`;
-                document.getElementById('modal-encargo-bar').style.width = `${pct}%`;
+                // No se muestra un número compartido falso. El contador real debe venir de Apps Script.
+                document.getElementById('modal-encargo-badge-count').innerText = 'Meta: 25 personas';
+                document.getElementById('modal-encargo-bar').style.width = '0%';
                 
                 const yaAnotado = usuarioEstaAnotadoEnEncargo(prod);
                 const alreadyBox = document.getElementById('modal-encargo-already-joined');
@@ -3591,7 +3755,7 @@
                 const joinBtn = document.getElementById('modal-encargo-btn');
                 if (joinBtn) {
                     joinBtn.innerHTML = yaAnotado
-                        ? `<i class="fa-solid fa-clipboard-check"></i> Anotado (${count}/25) - Ver / Modificar WhatsApp`
+                        ? `<i class="fa-solid fa-clipboard-check"></i> Ya estás anotado · Ver / Modificar WhatsApp`
                         : `<i class="fa-solid fa-hand-holding-dollar"></i> Anotarme en la Lista (Meta 25 pers.)`;
                 }
             } else {
@@ -3870,13 +4034,15 @@
                 const fotoLinea = p.imagen ? `\n📸 *Foto:* ${p.imagen}` : '';
                 const reqs = obtenerListaRequisitos(p);
                 const reqsTexto = reqs.length ? `\n\n✅ *Requisitos confirmados por el cliente:* ${reqs.join(', ')}` : '';
+                const precioWhatsApp = obtenerTextoPrecioWhatsApp(p, 'Precio');
+                const fotoLineaObligatoria = obtenerLineaImagenWhatsApp(p);
 
                 if (esRecargaSaldo(p.categoria)) {
-                    msg = `Hola, mi nombre es *${nombre}*.\nQuiero procesar la recarga:\n*Código:* ${cod}\n*Producto:* ${p.nombre}${descLinea}\n*Total:* $${p.precioFinalCalculado.toFixed(2)}${fotoLinea}${reqsTexto}\n📍 *Nota:* ${dir || 'N/A'}`;
+                    msg = `Hola, mi nombre es *${nombre}*.\nQuiero procesar la recarga:\n*Código:* ${cod}\n*Producto:* ${p.nombre}${descLinea}${precioWhatsApp}${fotoLineaObligatoria}${reqsTexto}\n📍 *Nota:* ${dir || 'N/A'}`;
                 } else if (esStriming(p.categoria) || esServicioGeneral(p.categoria)) {
-                    msg = `Hola, mi nombre es *${nombre}*.\nSolicito el servicio:\n*Código:* ${cod}\n*Servicio:* ${p.nombre}${descLinea}\n*Precio:* $${p.precioFinalCalculado.toFixed(2)}${fotoLinea}${reqsTexto}\n📍 *Nota:* ${dir || 'N/A'}`;
+                    msg = `Hola, mi nombre es *${nombre}*.\nSolicito el servicio:\n*Código:* ${cod}\n*Servicio:* ${p.nombre}${descLinea}${precioWhatsApp}${fotoLineaObligatoria}${reqsTexto}\n📍 *Nota:* ${dir || 'N/A'}`;
                 } else {
-                    msg = `Hola, mi nombre es *${nombre}*.\nMe interesa:\n*Código:* ${cod}\n*Producto:* ${p.nombre}${descLinea}\n*Precio:* $${p.precioFinalCalculado.toFixed(2)}${fotoLinea}${reqsTexto}\n📍 *Dirección:* ${dir || 'N/A'}`;
+                    msg = `Hola, mi nombre es *${nombre}*.\nMe interesa:\n*Código:* ${cod}\n*Producto:* ${p.nombre}${descLinea}${precioWhatsApp}${fotoLineaObligatoria}${reqsTexto}\n📍 *Dirección:* ${dir || 'N/A'}`;
                 }
             } else if (carritoGlobal.length > 0) {
                 msg = `Hola, mi nombre es *${nombre}*.\n*Cotización de pedido:*\n\n`;
@@ -3890,14 +4056,20 @@
                     const fotoLinea = i.imagen ? `\n🖼️ *Imagen del producto:* ${i.imagen}` : '';
                     const reqs = obtenerListaRequisitos(i);
                     if (reqs.length) itemsConRequisitos.push(`- ${i.nombre} (${reqs.join(', ')})`);
-                    msg += `*${idx + 1}. ${i.nombre}*\n*Código:* ${cod}${descLinea}\n*Precio:* $${i.precioFinalCalculado.toFixed(2)}${fotoLinea}\n\n`;
+                    const precioLinea = obtenerTextoPrecioWhatsApp(i, 'Precio');
+                    const fotoLineaObligatoria = obtenerLineaImagenWhatsApp(i);
+                    msg += `*${idx + 1}. ${i.nombre}*\n*Código:* ${cod}${descLinea}${precioLinea}${fotoLineaObligatoria}\n\n`;
                 });
 
                 if (itemsConRequisitos.length > 0) {
                     msg += `✅ *Requisitos leídos y listos para enviar:* \n${itemsConRequisitos.join('\n')}\n\n`;
                 }
 
-                msg += `💰 *Total General:* $${t.toFixed(2)}\n📍 *Dirección/Nota:* ${dir || 'N/A'}`;
+                msg += `💰 *Total General:* $${t.toFixed(2)}`;
+                if (esTasaUsable()) {
+                    msg += `\n🇻🇪 *Total equivalente:* ${formatearBolivares(t * configuracionCatalogo.tasa_usd)}\n📈 *Tasa de referencia usada:* ${configuracionCatalogo.tasa_usd}`;
+                }
+                msg += `\n📍 *Dirección/Nota:* ${dir || 'N/A'}`;
                 carritoGlobal = []; 
                 actualizarBtnCarrito();
             } else {
