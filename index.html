@@ -2012,17 +2012,18 @@
                 <img id="share-preview-image" class="share-preview-image" alt="Vista previa para Estado de WhatsApp">
             </div>
             <div class="share-status-link-box">
-                <div class="share-status-link-title"><i class="fa-solid fa-link"></i> Enlace del producto</div>
+                <div class="share-status-link-title"><i class="fa-solid fa-link"></i> Enlace directo del producto</div>
                 <div class="share-status-link-row">
                     <a id="share-status-link" class="share-status-link" href="#" target="_blank" rel="noopener">Abrir producto</a>
                     <button type="button" class="share-copy-link-btn" id="share-copy-status-link-btn" title="Copiar enlace"><i class="fa-regular fa-copy"></i></button>
                 </div>
-                <small>Puedes compartir la imagen y luego pegar este enlace en el Estado para que el cliente pueda tocarlo.</small>
+                <small>El cliente podrá tocar el enlace y entrar directamente a este producto.</small>
             </div>
-            <p class="share-preview-help">En teléfonos compatibles, el menú de compartir puede permitir enviar la imagen y el texto/enlace. Si WhatsApp no conserva el enlace al publicar el Estado, cópialo con el botón de arriba y pégalo como enlace en el Estado.</p>
+            <p class="share-preview-help">Elige cómo quieres compartirlo: <strong>imagen</strong> para publicar el diseño, o <strong>enlace</strong> para enviar directamente el producto.</p>
             <div class="share-preview-actions">
-                <button type="button" class="share-option-btn share-primary-btn" id="share-status-now-btn"><i class="fa-brands fa-whatsapp"></i> Compartir imagen</button>
-                <button type="button" class="share-option-btn share-secondary-btn" id="share-status-copy-link-btn"><i class="fa-solid fa-link"></i> Copiar enlace para el Estado</button>
+                <button type="button" class="share-option-btn share-primary-btn" id="share-status-now-btn"><i class="fa-solid fa-image"></i> Compartir imagen</button>
+                <button type="button" class="share-option-btn share-primary-btn" id="share-status-share-link-btn"><i class="fa-solid fa-link"></i> Compartir enlace</button>
+                <button type="button" class="share-option-btn share-secondary-btn" id="share-status-copy-link-btn"><i class="fa-regular fa-copy"></i> Copiar enlace</button>
                 <button type="button" class="share-option-btn share-secondary-btn" onclick="cerrarVistaPreviaCompartir()">Cerrar</button>
             </div>
         </div>
@@ -3179,6 +3180,53 @@
             }
         }
 
+        async function compartirEnlaceProducto(prod) {
+            if (!prod) return;
+            const shareUrl = obtenerUrlCompartirProducto(prod);
+            const precioTxt = parseFloat(prod.precio)
+                ? `$${calcularPrecioFinal(prod).toFixed(2)}`
+                : (esPorEncargo(prod) ? 'Precio según lote' : 'Consultar');
+            const shareText = [
+                `📌 ${prod.nombre || 'Producto'}`,
+                `💰 ${precioTxt}`,
+                '📲 Mira el producto y pide información:'
+            ].join('\n');
+            const shareData = {
+                title: prod.nombre || 'Producto',
+                text: shareText,
+                url: shareUrl
+            };
+
+            try {
+                if (navigator.share && (!navigator.canShare || navigator.canShare(shareData))) {
+                    await navigator.share(shareData);
+                    mostrarToast('Enlace listo para compartir', 'fa-solid fa-link', '#2563eb', 1800);
+                    return;
+                }
+            } catch (error) {
+                if (error?.name === 'AbortError') return;
+                console.warn('Web Share del enlace no disponible:', error);
+            }
+
+            try {
+                if (navigator.clipboard?.writeText) {
+                    await navigator.clipboard.writeText(shareUrl);
+                } else {
+                    const area = document.createElement('textarea');
+                    area.value = shareUrl;
+                    area.style.position = 'fixed';
+                    area.style.opacity = '0';
+                    document.body.appendChild(area);
+                    area.select();
+                    document.execCommand('copy');
+                    area.remove();
+                }
+                mostrarToast('Enlace copiado. Ya puedes pegarlo donde quieras.', 'fa-solid fa-copy', '#22c55e', 2800);
+            } catch (error) {
+                mostrarToast('No se pudo compartir el enlace', 'fa-solid fa-circle-exclamation', '#f97316', 2500);
+            }
+        }
+
         async function prepararTextoEnlaceEstado(prod) {
             if (!prod) return;
             const url = obtenerUrlCompartirProducto(prod);
@@ -3225,8 +3273,9 @@
                 document.getElementById('share-preview-modal').classList.add('active');
                 document.body.style.overflow = 'hidden';
                 document.getElementById('share-status-now-btn').onclick = () => compartirPosterEstado(prod);
+                document.getElementById('share-status-share-link-btn').onclick = () => compartirEnlaceProducto(prod);
                 document.getElementById('share-copy-status-link-btn').onclick = () => copiarEnlaceEstado(prod);
-                document.getElementById('share-status-copy-link-btn').onclick = () => prepararTextoEnlaceEstado(prod);
+                document.getElementById('share-status-copy-link-btn').onclick = () => copiarEnlaceEstado(prod);
             } catch (error) {
                 console.error('Error generando poster de Estado:', error);
                 mostrarToast('No se pudo preparar la imagen. Inténtalo de nuevo.', 'fa-solid fa-circle-exclamation', '#ef4444', 3000);
@@ -3279,7 +3328,7 @@
                 const textoEstado = `${shareText}\n${shareUrl}`;
                 if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(textoEstado);
             } catch (e) {}
-            mostrarToast('Imagen guardada y enlace copiado. Súbela al Estado y pega el enlace.', 'fa-solid fa-image', '#22c55e', 4200);
+            mostrarToast('Imagen guardada y enlace copiado. Puedes publicar la imagen o compartir el enlace.', 'fa-solid fa-image', '#22c55e', 4200);
         }
 
         async function compartirProducto(evt, prod) {
