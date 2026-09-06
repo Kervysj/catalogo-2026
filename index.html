@@ -1635,7 +1635,7 @@
             </div>
             <div class="confirm-req-footer">
                 <button class="btn-confirm-req" id="btn-confirm-requisitos-proceder">
-                    <i class="fa-solid fa-check-circle"></i> Sí, los leí y continuar
+                    <i class="fa-solid fa-check-circle"></i> Sí, los leí y los tengo listos
                 </button>
                 <button class="btn-cancel-req" onclick="cerrarConfirmacionRequisitos()">
                     No los tengo aún (Cancelar)
@@ -2196,8 +2196,8 @@
             if (categoriaSeleccionada === 'todos') {
                 lista = lista.filter(p => !debeOcultarseEnPrincipal(p.categoria));
             } else if (categoriaSeleccionada === 'ofertas') {
-                // OFERTAS: solo muestra productos marcados como oferta en Google Sheets.
-                // Si no hay ninguno, la pestaña queda vacía y muestra el aviso correspondiente.
+                // OFERTAS: únicamente productos marcados como oferta en Google Sheets.
+                // No se sustituyen por productos destacados/populares si no hay ofertas.
                 lista = lista.filter(p => p.en_oferta === true);
             } else if (categoriaSeleccionada === 'encargos') {
                 lista = lista.filter(p => esPorEncargo(p));
@@ -2238,8 +2238,7 @@
             const reqBadgeHtml = requisitos.length > 0 ? `<div class="card-req-badge"><i class="fa-solid fa-clipboard-check"></i> Requisitos</div>` : '';
             
             const esEncargoProd = esPorEncargo(prod);
-            // La etiqueta "Oferta" de la tarjeta depende exclusivamente
-            // del campo en_oferta que viene de Google Sheets.
+            // La etiqueta "Oferta" solo aparece si la columna en_oferta del Google Sheet está activa.
             const esOfertaProd = !esEncargoProd && prod.en_oferta === true;
             
             let statusBadgeHtml = '';
@@ -2280,20 +2279,6 @@
             const grid = document.getElementById('product-grid');
             grid.innerHTML = '';
             if (!lista.length) {
-                if (categoriaSeleccionada === 'ofertas') {
-                    grid.innerHTML = `
-                        <div style="grid-column:1/-1; background:var(--card-bg); border:2px dashed #f97316; border-radius:18px; padding:34px 20px; text-align:center; max-width:540px; margin:24px auto; box-shadow:var(--shadow-subtle);">
-                            <div style="width:64px; height:64px; border-radius:50%; background:rgba(249,115,22,0.12); color:#f97316; display:inline-flex; align-items:center; justify-content:center; font-size:1.8rem; margin-bottom:14px;">
-                                <i class="fa-solid fa-tag"></i>
-                            </div>
-                            <h3 style="font-size:1.05rem; margin-bottom:7px;">No hay ofertas disponibles</h3>
-                            <p style="color:var(--text-muted); font-size:0.84rem; line-height:1.45; margin:0;">
-                                En este momento no tenemos artículos marcados como oferta.
-                                Cuando agreguemos uno en el catálogo, aparecerá aquí automáticamente.
-                            </p>
-                        </div>`;
-                    return;
-                }
                 if (categoriaSeleccionada === 'encargos') {
                     grid.innerHTML = `
                         <div style="grid-column: 1 / -1; background: var(--card-bg); border: 2px dashed #818cf8; border-radius: 18px; padding: 36px 20px; text-align: center; max-width: 540px; margin: 24px auto; box-shadow: var(--shadow-sm);">
@@ -2307,6 +2292,17 @@
                             <a href="https://wa.me/584149956831?text=Hola,%20quisiera%20consultar%20sobre%20los%20próximos%20pedidos%20por%20encargo:" target="_blank" class="whatsapp-btn" style="max-width: 320px; margin: 0 auto; display: inline-flex; justify-content: center; align-items: center; gap: 8px; font-size: 0.92rem; text-decoration: none;">
                                 <i class="fa-brands fa-whatsapp"></i> Consultar por WhatsApp
                             </a>
+                        </div>`;
+                } else if (categoriaSeleccionada === 'ofertas') {
+                    grid.innerHTML = `
+                        <div style="grid-column:1 / -1; background:var(--card-bg); border:2px dashed var(--border-color); border-radius:18px; padding:36px 20px; text-align:center; max-width:540px; margin:24px auto; box-shadow:var(--shadow-sm);">
+                            <div style="width:64px; height:64px; border-radius:50%; background:rgba(239,68,68,.10); color:#ef4444; display:inline-flex; align-items:center; justify-content:center; font-size:1.8rem; margin-bottom:14px;">
+                                <i class="fa-solid fa-tag"></i>
+                            </div>
+                            <h3 style="font-size:1.2rem; font-weight:800; margin-bottom:8px; color:var(--text-color);">No hay ofertas disponibles</h3>
+                            <p style="font-size:.92rem; color:var(--text-muted); line-height:1.55; margin:0;">
+                                Cuando un artículo sea marcado como oferta en el Google Sheet, aparecerá automáticamente en esta sección.
+                            </p>
                         </div>`;
                 } else {
                     grid.innerHTML = `<p style="text-align:center; grid-column:1/-1; color: var(--text-muted); padding: 40px;">No se encontraron productos en este criterio.</p>`;
@@ -2423,19 +2419,9 @@
 
             accionPendienteRequisitos = onConfirmar;
             document.getElementById('btn-confirm-requisitos-proceder').onclick = () => {
-                const accion = accionPendienteRequisitos;
-
-                // Para "Pedir Individual", la confirmación termina llevando a WhatsApp.
-                // Las demás acciones (por ejemplo, agregar al carrito) conservan su flujo actual.
-                if (accion && accion._irAWhatsAppConRequisitos) {
-                    accionPendienteRequisitos = null;
-                    accion();
-                    return;
-                }
-
                 cerrarConfirmacionRequisitos();
-                if (accion) {
-                    accion();
+                if (accionPendienteRequisitos) {
+                    accionPendienteRequisitos();
                     accionPendienteRequisitos = null;
                 }
             };
@@ -2443,53 +2429,39 @@
             document.getElementById('confirm-requisitos-modal').classList.add('active');
         }
 
+        function enviarProductoConRequisitosPorWhatsApp(prod) {
+            if (!prod) return;
+
+            // Abrimos la pestaña durante el clic del usuario para evitar que el navegador
+            // bloquee WhatsApp mientras mostramos una transición breve.
+            const waWindow = window.open('', '_blank');
+            const cod = prod.codigo_producto || prod.id || 'N/A';
+            const precio = parseFloat(prod.precio) ? `$${calcularPrecioFinal(prod).toFixed(2)}` : 'Consultar';
+            const descLinea = (prod.descripcion || '').trim() ? `\n*Descripción:* ${prod.descripcion.trim()}` : '';
+            const fotoLinea = prod.imagen ? `\n📸 *Foto:* ${prod.imagen}` : '';
+            const reqs = obtenerListaRequisitos(prod);
+            const reqsTexto = reqs.length
+                ? `\n\n✅ *Requisitos leídos y listos para enviar:*\n${reqs.map(r => `• ${r}`).join('\n')}`
+                : '';
+
+            const msg = `Hola, vengo del catálogo web.\n\nQuiero solicitar información para:\n*Producto:* ${prod.nombre}\n*Código:* ${cod}${descLinea}\n*Precio:* ${precio}${fotoLinea}${reqsTexto}\n\nConfirmo que ya leí y tengo listos los requisitos indicados.`;
+            const urlWhatsApp = `https://wa.me/584149956831?text=${encodeURIComponent(msg)}`;
+
+            cerrarModal();
+            mostrarToast('Requisitos confirmados. Preparando WhatsApp...', 'fa-brands fa-whatsapp', '#25d366', 1200);
+
+            setTimeout(() => {
+                if (waWindow && !waWindow.closed) {
+                    waWindow.location.href = urlWhatsApp;
+                } else {
+                    window.location.href = urlWhatsApp;
+                }
+            }, 750);
+        }
+
         function cerrarConfirmacionRequisitos() {
             document.getElementById('confirm-requisitos-modal').classList.remove('active');
             accionPendienteRequisitos = null;
-        }
-
-        // Abre WhatsApp después de una breve transición para que la confirmación
-        // se sienta como un paso real y no como un salto brusco.
-        function continuarRequisitosAWhatsApp(prod) {
-            if (!prod) return;
-
-            const numero = (prod.whatsapp || '584149956831').toString().replace(/\D/g, '') || '584149956831';
-            const cod = prod.codigo_producto || prod.id || 'N/A';
-            const precio = parseFloat(prod.precio) ? `$${calcularPrecioFinal(prod).toFixed(2)}` : 'Consultar';
-            const reqs = obtenerListaRequisitos(prod);
-
-            const msg =
-                `Hola, quiero procesar este pedido.\n` +
-                `🛍️ *Producto:* ${prod.nombre}\n` +
-                `🆔 *Código:* ${cod}\n` +
-                `💰 *Precio:* ${precio}\n\n` +
-                `✅ *He leído los requisitos y los tengo listos para enviarlos.*\n` +
-                `${reqs.length ? `📋 *Requisitos:* ${reqs.join(', ')}\n\n` : ''}` +
-                `Quedo atento(a) para continuar con el proceso.`;
-
-            // Se crea la ventana dentro del clic del usuario para evitar que
-            // el navegador bloquee la apertura de WhatsApp por un popup.
-            const waWindow = window.open('', '_blank');
-
-            cerrarConfirmacionRequisitos();
-            cerrarModal();
-
-            mostrarToast(
-                'Requisitos confirmados. Preparando WhatsApp…',
-                'fa-brands fa-whatsapp',
-                '#25d366',
-                1800
-            );
-
-            setTimeout(() => {
-                const url = `https://wa.me/${numero}?text=${encodeURIComponent(msg)}`;
-                if (waWindow) {
-                    waWindow.location.href = url;
-                    waWindow.focus();
-                } else {
-                    window.location.href = url;
-                }
-            }, 650);
         }
 
         let productoActualModal = null;
@@ -2551,9 +2523,9 @@
             // Comprar individual con validación previa de requisitos
             document.getElementById('modal-wa-btn').onclick = () => {
                 if (requisitos.length > 0) {
-                    const continuar = () => continuarRequisitosAWhatsApp(prod);
-                    continuar._irAWhatsAppConRequisitos = true;
-                    mostrarConfirmacionRequisitos(prod, continuar);
+                    mostrarConfirmacionRequisitos(prod, () => {
+                        enviarProductoConRequisitosPorWhatsApp(prod);
+                    });
                 } else {
                     productoIndividualPendiente = { ...prod, precioFinalCalculado: calcularPrecioFinal(prod) };
                     cerrarModal();
