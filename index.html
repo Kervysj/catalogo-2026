@@ -1809,7 +1809,13 @@
     </nav>
 
     <script>
-        // Google Apps Script / Google Sheets: la respuesta esperada es un array de objetos con la primera fila como encabezados.\n        const urlAPI = "https://script.google.com/macros/s/AKfycbz_qzzzwFK6szGI5zZRHoy_cFZC04PdakHSwZEqU3JaRUnkaAWGV1qhN261-8gUnBLM9g/exec";
+        // ============================================================
+        // CONEXIÓN GOOGLE SHEETS / GOOGLE APPS SCRIPT
+        // Esta es la URL de tu aplicación web publicada en Apps Script.
+        // ============================================================
+        const urlAPI = 'https://script.google.com/macros/s/AKfycbz_qzzzwFK6szGI5zZRHoy_cFZC04PdakHSwZEqU3JaRUnkaAWGV1qhN261-8gUnBLM9g/exec';
+        const API_TIMEOUT_MS = 15000;
+
         const CACHE_KEY = 'kervys_catalogo_cache_data_v2';
         const FAVS_KEY = 'kervys_catalogo_favoritos';
         const RECENT_KEY = 'kervys_catalogo_recientes';
@@ -2149,13 +2155,85 @@
             };
         }
 
+        function convertirFilasAObjetos(rows) {
+            if (!Array.isArray(rows) || !rows.length) return [];
+            if (rows.every(item => item && typeof item === 'object' && !Array.isArray(item))) return rows;
+
+            const encabezados = Array.isArray(rows[0])
+                ? rows[0].map((h, i) => normalizarTexto(h) || `campo_${i + 1}`)
+                : [];
+            if (!encabezados.length) return [];
+
+            return rows.slice(1).map(fila => {
+                const obj = {};
+                encabezados.forEach((key, i) => {
+                    obj[key] = Array.isArray(fila) ? (fila[i] ?? '') : '';
+                });
+                return obj;
+            }).filter(obj => Object.values(obj).some(v => String(v ?? '').trim() !== ''));
+        }
+
         function normalizarRespuestaCatalogo(data) {
-            const rawItems = Array.isArray(data)
-                ? data
-                : (Array.isArray(data?.products) ? data.products
-                    : Array.isArray(data?.items) ? data.items
-                    : []);
+            let rawItems = [];
+
+            if (Array.isArray(data)) {
+                rawItems = data;
+            } else if (data && typeof data === 'object') {
+                const posibles = [
+                    data.products,
+                    data.items,
+                    data.data,
+                    data.result,
+                    data.results,
+                    data.rows,
+                    data.values,
+                    data.catalogo,
+                    data.catalog
+                ];
+                rawItems = posibles.find(Array.isArray) || [];
+            }
+
+            rawItems = convertirFilasAObjetos(rawItems);
             return rawItems.map((item, index) => normalizarProductoDesdeSheet(item, index));
+        }
+
+        function crearControlAbortable(ms) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), ms);
+            return { controller, timer };
+        }
+
+        async function obtenerCatalogoDesdeAPI() {
+            const control = crearControlAbortable(API_TIMEOUT_MS);
+            try {
+                // cache-buster: obliga a Apps Script a entregar la versión actual.
+                const separador = urlAPI.includes('?') ? '&' : '?';
+                const urlSolicitud = `${urlAPI}${separador}t=${Date.now()}`;
+
+                const res = await fetch(urlSolicitud, {
+                    method: 'GET',
+                    cache: 'no-store',
+                    redirect: 'follow',
+                    headers: { 'Accept': 'application/json' },
+                    signal: control.controller.signal
+                });
+
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+                const texto = await res.text();
+                if (!texto || !texto.trim()) throw new Error('Respuesta vacía del Google Sheet');
+
+                let data;
+                try {
+                    data = JSON.parse(texto);
+                } catch (error) {
+                    throw new Error('Google Apps Script no devolvió JSON válido');
+                }
+
+                return data;
+            } finally {
+                clearTimeout(control.timer);
+            }
         }
 
         function productoEstaDisponible(prod) {
@@ -2164,36 +2242,55 @@
             return !['agotado','no disponible','no_disponible','inactivo','oculto','false','0'].includes(estado);
         }
 
-        function cargarCatalogo(silencioso = false) {
+        async function cargarCatalogo(silencioso = false) {
             cargarFavoritosStorage();
             cargarRecientesStorage();
 
             const cached = localStorage.getItem(CACHE_KEY);
             if (cached) {
                 try {
-                    procesarYRenderizarDatos(JSON.parse(cached));
+                    const cacheData = JSON.parse(cached);
+                    const cacheNormalized = normalizarRespuestaCatalogo(cacheData);
+                    if (cacheNormalized.length) {
+                        procesarYRenderizarDatos(cacheNormalized);
+                    } else {
+                        localStorage.removeItem(CACHE_KEY);
+                    }
                 } catch (_) {
                     localStorage.removeItem(CACHE_KEY);
                 }
             }
 
-            fetch(urlAPI, { method: 'GET', cache: 'no-store' })
-                .then(res => {
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                    return res.json();
-                })
-                .then(data => {
-                    const normalized = normalizarRespuestaCatalogo(data);
-                    if (!normalized.length) throw new Error('El endpoint no devolvió productos');
-                    localStorage.setItem(CACHE_KEY, JSON.stringify(normalized));
-                    procesarYRenderizarDatos(normalized);
-                    mostrarToast('Catálogo actualizado correctamente', 'fa-solid fa-circle-check', '#22c55e', 1800);
-                })
-                .catch(() => {
-                    if (!cached && !silencioso) {
-                        document.getElementById('product-grid').innerHTML = '<p style="text-align:center; grid-column:1/-1; color: var(--danger-color); padding: 40px;">No se pudo conectar con el catálogo en línea. Revisa tu conexión.</p>';
-                    }
-                });
+            try {
+                const data = await obtenerCatalogoDesdeAPI();
+                const normalized = normalizarRespuestaCatalogo(data);
+
+                if (!normalized.length) {
+                    throw new Error('El endpoint no devolvió productos reconocibles');
+                }
+
+                localStorage.setItem(CACHE_KEY, JSON.stringify(normalized));
+                procesarYRenderizarDatos(normalized);
+                mostrarToast('Catálogo actualizado correctamente', 'fa-solid fa-circle-check', '#22c55e', 1800);
+            } catch (error) {
+                console.error('Error conectando con Google Sheets / Apps Script:', error);
+
+                if (!cached && !silencioso) {
+                    document.getElementById('product-grid').innerHTML = `
+                        <div style="grid-column:1/-1; text-align:center; padding:42px 20px; color:var(--text-muted);">
+                            <i class="fa-solid fa-cloud-arrow-down" style="font-size:2rem; margin-bottom:12px;"></i>
+                            <h3 style="color:var(--text-main); margin-bottom:8px;">No se pudo cargar el catálogo</h3>
+                            <p style="max-width:520px; margin:0 auto 16px; line-height:1.5;">
+                                Verifica que la aplicación web de Google Apps Script esté publicada y permita el acceso necesario.
+                            </p>
+                            <button class="filter-btn" type="button" onclick="cargarCatalogo(false)" style="margin:auto;">
+                                <i class="fa-solid fa-rotate"></i> Intentar nuevamente
+                            </button>
+                        </div>`;
+                } else if (!silencioso) {
+                    mostrarToast('Sin conexión: mostrando los datos guardados', 'fa-solid fa-cloud', '#f59e0b', 2600);
+                }
+            }
         }
 
         function procesarYRenderizarDatos(data) {
