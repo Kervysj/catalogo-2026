@@ -31,8 +31,8 @@
         },
         "geo": {
             "@type": "GeoCoordinates",
-            "latitude": 8.8864,
-            "longitude": -64.1532
+            "latitude": 8.8891204,
+            "longitude": -64.1521477
         }
     }
     </script>
@@ -1595,7 +1595,7 @@
                             <button id="modal-fav-btn" class="modal-icon-action-btn" title="Favorito">
                                 <i class="fa-regular fa-star"></i>
                             </button>
-                            <button id="modal-share-btn" class="modal-icon-action-btn" title="Compartir">
+                            <button id="modal-share-btn" title="Compartir producto" class="modal-icon-action-btn" title="Compartir">
                                 <i class="fa-solid fa-share-nodes"></i>
                             </button>
                             <button id="modal-tiktok-btn" class="modal-icon-action-btn modal-tiktok-btn" title="TikTok" style="display:none;">
@@ -1709,13 +1709,13 @@
                 <h2 class="modal-title" style="color:var(--danger-color); margin-bottom:4px;">
                     <i class="fa-solid fa-location-dot"></i> Nuestra Ubicación
                 </h2>
-                <p style="color:var(--text-muted); font-size:0.82rem; margin-bottom:12px;">Calle Zea entre Unión y Democracia, frente a la Plaza Bolívar, al lado de Mi Plazita, San José de Guanipa.</p>
+                <p style="color:var(--text-muted); font-size:0.82rem; margin-bottom:12px;">Ubicación exacta: Inversiones Martinez Caña C.A., San José de Guanipa.</p>
                 <div id="interactive-map" class="map-modal-container"></div>
                 <div class="route-info-box" id="route-text-status">
                     <i class="fa-solid fa-compass"></i>
                     <span id="route-distance-label">Calculando distancia...</span>
                 </div>
-                <a href="https://maps.app.goo.gl/scvfNGbCY3UAANLKA" target="_blank" class="whatsapp-btn" style="background:var(--danger-color); width:100%;">
+                <a href="https://maps.app.goo.gl/nWKoqPqunbBiFGgF7" target="_blank" class="whatsapp-btn" style="background:var(--danger-color); width:100%;">
                     <i class="fa-solid fa-diamond-turn-right"></i> Abrir en Google Maps / Waze
                 </a>
             </div>
@@ -1753,8 +1753,8 @@
     </nav>
 
     <script>
-        const urlAPI = "https://script.google.com/macros/s/AKfycbyfjv9UscbcmgqeKjx_0j5UxGWK2qpFudgFGcHeCBt252fUfxgkhcQUKH-b8BeZLU8NNg/exec";
-        const CACHE_KEY = 'kervys_catalogo_cache_data';
+        // Google Apps Script / Google Sheets: la respuesta esperada es un array de objetos con la primera fila como encabezados.\n        const urlAPI = "https://script.google.com/macros/s/AKfycbz_qzzzwFK6szGI5zZRHoy_cFZC04PdakHSwZEqU3JaRUnkaAWGV1qhN261-8gUnBLM9g/exec";
+        const CACHE_KEY = 'kervys_catalogo_cache_data_v2';
         const FAVS_KEY = 'kervys_catalogo_favoritos';
         const RECENT_KEY = 'kervys_catalogo_recientes';
 
@@ -2039,30 +2039,115 @@
             jsPDFCargado = true;
         }
 
+        function normalizarTexto(valor) {
+            return valor == null ? '' : String(valor).trim();
+        }
+
+        function normalizarBooleano(valor, defecto = false) {
+            if (typeof valor === 'boolean') return valor;
+            const v = normalizarTexto(valor).toLowerCase();
+            if (!v) return defecto;
+            return ['true','1','si','sí','yes','disponible','activo'].includes(v);
+        }
+
+        function obtenerCampo(obj, aliases, fallback = '') {
+            for (const key of aliases) {
+                if (Object.prototype.hasOwnProperty.call(obj, key) && obj[key] !== '' && obj[key] != null) {
+                    return obj[key];
+                }
+            }
+            const keys = Object.keys(obj);
+            for (const key of keys) {
+                const normal = key.toLowerCase().trim().replace(/\\s+/g, '_');
+                if (aliases.includes(normal) && obj[key] !== '' && obj[key] != null) return obj[key];
+            }
+            return fallback;
+        }
+
+        function normalizarProductoDesdeSheet(raw, index) {
+            const id = normalizarTexto(obtenerCampo(raw, ['id','codigo','codigo_producto','sku','cod']));
+            const nombre = normalizarTexto(obtenerCampo(raw, ['nombre','titulo','producto','nombre_producto'], `Producto ${index + 1}`));
+            const categoria = normalizarTexto(obtenerCampo(raw, ['categoria','seccion','categoría'], 'General'));
+            const precioRaw = obtenerCampo(raw, ['precio','precio_usd','precio_dolares','precio_dólares','valor'], '');
+            const precio = Number.parseFloat(String(precioRaw).replace(/[^0-9.,-]/g, '').replace(/,(?=\\d{1,2}$)/, '.').replace(/,/g, '')) || 0;
+            const estado = normalizarTexto(obtenerCampo(raw, ['status','estado','disponible','activo'], 'disponible')).toLowerCase();
+
+            return {
+                ...raw,
+                id: id || String(index + 1),
+                codigo_producto: id || String(index + 1),
+                nombre,
+                categoria,
+                subcategoria: normalizarTexto(obtenerCampo(raw, ['subcategoria','subcategoría','sub_categoria'], '')),
+                precio,
+                descripcion: normalizarTexto(obtenerCampo(raw, ['descripcion','descripción','detalles'], '')),
+                mas_detalles: normalizarTexto(obtenerCampo(raw, ['mas_detalles','más_detalles','detalle_adicional'], '')),
+                imagen: normalizarTexto(obtenerCampo(raw, ['imagen','foto','url_imagen','image','foto_url'], 'https://via.placeholder.com/600x600?text=Producto')),
+                whatsapp: normalizarTexto(obtenerCampo(raw, ['whatsapp','telefono','teléfono','contacto'], '584149956831')),
+                requisitos: normalizarTexto(obtenerCampo(raw, ['requisitos','requisito'], '')),
+                etiquetas: normalizarTexto(obtenerCampo(raw, ['etiquetas','tags'], '')),
+                status: estado || 'disponible',
+                en_oferta: normalizarBooleano(obtenerCampo(raw, ['en_oferta','oferta','es_oferta'], false), false),
+                por_encargo: normalizarBooleano(obtenerCampo(raw, ['por_encargo','encargo','pedido'], false), false),
+                video_tiktok: normalizarTexto(obtenerCampo(raw, ['video_tiktok','tiktok','video'], ''))
+            };
+        }
+
+        function normalizarRespuestaCatalogo(data) {
+            const rawItems = Array.isArray(data)
+                ? data
+                : (Array.isArray(data?.products) ? data.products
+                    : Array.isArray(data?.items) ? data.items
+                    : []);
+            return rawItems.map((item, index) => normalizarProductoDesdeSheet(item, index));
+        }
+
+        function productoEstaDisponible(prod) {
+            const estado = normalizarTexto(prod.status || prod.estado || '').toLowerCase();
+            if (!estado) return true;
+            return !['agotado','no disponible','no_disponible','inactivo','oculto','false','0'].includes(estado);
+        }
+
         function cargarCatalogo(silencioso = false) {
             cargarFavoritosStorage();
             cargarRecientesStorage();
-            if (!silencioso && localStorage.getItem(CACHE_KEY)) {
-                procesarYRenderizarDatos(JSON.parse(localStorage.getItem(CACHE_KEY)));
+
+            const cached = localStorage.getItem(CACHE_KEY);
+            if (cached) {
+                try {
+                    procesarYRenderizarDatos(JSON.parse(cached));
+                } catch (_) {
+                    localStorage.removeItem(CACHE_KEY);
+                }
             }
-            fetch(urlAPI)
-                .then(res => res.json())
+
+            fetch(urlAPI, { method: 'GET', cache: 'no-store' })
+                .then(res => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
+                })
                 .then(data => {
-                    localStorage.setItem(CACHE_KEY, JSON.stringify(data));
-                    procesarYRenderizarDatos(data);
+                    const normalized = normalizarRespuestaCatalogo(data);
+                    if (!normalized.length) throw new Error('El endpoint no devolvió productos');
+                    localStorage.setItem(CACHE_KEY, JSON.stringify(normalized));
+                    procesarYRenderizarDatos(normalized);
+                    mostrarToast('Catálogo actualizado correctamente', 'fa-solid fa-circle-check', '#22c55e', 1800);
                 })
                 .catch(() => {
-                    if (!silencioso && !localStorage.getItem(CACHE_KEY)) {
+                    if (!cached && !silencioso) {
                         document.getElementById('product-grid').innerHTML = '<p style="text-align:center; grid-column:1/-1; color: var(--danger-color); padding: 40px;">No se pudo conectar con el catálogo en línea. Revisa tu conexión.</p>';
                     }
                 });
         }
 
         function procesarYRenderizarDatos(data) {
-            listaProductosGlobal = data.filter(prod => prod.status && prod.status.toString().trim().toLowerCase() === 'disponible');
+            const normalized = normalizarRespuestaCatalogo(data);
+            listaProductosGlobal = normalized.filter(productoEstaDisponible);
+
             loadSubcategories(listaProductosGlobal);
             construirBotonesCategorias(listaProductosGlobal);
             filtrarCombinado();
+
             if (!hashInicialProcesado) {
                 hashInicialProcesado = true;
                 abrirProductoDesdeHash();
@@ -2079,8 +2164,6 @@
             const cats = [...new Set(productos.map(p => p.categoria ? p.categoria.trim() : 'General'))];
             
             let html = `<button class="filter-btn ${categoriaSeleccionada === 'todos' ? 'active' : ''}" onclick="cambiarCategoria('todos', this)"><i class="fa-solid fa-border-all"></i> Todos</button>
-                        <button class="filter-btn oferta-filter ${categoriaSeleccionada === 'ofertas' ? 'active' : ''}" onclick="cambiarCategoria('ofertas', this)"><i class="fa-solid fa-fire"></i> Ofertas</button>
-                        <button class="filter-btn encargo-filter ${categoriaSeleccionada === 'encargos' ? 'active' : ''}" onclick="cambiarCategoria('encargos', this)"><i class="fa-solid fa-boxes-packing"></i> Por Encargo</button>
                         <button class="filter-btn fav-filter ${categoriaSeleccionada === 'favoritos' ? 'active' : ''}" onclick="cambiarCategoria('favoritos', this)"><i class="fa-solid fa-star"></i> Favoritos</button>
                         <button class="filter-btn recent-filter ${categoriaSeleccionada === 'recientes' ? 'active' : ''}" onclick="cambiarCategoria('recientes', this)"><i class="fa-solid fa-clock-rotate-left"></i> Recientes</button>`;
             
@@ -2176,7 +2259,6 @@
                     <button class="card-fav-btn ${isFav ? 'fav-active' : ''}" onclick="toggleFavoritoPorId(event, '${idProdEncoded}')" aria-label="Favorito">
                         <i class="fa-${isFav ? 'solid' : 'regular'} fa-star"></i>
                     </button>
-                    ${statusBadgeHtml}
                     ${reqBadgeHtml}
                 </div>
                 <div class="card-body">
@@ -2254,16 +2336,55 @@
             toast._timeoutId = setTimeout(() => toast.classList.remove('show'), duracionMs);
         }
 
-        function compartirProducto(evt, prod) {
-            const precioTxt = parseFloat(prod.precio) ? `$${calcularPrecioFinal(prod).toFixed(2)}` : 'Por Encargo';
-            const txt = `📌 *${prod.nombre}*\n💰 Precio: ${precioTxt}\n\n¡Consíguelo en nuestro Catálogo Digital!`;
-            if (navigator.share) {
-                navigator.share({ title: prod.nombre, text: txt, url: window.location.href }).catch(() => {});
-            } else {
-                navigator.clipboard.writeText(txt + "\n" + window.location.href);
-                mostrarToast('¡Enlace copiado al portapapeles!', 'fa-solid fa-check-circle', '#22c55e', 2500);
+        async function compartirProducto(evt, prod) {
+            if (evt) evt.stopPropagation();
+            if (!prod) return;
+
+            const id = obtenerIdentificadorProducto(prod);
+            const shareUrl = `${window.location.origin}${window.location.pathname}#producto-${encodeURIComponent(id)}`;
+            const precioTxt = parseFloat(prod.precio)
+                ? `$${calcularPrecioFinal(prod).toFixed(2)}`
+                : (esPorEncargo(prod) ? 'Precio según lote' : 'Consultar');
+
+            const shareText =
+                `📌 ${prod.nombre}\n` +
+                `💰 Precio: ${precioTxt}\n` +
+                `📍 San José de Guanipa\n\n` +
+                `Mira este producto en nuestro catálogo digital.`;
+
+            try {
+                if (navigator.share) {
+                    await navigator.share({
+                        title: prod.nombre,
+                        text: shareText,
+                        url: shareUrl
+                    });
+                    mostrarToast('Producto compartido', 'fa-solid fa-share-nodes', '#2563eb', 1800);
+                    return;
+                }
+
+                const completeText = `${shareText}\n${shareUrl}`;
+                if (navigator.clipboard?.writeText) {
+                    await navigator.clipboard.writeText(completeText);
+                } else {
+                    const area = document.createElement('textarea');
+                    area.value = completeText;
+                    area.style.position = 'fixed';
+                    area.style.opacity = '0';
+                    document.body.appendChild(area);
+                    area.select();
+                    document.execCommand('copy');
+                    area.remove();
+                }
+
+                mostrarToast('¡Enlace del producto copiado!', 'fa-solid fa-link', '#22c55e', 2500);
+            } catch (error) {
+                if (error?.name !== 'AbortError') {
+                    mostrarToast('No se pudo compartir. Puedes copiar el enlace desde el navegador.', 'fa-solid fa-circle-exclamation', '#f97316', 3000);
+                }
             }
         }
+
 
         // ================= GESTIÓN DE REQUISITOS OBLIGATORIOS =================
         function abrirModalRequisitosDirecto() {
@@ -2312,7 +2433,7 @@
             document.getElementById('modal-category').innerText = prod.subcategoria ? `${prod.categoria || ''} • ${prod.subcategoria}` : (prod.categoria || '');
             document.getElementById('modal-title').innerText = prod.nombre;
             document.getElementById('modal-code').innerText = `Código: ${prod.codigo_producto || prod.id || 'N/A'}`;
-            document.getElementById('modal-price').innerText = parseFloat(prod.precio) ? `$${calcularPrecioFinal(prod).toFixed(2)}` : (esPorEncargo(prod) ? 'Precio a definir según lote' : 'Consultar');
+            document.getElementById('modal-price').innerText = parseFloat(prod.precio) ? `$${calcularPrecioFinal(prod).toFixed(2)}` : (esPorEncargo(prod) ? 'Precio según lote' : 'Consultar');
             
             const alert = document.getElementById('recharge-alert-container');
             if (esRecargaSaldo(prod.categoria)) {
@@ -2688,12 +2809,12 @@
             await asegurarLeaflet();
             setTimeout(() => {
                 if (!leafletMap) {
-                    leafletMap = L.map('interactive-map').setView([8.8864, -64.1532], 16);
+                    leafletMap = L.map('interactive-map').setView([8.8891204, -64.1521477], 16);
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                         attribution: '&copy; OpenStreetMap'
                     }).addTo(leafletMap);
-                    L.marker([8.8864, -64.1532]).addTo(leafletMap)
-                        .bindPopup('<b>📍 Tienda Principal</b><br>Calle Zea, frente a la Plaza Bolívar, al lado de Mi Plazita')
+                    L.marker([8.8891204, -64.1521477]).addTo(leafletMap)
+                        .bindPopup('<b>📍 Tienda Principal</b><br>Inversiones Martinez Caña C.A., San José de Guanipa')
                         .openPopup();
                 } else {
                     leafletMap.invalidateSize();
@@ -2704,13 +2825,13 @@
                 navigator.geolocation.getCurrentPosition(pos => {
                     const latUser = pos.coords.latitude;
                     const lonUser = pos.coords.longitude;
-                    const distanciaKm = calcularDistanciaGeo(latUser, lonUser, 8.8864, -64.1532);
+                    const distanciaKm = calcularDistanciaGeo(latUser, lonUser, 8.8891204, -64.1521477);
                     document.getElementById('route-distance-label').innerText = `Estás a aprox. ${distanciaKm.toFixed(1)} km de la tienda.`;
                 }, () => {
-                    document.getElementById('route-distance-label').innerText = 'Calle Zea, frente a la Plaza Bolívar, al lado de Mi Plazita.';
+                    document.getElementById('route-distance-label').innerText = 'Inversiones Martinez Caña C.A., San José de Guanipa.';
                 });
             } else {
-                document.getElementById('route-distance-label').innerText = 'Calle Zea, frente a la Plaza Bolívar, al lado de Mi Plazita.';
+                document.getElementById('route-distance-label').innerText = 'Inversiones Martinez Caña C.A., San José de Guanipa.';
             }
         }
 
