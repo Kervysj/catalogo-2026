@@ -2932,14 +2932,67 @@
             return y + lineas.length * lineHeight;
         }
 
+        function obtenerFuentesImagenPoster(src) {
+            if (!src) return [];
+            const original = String(src).trim();
+            if (!original) return [];
+
+            const fuentes = [];
+            const agregar = (url) => {
+                if (url && !fuentes.includes(url)) fuentes.push(url);
+            };
+
+            // GitHub suele entregar enlaces /blob/ que funcionan como <img>,
+            // pero no son la mejor fuente para dibujar en un canvas por CORS.
+            // Convertimos automáticamente a raw.githubusercontent.com.
+            try {
+                const u = new URL(original, window.location.href);
+                if (u.hostname === 'github.com') {
+                    const partes = u.pathname.split('/').filter(Boolean);
+                    const indiceBlob = partes.indexOf('blob');
+                    if (partes.length >= 4 && indiceBlob === 2) {
+                        const owner = partes[0];
+                        const repo = partes[1];
+                        const rama = partes[3];
+                        const ruta = partes.slice(4).join('/');
+                        if (owner && repo && rama && ruta) {
+                            agregar(`https://raw.githubusercontent.com/${owner}/${repo}/${rama}/${ruta}`);
+                        }
+                    }
+                }
+            } catch (e) {}
+
+            agregar(original);
+            return fuentes;
+        }
+
         function cargarImagenParaPoster(src) {
-            return new Promise((resolve) => {
-                if (!src) return resolve(null);
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-                img.onload = () => resolve(img);
-                img.onerror = () => resolve(null);
-                img.src = src;
+            return new Promise(async (resolve) => {
+                const fuentes = obtenerFuentesImagenPoster(src);
+                if (!fuentes.length) return resolve(null);
+
+                // Probamos primero la versión RAW de GitHub y luego la original.
+                for (const fuente of fuentes) {
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    img.decoding = 'async';
+
+                    const resultado = await new Promise((resolver) => {
+                        let terminado = false;
+                        const finalizar = (valor) => {
+                            if (terminado) return;
+                            terminado = true;
+                            resolver(valor);
+                        };
+                        img.onload = () => finalizar(img);
+                        img.onerror = () => finalizar(null);
+                        img.src = fuente;
+                    });
+
+                    if (resultado) return resolve(resultado);
+                }
+
+                resolve(null);
             });
         }
 
