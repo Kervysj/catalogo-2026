@@ -1815,6 +1815,8 @@
         // ============================================================
         const urlAPI = 'https://script.google.com/macros/s/AKfycbz_qzzzwFK6szGI5zZRHoy_cFZC04PdakHSwZEqU3JaRUnkaAWGV1qhN261-8gUnBLM9g/exec';
         const API_TIMEOUT_MS = 15000;
+        // Actualización automática del catálogo: cada 8 segundos.
+        const AUTO_REFRESH_MS = 8000;
 
         const CACHE_KEY = 'kervys_catalogo_cache_data_v2';
         const FAVS_KEY = 'kervys_catalogo_favoritos';
@@ -1834,6 +1836,9 @@
         let leafletCargado = false;
         let jsPDFCargado = false;
         let accionPendienteRequisitos = null; // Callback tras confirmar requisitos
+        let ultimaFirmaCatalogo = '';
+        let actualizacionAutomaticaIniciada = false;
+        let actualizacionEnCurso = false;
 
         function debounce(fn, delay = 200) {
             let timer;
@@ -2107,9 +2112,16 @@
 
         function normalizarBooleano(valor, defecto = false) {
             if (typeof valor === 'boolean') return valor;
-            const v = normalizarTexto(valor).toLowerCase();
+            const v = normalizarTexto(valor)
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '');
             if (!v) return defecto;
-            return ['true','1','si','sí','yes','disponible','activo'].includes(v);
+            return [
+                'true', '1', 'si', 'yes', 'disponible', 'activo',
+                'oferta', 'en oferta', 'en_oferta', 'si oferta',
+                'promocion', 'promo'
+            ].includes(v);
         }
 
         function obtenerCampo(obj, aliases, fallback = '') {
@@ -2149,6 +2161,8 @@
                 requisitos: normalizarTexto(obtenerCampo(raw, ['requisitos','requisito'], '')),
                 etiquetas: normalizarTexto(obtenerCampo(raw, ['etiquetas','tags'], '')),
                 status: estado || 'disponible',
+                // Acepta una columna llamada en_oferta, oferta o es_oferta.
+                // También acepta valores como SI, TRUE, 1, OFERTA o EN OFERTA.
                 en_oferta: normalizarBooleano(obtenerCampo(raw, ['en_oferta','oferta','es_oferta'], false), false),
                 por_encargo: normalizarBooleano(obtenerCampo(raw, ['por_encargo','encargo','pedido'], false), false),
                 video_tiktok: normalizarTexto(obtenerCampo(raw, ['video_tiktok','tiktok','video'], ''))
@@ -2252,6 +2266,7 @@
                     const cacheData = JSON.parse(cached);
                     const cacheNormalized = normalizarRespuestaCatalogo(cacheData);
                     if (cacheNormalized.length) {
+                        ultimaFirmaCatalogo = JSON.stringify(cacheNormalized);
                         procesarYRenderizarDatos(cacheNormalized);
                     } else {
                         localStorage.removeItem(CACHE_KEY);
@@ -2269,9 +2284,18 @@
                     throw new Error('El endpoint no devolvió productos reconocibles');
                 }
 
+                const firmaNueva = JSON.stringify(normalized);
+                const huboCambios = firmaNueva !== ultimaFirmaCatalogo;
+
                 localStorage.setItem(CACHE_KEY, JSON.stringify(normalized));
+                ultimaFirmaCatalogo = firmaNueva;
                 procesarYRenderizarDatos(normalized);
-                mostrarToast('Catálogo actualizado correctamente', 'fa-solid fa-circle-check', '#22c55e', 1800);
+
+                // En la carga inicial mostramos confirmación; en las actualizaciones
+                // automáticas solo avisamos cuando realmente cambió el catálogo.
+                if (!silencioso && huboCambios) {
+                    mostrarToast('Catálogo actualizado correctamente', 'fa-solid fa-circle-check', '#22c55e', 1800);
+                }
             } catch (error) {
                 console.error('Error conectando con Google Sheets / Apps Script:', error);
 
@@ -2291,6 +2315,47 @@
                     mostrarToast('Sin conexión: mostrando los datos guardados', 'fa-solid fa-cloud', '#f59e0b', 2600);
                 }
             }
+        }
+
+        async function actualizarCatalogoAutomaticamente() {
+            // Evita dos consultas simultáneas si una petición tarda más de 8 segundos.
+            if (actualizacionEnCurso) return;
+            actualizacionEnCurso = true;
+
+            try {
+                const data = await obtenerCatalogoDesdeAPI();
+                const normalized = normalizarRespuestaCatalogo(data);
+                if (!normalized.length) return;
+
+                const firmaNueva = JSON.stringify(normalized);
+                const huboCambios = firmaNueva !== ultimaFirmaCatalogo;
+
+                if (huboCambios) {
+                    localStorage.setItem(CACHE_KEY, JSON.stringify(normalized));
+                    ultimaFirmaCatalogo = firmaNueva;
+                    procesarYRenderizarDatos(normalized);
+                    mostrarToast('Catálogo actualizado', 'fa-solid fa-arrows-rotate', '#2563eb', 1800);
+                }
+            } catch (error) {
+                // El catálogo continúa funcionando con los datos actuales si una
+                // actualización automática falla temporalmente.
+                console.warn('Actualización automática no disponible:', error);
+            } finally {
+                actualizacionEnCurso = false;
+            }
+        }
+
+        function iniciarActualizacionAutomatica() {
+            if (actualizacionAutomaticaIniciada) return;
+            actualizacionAutomaticaIniciada = true;
+
+            // Consulta Google Sheets cada 8 segundos sin recargar toda la página.
+            setInterval(actualizarCatalogoAutomaticamente, AUTO_REFRESH_MS);
+
+            // Si la persona vuelve a la pestaña, comprobamos inmediatamente.
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) actualizarCatalogoAutomaticamente();
+            });
         }
 
         function procesarYRenderizarDatos(data) {
@@ -2574,11 +2639,13 @@
 
             accionPendienteRequisitos = onConfirmar;
             document.getElementById('btn-confirm-requisitos-proceder').onclick = () => {
+                // Guardamos la acción ANTES de cerrar el modal, porque cerrarConfirmacionRequisitos()
+                // limpia accionPendienteRequisitos. Esto garantiza que "Sí, los leí y los tengo listos"
+                // continúe correctamente hacia WhatsApp o hacia la acción del carrito.
+                const accionConfirmada = accionPendienteRequisitos;
+                accionPendienteRequisitos = null;
                 cerrarConfirmacionRequisitos();
-                if (accionPendienteRequisitos) {
-                    accionPendienteRequisitos();
-                    accionPendienteRequisitos = null;
-                }
+                if (accionConfirmada) accionConfirmada();
             };
 
             document.getElementById('confirm-requisitos-modal').classList.add('active');
@@ -3220,7 +3287,7 @@
             inicializarTema();
             aplicarCampanaTemporada();
             verificarNovedadesVisita();
-            cargarCatalogo();
+            cargarCatalogo().finally(() => iniciarActualizacionAutomatica());
             const footerYearEl = document.getElementById('footer-year');
             if (footerYearEl) footerYearEl.innerText = new Date().getFullYear();
         };
