@@ -1488,17 +1488,35 @@
         .share-option-btn i { width:25px; text-align:center; font-size:1.05rem; color:var(--primary-color); }
         .share-option-btn.status i { color:#25d366; }
         .share-option-btn small { display:block; color:var(--text-muted); font-size:.72rem; font-weight:500; margin-top:2px; }
-        .share-preview-card { max-width:430px; width:min(94vw,430px); }
+        .share-preview-card {
+            max-width:430px;
+            width:min(94vw,430px);
+            max-height:calc(100dvh - 24px);
+            overflow-y:auto;
+            overscroll-behavior:contain;
+            scrollbar-width:thin;
+        }
+        .share-preview-card .share-choice-header {
+            position:sticky;
+            top:0;
+            z-index:3;
+            background:var(--card-bg);
+            border-bottom:1px solid rgba(148,163,184,.08);
+        }
         .share-preview-wrap {
-            padding:12px 18px 8px; display:flex; justify-content:center;
+            padding:10px 18px 8px; display:flex; justify-content:center;
             background:linear-gradient(180deg, rgba(37,99,235,.05), transparent);
         }
         .share-preview-image {
-            width:min(72vw,300px); max-height:58vh; object-fit:contain; display:block;
+            width:min(66vw,280px);
+            height:auto;
+            max-height:46vh;
+            object-fit:contain;
+            display:block;
             border-radius:14px; box-shadow:0 12px 35px rgba(0,0,0,.28);
             background:#111827;
         }
-        .share-preview-help { color:var(--text-muted); font-size:.76rem; line-height:1.35; text-align:center; padding:4px 22px 10px; }
+        .share-preview-help { color:var(--text-muted); font-size:.76rem; line-height:1.35; text-align:center; padding:4px 22px 8px; margin:0; }
         .share-status-link-box { margin:4px 18px 0; padding:11px 12px; border:1px solid var(--border-color); border-radius:13px; background:rgba(37,99,235,.055); }
         .share-status-link-title { font-size:.75rem; font-weight:800; margin-bottom:7px; color:var(--text-main); }
         .share-status-link-title i { color:var(--primary-color); margin-right:5px; }
@@ -1507,7 +1525,26 @@
         .share-status-link:hover { text-decoration:underline; }
         .share-copy-link-btn { width:34px; height:34px; border:1px solid var(--border-color); border-radius:9px; background:var(--card-bg); color:var(--text-main); cursor:pointer; flex-shrink:0; }
         .share-status-link-box small { display:block; margin-top:6px; color:var(--text-muted); font-size:.67rem; line-height:1.3; }
-        .share-preview-actions { display:grid; gap:8px; padding:10px 18px 18px; }
+        .share-preview-actions {
+            display:grid; gap:8px; padding:10px 18px 18px;
+            position:sticky; bottom:0; z-index:3;
+            background:linear-gradient(180deg, rgba(15,23,42,0), var(--card-bg) 22%);
+        }
+        @media (max-width:520px) {
+            .modal { padding:8px; align-items:flex-start; }
+            .share-preview-card {
+                width:100%;
+                max-height:calc(100dvh - 16px);
+                border-radius:18px;
+                margin-top:4px;
+            }
+            .share-choice-header { padding:14px 14px 10px; }
+            .share-preview-wrap { padding:8px 12px 6px; }
+            .share-preview-image { width:min(54vw,230px); max-height:40vh; border-radius:12px; }
+            .share-status-link-box { margin:4px 12px 0; }
+            .share-preview-help { padding:4px 14px 6px; font-size:.72rem; }
+            .share-preview-actions { padding:8px 12px 12px; }
+        }
         .share-primary-btn { background:var(--primary-color); color:white; border-color:var(--primary-color); justify-content:center; text-align:center; }
         .share-secondary-btn { justify-content:center; text-align:center; }
         @media (prefers-reduced-motion: reduce) {
@@ -1984,7 +2021,7 @@
             </div>
             <p class="share-preview-help">En teléfonos compatibles, el menú de compartir puede permitir enviar la imagen y el texto/enlace. Si WhatsApp no conserva el enlace al publicar el Estado, cópialo con el botón de arriba y pégalo como enlace en el Estado.</p>
             <div class="share-preview-actions">
-                <button type="button" class="share-option-btn share-primary-btn" id="share-status-now-btn"><i class="fa-brands fa-whatsapp"></i> Compartir imagen + enlace</button>
+                <button type="button" class="share-option-btn share-primary-btn" id="share-status-now-btn"><i class="fa-brands fa-whatsapp"></i> Compartir imagen</button>
                 <button type="button" class="share-option-btn share-secondary-btn" id="share-status-copy-link-btn"><i class="fa-solid fa-link"></i> Copiar enlace para el Estado</button>
                 <button type="button" class="share-option-btn share-secondary-btn" onclick="cerrarVistaPreviaCompartir()">Cerrar</button>
             </div>
