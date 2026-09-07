@@ -2081,20 +2081,11 @@
       <div class="modal-content assistant-card" onclick="event.stopPropagation()">
         <button class="modal-close-btn" onclick="cerrarAsistenteCompra()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
         <div class="assistant-head"><div class="assistant-head-row"><div class="assistant-icon"><i class="fa-solid fa-headset"></i></div><div><h3 class="assistant-title">Asistente de compra</h3><p class="assistant-subtitle">Respuestas rápidas para ayudarte a encontrar y comprar lo que necesitas.</p></div></div><div id="assistant-product-context" class="assistant-product" style="display:none"></div></div>
-        <div class="assistant-body"><p class="assistant-question">¿Qué necesitas saber?</p><div class="assistant-grid">
-          <button class="assistant-action" onclick="asistenteAccion('precio')"><i class="fa-solid fa-tag"></i><span>Precio</span></button>
-          <button class="assistant-action" onclick="asistenteAccion('disponibilidad')"><i class="fa-solid fa-circle-check"></i><span>Disponibilidad</span></button>
-          <button class="assistant-action" onclick="asistenteAccion('requisitos')"><i class="fa-solid fa-list-check"></i><span>Requisitos</span></button>
-          <button class="assistant-action" onclick="asistenteAccion('compra')"><i class="fa-solid fa-cart-shopping"></i><span>¿Cómo comprar?</span></button>
-          <button class="assistant-action" onclick="asistenteAccion('delivery')"><i class="fa-solid fa-motorcycle"></i><span>Delivery</span></button>
-          <div class="assistant-budget-title">Encuentra algo según lo que necesitas</div>
-          <button class="assistant-action assistant-budget-action" onclick="asistenteAccion('presupuesto10')"><i class="fa-solid fa-coins"></i><span>Tengo menos de $10</span></button>
-          <button class="assistant-action assistant-budget-action" onclick="asistenteAccion('regalo')"><i class="fa-solid fa-gift"></i><span>Busco regalo</span></button>
-          <button class="assistant-action assistant-budget-action" onclick="asistenteAccion('telefono')"><i class="fa-solid fa-mobile-screen-button"></i><span>Accesorios para mi teléfono</span></button>
-          <button class="assistant-action" onclick="asistenteAccion('ofertas')"><i class="fa-solid fa-fire"></i><span>Ver ofertas</span></button>
-          <button class="assistant-action" onclick="asistenteAccion('encargos')"><i class="fa-solid fa-box"></i><span>Por encargo</span></button>
-          <button class="assistant-action" onclick="asistenteAccion('whatsapp')"><i class="fa-brands fa-whatsapp"></i><span>Hablar por WhatsApp</span></button>
-        </div><div id="assistant-answer" class="assistant-answer"></div></div>
+        <div class="assistant-body">
+          <p class="assistant-question" id="assistant-question">¿Qué estás buscando?</p>
+          <div class="assistant-grid" id="assistant-options"></div>
+          <div id="assistant-answer" class="assistant-answer"></div>
+        </div>
       </div>
     </div>
 
@@ -3624,230 +3615,446 @@
             if (window.location.hash.indexOf('#producto-') === 0) return buscarProductoPorId(decodeURIComponent(window.location.hash.replace('#producto-','')));
             return null;
         }
-        function abrirAsistenteCompra() {
-            const prod=obtenerProductoContextoAsistente(),ctx=document.getElementById('assistant-product-context'),ans=document.getElementById('assistant-answer');
-            if(ctx){if(prod){ctx.style.display='flex';ctx.innerHTML=`<img src="${prod.imagen||'https://via.placeholder.com/150'}" alt=""><div><strong>${prod.nombre}</strong><small>${prod.categoria||'Producto'}${prod.subcategoria?' · '+prod.subcategoria:''}</small></div>`;}else ctx.style.display='none';}
-            if(ans){ans.classList.remove('active');ans.innerHTML='';} document.getElementById('assistant-modal').classList.add('active');document.body.style.overflow='hidden';
-        }
-        function cerrarAsistenteCompra(){const m=document.getElementById('assistant-modal');if(m)m.classList.remove('active');document.body.style.overflow='auto';}
-        function obtenerResultadosAsistente(tipo) {
-            const productos = Array.isArray(listaProductosGlobal) ? listaProductosGlobal.filter(productoEstaDisponible) : [];
-            if (tipo === 'presupuesto10') return productos.filter(p => parseFloat(p.precio) && calcularPrecioFinal(p) < 10).sort((a,b) => calcularPrecioFinal(a)-calcularPrecioFinal(b)).slice(0,8);
-            const textoProducto = p => [p.nombre,p.categoria,p.subcategoria,p.descripcion,p.mas_detalles,p.etiquetas,p.tags].filter(Boolean).join(' ').toLowerCase();
-            if (tipo === 'regalo') {
-                const palabras=['regalo','gift','detalle','obsequio','combo','peluche','juguete','accesorio','audifono','audífono','corneta','reloj'];
-                return productos.filter(p => palabras.some(k => textoProducto(p).includes(k))).slice(0,8);
-            }
-            if (tipo === 'telefono') {
-                const palabras=['telefono','teléfono','celular','smartphone','iphone','samsung','xiaomi','redmi','motorola','funda','forro','vidrio','templado','cargador','cable','powerbank','audifono','audífono'];
-                return productos.filter(p => palabras.some(k => textoProducto(p).includes(k))).slice(0,8);
-            }
-            return [];
+        // ================= ASISTENTE DE COMPRA DINÁMICO =================
+        // El asistente utiliza únicamente los productos ya cargados desde Google Sheets.
+        // Máximo 4 botones visibles por nivel. Las selecciones del cliente se conservan
+        // durante la sesión para refinar las recomendaciones.
+        const estadoAsistente = {
+            vista: 'inicio',
+            filtroCategoria: null,
+            filtroSubcategoria: null,
+            filtroPrecioMax: null,
+            filtroPrecioMin: null,
+            contextoProducto: null,
+            historial: []
+        };
+
+        function normalizarTextoAsistente(valor) {
+            return (valor == null ? '' : String(valor))
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase().trim();
         }
 
-        function mostrarResultadosAsistente(tipo) {
-            const answer=document.getElementById('assistant-answer');
-            if(!answer)return;
-            const resultados=obtenerResultadosAsistente(tipo);
-            const titulos={presupuesto10:'💵 Opciones por menos de $10',regalo:'🎁 Ideas para regalar',telefono:'📱 Accesorios para tu teléfono'};
-            if(!resultados.length){
-                answer.innerHTML=`<strong>${titulos[tipo]||'🔎 Resultados'}</strong><div style="margin-top:6px">No encontré opciones con los datos actuales del catálogo. Puedes probar otra categoría o consultar por WhatsApp.</div>`;
-                answer.classList.add('active'); return;
+        function textoCompletoProductoAsistente(prod) {
+            return [
+                prod && prod.nombre, prod && prod.categoria, prod && prod.subcategoria,
+                prod && prod.descripcion, prod && prod.mas_detalles,
+                prod && prod.etiquetas, prod && prod.tags
+            ].filter(Boolean).join(' ');
+        }
+
+        function valorNumericoPrecioAsistente(prod) {
+            const precio = parseFloat(prod && prod.precio);
+            return Number.isFinite(precio) && precio > 0 ? calcularPrecioFinal(prod) : null;
+        }
+
+        function obtenerUrlProductoDirecto(prod) {
+            if (!prod) return window.location.href;
+            return `${window.location.origin}${window.location.pathname}#producto-${encodeURIComponent(obtenerIdentificadorProducto(prod))}`;
+        }
+
+        function obtenerLineaImagenWhatsApp(prod) {
+            return prod && prod.imagen ? `\n🖼️ *Imagen del producto:* ${prod.imagen}` : '\n🖼️ *Imagen del producto:* No disponible';
+        }
+
+        function obtenerProductoContextoAsistente() {
+            if (typeof productoActual !== 'undefined' && productoActual) return productoActual;
+            if (typeof productoActualModal !== 'undefined' && productoActualModal) return productoActualModal;
+            if (window.location.hash.indexOf('#producto-') === 0) {
+                return buscarProductoPorId(decodeURIComponent(window.location.hash.replace('#producto-','')));
             }
-            const listaHtml=resultados.map(p=>{
-                const id=encodeURIComponent(obtenerIdentificadorProducto(p));
-                const precio=parseFloat(p.precio)?`$${calcularPrecioFinal(p).toFixed(2)}`:'Consultar';
-                return `<button class="assistant-result-btn" onclick="abrirResultadoAsistente('${id}')"><span>${p.nombre}</span><small>${precio}</small></button>`;
+            return null;
+        }
+
+        function productosDisponiblesAsistente() {
+            return Array.isArray(listaProductosGlobal)
+                ? listaProductosGlobal.filter(productoEstaDisponible)
+                : [];
+        }
+
+        function contarValoresAsistente(productos, extractor) {
+            const mapa = new Map();
+            productos.forEach(prod => {
+                const valor = (extractor(prod) || '').toString().trim();
+                if (!valor) return;
+                mapa.set(valor, (mapa.get(valor) || 0) + 1);
+            });
+            return [...mapa.entries()]
+                .sort((a,b) => b[1] - a[1] || a[0].localeCompare(b[0], 'es'))
+                .map(([valor, cantidad]) => ({valor, cantidad}));
+        }
+
+        function obtenerCategoriasDinamicasAsistente(productos, contexto) {
+            const base = contexto ? contexto.categoria : null;
+            const relacionados = productos.filter(p => {
+                if (!base) return true;
+                const cat = normalizarTextoAsistente(p.categoria);
+                const sub = normalizarTextoAsistente(p.subcategoria);
+                const ctxCat = normalizarTextoAsistente(base);
+                const ctxSub = normalizarTextoAsistente(contexto.subcategoria);
+                return cat === ctxCat || (ctxSub && sub === ctxSub);
+            });
+            return contarValoresAsistente(relacionados.length ? relacionados : productos, p => p.categoria);
+        }
+
+        function obtenerRangosPrecioDinamicosAsistente(productos) {
+            const precios = productos.map(valorNumericoPrecioAsistente).filter(v => v !== null).sort((a,b) => a-b);
+            if (!precios.length) return [];
+            const max = precios[precios.length - 1];
+            const candidatos = [
+                {min: 0, max: 5, label: 'Hasta $5'},
+                {min: 5, max: 10, label: '$5 – $10'},
+                {min: 10, max: 20, label: '$10 – $20'},
+                {min: 20, max: 50, label: '$20 – $50'},
+                {min: 50, max: Infinity, label: 'Más de $50'}
+            ];
+            let rangos = candidatos.filter(r => productos.some(p => {
+                const precio = valorNumericoPrecioAsistente(p);
+                return precio !== null && precio >= r.min && (r.max === Infinity ? precio > r.min : precio < r.max || (r.min === 0 && precio <= r.max));
+            }));
+            if (!rangos.length) rangos = [{min:0, max:Infinity, label:`Hasta $${max.toFixed(2)}`}];
+            return rangos.slice(0, 4);
+        }
+
+        function obtenerEtiquetasDinamicasAsistente(productos, limite=4) {
+            const valores = [];
+            productos.forEach(p => {
+                const texto = [p.etiquetas, p.tags].filter(Boolean).join('|');
+                texto.split(/[|,;]/).map(x => x.trim()).filter(Boolean).forEach(x => valores.push(x));
+            });
+            const mapa = new Map();
+            valores.forEach(v => mapa.set(v, (mapa.get(v) || 0) + 1));
+            return [...mapa.entries()]
+                .sort((a,b) => b[1] - a[1] || a[0].localeCompare(b[0], 'es'))
+                .slice(0, limite)
+                .map(([valor, cantidad]) => ({valor, cantidad}));
+        }
+
+        function tieneOfertaAsistente(prod) {
+            return !!(prod && (prod.en_oferta === true || normalizarTextoAsistente(prod.en_oferta) === 'si' || normalizarTextoAsistente(prod.en_oferta) === 'true'));
+        }
+
+        function tieneEncargoAsistente(prod) {
+            return !!(prod && (prod.por_encargo === true || normalizarTextoAsistente(prod.por_encargo) === 'si' || normalizarTextoAsistente(prod.por_encargo) === 'true'));
+        }
+
+        function puntuarProductoAsistente(prod, contexto, preferencias = {}) {
+            if (!prod) return -999;
+            let score = 0;
+            const texto = normalizarTextoAsistente(textoCompletoProductoAsistente(prod));
+            const ctxTexto = contexto ? normalizarTextoAsistente(textoCompletoProductoAsistente(contexto)) : '';
+
+            if (contexto) {
+                if (normalizarTextoAsistente(prod.categoria) === normalizarTextoAsistente(contexto.categoria)) score += 50;
+                if (contexto.subcategoria && normalizarTextoAsistente(prod.subcategoria) === normalizarTextoAsistente(contexto.subcategoria)) score += 70;
+
+                const tokens = ctxTexto.split(/\s+/).filter(t => t.length >= 4);
+                tokens.forEach(token => { if (texto.includes(token)) score += 4; });
+
+                const p1 = valorNumericoPrecioAsistente(contexto);
+                const p2 = valorNumericoPrecioAsistente(prod);
+                if (p1 !== null && p2 !== null) {
+                    const diferencia = Math.abs(p1 - p2);
+                    score += Math.max(0, 25 - diferencia * 2);
+                }
+            }
+
+            if (preferencias.categoria && normalizarTextoAsistente(prod.categoria) === normalizarTextoAsistente(preferencias.categoria)) score += 80;
+            if (preferencias.subcategoria && normalizarTextoAsistente(prod.subcategoria) === normalizarTextoAsistente(preferencias.subcategoria)) score += 90;
+            if (preferencias.precioMin != null || preferencias.precioMax != null) {
+                const precio = valorNumericoPrecioAsistente(prod);
+                if (precio !== null && precio >= (preferencias.precioMin || 0) && precio <= (preferencias.precioMax ?? Infinity)) score += 60;
+                else score -= 50;
+            }
+            if (preferencias.etiqueta && texto.includes(normalizarTextoAsistente(preferencias.etiqueta))) score += 70;
+            if (tieneOfertaAsistente(prod)) score += preferencias.oferta ? 100 : 0;
+            if (tieneEncargoAsistente(prod)) score += preferencias.encargo ? 100 : 0;
+
+            return score;
+        }
+
+        function obtenerRecomendacionesAsistente(opciones = {}) {
+            const productos = productosDisponiblesAsistente();
+            const contexto = opciones.contexto || estadoAsistente.contextoProducto || obtenerProductoContextoAsistente();
+            const excluir = contexto ? obtenerIdentificadorProducto(contexto) : null;
+
+            return productos
+                .filter(p => !excluir || obtenerIdentificadorProducto(p) !== excluir)
+                .map(p => ({p, score: puntuarProductoAsistente(p, contexto, opciones)}))
+                .filter(x => {
+                    const precio = valorNumericoPrecioAsistente(x.p);
+                    if (opciones.precioMin != null && (precio === null || precio < opciones.precioMin)) return false;
+                    if (opciones.precioMax != null && (precio === null || precio > opciones.precioMax)) return false;
+                    return true;
+                })
+                .sort((a,b) => b.score - a.score || (valorNumericoPrecioAsistente(a.p) || 999999) - (valorNumericoPrecioAsistente(b.p) || 999999))
+                .slice(0, 8)
+                .map(x => x.p);
+        }
+
+        function botonAsistente(label, icon, accion, data='') {
+            const safeLabel = String(label).replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            const safeData = String(data).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+            return `<button type="button" class="assistant-action" onclick="asistenteAccion('${accion}','${safeData}')"><i class="${icon}"></i><span>${safeLabel}</span></button>`;
+        }
+
+        function renderOpcionesAsistente(opciones, pregunta) {
+            const cont = document.getElementById('assistant-options');
+            const q = document.getElementById('assistant-question');
+            if (q) q.textContent = pregunta || '¿Qué estás buscando?';
+            if (!cont) return;
+            cont.innerHTML = opciones.slice(0,4).join('');
+        }
+
+        function mostrarRespuestaAsistente(titulo, contenido, opciones = []) {
+            const answer = document.getElementById('assistant-answer');
+            if (!answer) return;
+            const botones = opciones.slice(0,4).join('');
+            answer.innerHTML = `<strong>${titulo}</strong>${contenido ? `<div style="margin-top:6px">${contenido}</div>` : ''}${botones ? `<div class="assistant-answer-actions">${botones}</div>` : ''}`;
+            answer.classList.add('active');
+        }
+
+        function abrirAsistenteCompra() {
+            const prod = obtenerProductoContextoAsistente();
+            estadoAsistente.contextoProducto = prod || null;
+            estadoAsistente.vista = prod ? 'producto' : 'inicio';
+            estadoAsistente.filtroCategoria = null;
+            estadoAsistente.filtroSubcategoria = null;
+            estadoAsistente.filtroPrecioMax = null;
+            estadoAsistente.filtroPrecioMin = null;
+
+            const ctx = document.getElementById('assistant-product-context');
+            if (ctx) {
+                if (prod) {
+                    ctx.style.display = 'flex';
+                    ctx.innerHTML = `<img src="${prod.imagen || 'https://via.placeholder.com/150'}" alt=""><div><strong>${prod.nombre}</strong><small>${prod.categoria || 'Producto'}${prod.subcategoria ? ' · ' + prod.subcategoria : ''}</small></div>`;
+                } else {
+                    ctx.style.display = 'none';
+                }
+            }
+
+            const answer = document.getElementById('assistant-answer');
+            if (answer) { answer.classList.remove('active'); answer.innerHTML = ''; }
+
+            document.getElementById('assistant-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            renderInicioAsistente();
+        }
+
+        function cerrarAsistenteCompra() {
+            const m = document.getElementById('assistant-modal');
+            if (m) m.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function renderInicioAsistente() {
+            const productos = productosDisponiblesAsistente();
+            const prod = estadoAsistente.contextoProducto;
+
+            if (prod) {
+                const opciones = [
+                    botonAsistente('Precio', 'fa-solid fa-tag', 'precio'),
+                    botonAsistente('Disponibilidad', 'fa-solid fa-circle-check', 'disponibilidad')
+                ];
+                if (obtenerListaRequisitos(prod).length) opciones.push(botonAsistente('Requisitos', 'fa-solid fa-list-check', 'requisitos'));
+                opciones.push(botonAsistente('Ver similares', 'fa-solid fa-wand-magic-sparkles', 'similares'));
+                if (tieneOfertaAsistente(prod)) opciones.push(botonAsistente('Ofertas similares', 'fa-solid fa-fire', 'ofertas_similares'));
+                renderOpcionesAsistente(opciones, `Sobre ${prod.nombre}, ¿qué quieres hacer?`);
+                return;
+            }
+
+            const opciones = [];
+            const categorias = obtenerCategoriasDinamicasAsistente(productos, null);
+            categorias.slice(0, 2).forEach(c => opciones.push(botonAsistente(`Ver ${c.valor}`, 'fa-solid fa-layer-group', 'categoria', c.valor)));
+
+            const rangos = obtenerRangosPrecioDinamicosAsistente(productos);
+            if (rangos.length) opciones.push(botonAsistente(rangos[0].label, 'fa-solid fa-coins', 'precio_rango', `${rangos[0].min}|${rangos[0].max}`));
+
+            if (productos.some(tieneOfertaAsistente)) opciones.push(botonAsistente('🔥 Ofertas', 'fa-solid fa-fire', 'ofertas'));
+            else if (productos.some(tieneEncargoAsistente)) opciones.push(botonAsistente('📦 Por encargo', 'fa-solid fa-box', 'encargos'));
+
+            renderOpcionesAsistente(opciones, '¿Qué estás buscando?');
+        }
+
+        function renderCategoriasAsistente() {
+            const productos = productosDisponiblesAsistente();
+            const contexto = estadoAsistente.contextoProducto;
+            const categorias = obtenerCategoriasDinamicasAsistente(productos, contexto);
+
+            const opciones = categorias.slice(0,4).map(c =>
+                botonAsistente(`${c.valor} (${c.cantidad})`, 'fa-solid fa-layer-group', 'categoria', c.valor)
+            );
+            mostrarRespuestaAsistente('🗂️ Categorías disponibles', 'Elige una categoría del catálogo actual:', opciones);
+        }
+
+        function renderRangosPrecioAsistente() {
+            const rangos = obtenerRangosPrecioDinamicosAsistente(productosDisponiblesAsistente());
+            const opciones = rangos.slice(0,4).map(r =>
+                botonAsistente(r.label, 'fa-solid fa-coins', 'precio_rango', `${r.min}|${r.max}`)
+            );
+            mostrarRespuestaAsistente('💰 Buscar por precio', 'Estos rangos se generan según los precios que existen actualmente en Google Sheets:', opciones);
+        }
+
+        function renderResultadosProductosAsistente(resultados, titulo, texto='') {
+            const answer = document.getElementById('assistant-answer');
+            if (!answer) return;
+            if (!resultados.length) {
+                mostrarRespuestaAsistente('🔎 Sin resultados', 'No encontré productos disponibles que coincidan con tus opciones actuales. Puedes volver y probar otra combinación.', [
+                    botonAsistente('‹ Volver', 'fa-solid fa-arrow-left', 'inicio')
+                ]);
+                return;
+            }
+            const listaHtml = resultados.slice(0,8).map(p => {
+                const id = encodeURIComponent(obtenerIdentificadorProducto(p));
+                const precio = valorNumericoPrecioAsistente(p);
+                const precioHtml = precio !== null ? obtenerHtmlPrecio(p) : 'Consultar';
+                return `<button type="button" class="assistant-result-btn" onclick="abrirResultadoAsistente('${id}')"><span>${p.nombre}</span><small>${precioHtml}</small></button>`;
             }).join('');
-            answer.innerHTML=`<strong>${titulos[tipo]||'🔎 Resultados'}</strong><div style="margin-top:6px">Estas son algunas opciones encontradas en el catálogo:</div><div class="assistant-result-list">${listaHtml}</div>`;
+            answer.innerHTML = `<strong>${titulo}</strong><div style="margin-top:6px">${texto || 'Opciones encontradas en el catálogo actual:'}</div><div class="assistant-result-list">${listaHtml}</div><div class="assistant-answer-actions">${botonAsistente('‹ Volver','fa-solid fa-arrow-left','inicio')}</div>`;
             answer.classList.add('active');
         }
 
         function abrirResultadoAsistente(idEncoded) {
-            const prod=buscarProductoPorId(decodeURIComponent(idEncoded));
-            if(!prod){mostrarToast('Ese producto ya no está disponible en el catálogo.','fa-solid fa-circle-exclamation','#ef4444',2500);return;}
-            cerrarAsistenteCompra(); abrirModal(prod);
+            const prod = buscarProductoPorId(decodeURIComponent(idEncoded));
+            if (!prod) {
+                mostrarToast('Ese producto ya no está disponible en el catálogo.','fa-solid fa-circle-exclamation','#ef4444',2500);
+                return;
+            }
+            cerrarAsistenteCompra();
+            abrirModal(prod);
         }
 
-        function asistenteAccion(tipo){
-            const prod=obtenerProductoContextoAsistente(),answer=document.getElementById('assistant-answer');
-            if(!answer)return;
-            if(['presupuesto10','regalo','telefono'].includes(tipo)){mostrarResultadosAsistente(tipo);return;}
-            if(tipo==='ofertas'){cerrarAsistenteCompra();filtrarOfertasYTendencias();return;}
-            if(tipo==='encargos'){cerrarAsistenteCompra();filtrarEncargos();return;}
-            let titulo='',contenido='';
-            if(prod){
-                const precio=prod.precio?obtenerHtmlPrecio(prod):'Consultar',reqs=obtenerListaRequisitos(prod),disponible=productoEstaDisponible(prod);
-                if(tipo==='precio'){titulo='💰 Precio';contenido=`<strong>${prod.nombre}</strong><br>${precio}${prod.en_oferta?' 🔥 Este producto está en oferta.':''}`;}
-                else if(tipo==='disponibilidad'){titulo='📦 Disponibilidad';contenido=disponible?`<strong>${prod.nombre}</strong> aparece como disponible en el catálogo. Si quieres confirmar existencia inmediata, podemos consultarlo por WhatsApp.`:`<strong>${prod.nombre}</strong> no aparece disponible actualmente.`;}
-                else if(tipo==='requisitos'){titulo='📋 Requisitos';contenido=reqs.length?`<strong>Para ${prod.nombre}:</strong><br>${reqs.map(r=>`• ${r}`).join('<br>')}`:'Este producto no tiene requisitos registrados en Google Sheets.';}
-                else if(tipo==='compra'){titulo='🛒 ¿Cómo comprar?';contenido='Revisa el producto, confirma los requisitos si aparecen y luego puedes enviarlo directamente por WhatsApp.';}
-                else if(tipo==='delivery'){titulo='🚚 Delivery';contenido='Hacemos entregas en San José de Guanipa y zonas cercanas. El horario y costo se coordinan por WhatsApp.';}
-                else if(tipo==='whatsapp'){
-                    titulo='📲 WhatsApp';
-                    const msg=`Hola 👋 Vengo del catálogo web.\n\nQuiero consultar sobre:\n*Producto:* ${prod.nombre}\n*Código:* ${prod.codigo_producto||prod.id||'N/A'}${obtenerTextoPrecioWhatsApp(prod,'Precio mostrado')}\n🔗 *Link del producto:* ${obtenerUrlProductoDirecto(prod)}${obtenerLineaImagenWhatsApp(prod)}\n\n¿Me pueden ayudar con este producto?`;
-                    const url=`https://wa.me/${prod.whatsapp||'584149956831'}?text=${encodeURIComponent(msg)}`;
-                    contenido=`Te preparé el mensaje con el <strong>producto, código, precio, enlace del producto y enlace directo de la imagen</strong>.<div class="assistant-answer-actions"><button class="assistant-mini-btn" onclick="window.open('${url}','_blank')">📲 Abrir WhatsApp</button></div>`;
-                }
-            }else{
-                if(tipo==='delivery'){titulo='🚚 Delivery';contenido='Hacemos entregas en San José de Guanipa y zonas cercanas. El horario y costo se coordinan por WhatsApp.';}
-                else if(tipo==='compra'){titulo='🛒 ¿Cómo comprar?';contenido='Elige un producto, revisa sus detalles y usa el botón de WhatsApp para continuar la compra.';}
-                else if(tipo==='whatsapp'){titulo='📲 WhatsApp';const url='https://wa.me/584149956831?text='+encodeURIComponent('Hola 👋 Vengo del catálogo web y quiero más información sobre sus productos.');contenido=`<div class="assistant-answer-actions"><button class="assistant-mini-btn" onclick="window.open('${url}','_blank')">📲 Abrir WhatsApp</button></div>`;}
-                else{titulo='🔎 Primero elige un producto';contenido='Abre cualquier producto del catálogo y vuelve a tocar el asistente. Así la consulta y el mensaje de WhatsApp quedarán vinculados al producto correcto.';}
-            }
-            answer.innerHTML=`<strong>${titulo}</strong><div style="margin-top:6px">${contenido}</div>`;answer.classList.add('active');
-        }
+        function asistenteAccion(tipo, dato='') {
+            const prod = estadoAsistente.contextoProducto || obtenerProductoContextoAsistente();
 
-        function enviarProductoConRequisitosPorWhatsApp(prod) {
-            if (!prod) return;
-
-            const cod = prod.codigo_producto || prod.id || 'N/A';
-            const precio = parseFloat(prod.precio) ? `$${calcularPrecioFinal(prod).toFixed(2)}` : 'Consultar';
-            const descLinea = (prod.descripcion || '').trim() ? `\n*Descripción:* ${prod.descripcion.trim()}` : '';
-            const fotoLinea = obtenerLineaImagenWhatsApp(prod);
-            const precioWhatsApp = obtenerTextoPrecioWhatsApp(prod, 'Precio');
-            const reqs = obtenerListaRequisitos(prod);
-            const reqsTexto = reqs.length
-                ? `\n\n✅ *Requisitos leídos y listos para enviar:*\n${reqs.map(r => `• ${r}`).join('\n')}`
-                : '';
-
-            const msg = `Hola, vengo del catálogo web.\n\nQuiero solicitar información para:\n*Producto:* ${prod.nombre}\n*Código:* ${cod}${descLinea}${precioWhatsApp}\n🔗 *Link del producto:* ${obtenerUrlProductoDirecto(prod)}${fotoLinea}${reqsTexto}\n\nConfirmo que ya leí y tengo listos los requisitos indicados.`;
-            const urlWhatsApp = `https://wa.me/584149956831?text=${encodeURIComponent(msg)}`;
-
-            // Se abre directamente durante el clic de confirmación para evitar que el navegador
-            // bloquee la ventana por considerarla un popup automático.
-            let waWindow = null;
-            try {
-                waWindow = window.open(urlWhatsApp, '_blank', 'noopener,noreferrer');
-            } catch (error) {
-                console.warn('No fue posible abrir WhatsApp en una nueva pestaña:', error);
+            if (tipo === 'inicio') {
+                estadoAsistente.filtroCategoria = null;
+                estadoAsistente.filtroSubcategoria = null;
+                estadoAsistente.filtroPrecioMax = null;
+                estadoAsistente.filtroPrecioMin = null;
+                estadoAsistente.vista = prod ? 'producto' : 'inicio';
+                const answer = document.getElementById('assistant-answer');
+                if (answer) { answer.classList.remove('active'); answer.innerHTML=''; }
+                renderInicioAsistente();
+                return;
             }
 
-            cerrarModal();
-            mostrarToast('Requisitos confirmados. Abriendo WhatsApp...', 'fa-brands fa-whatsapp', '#25d366', 1600);
-
-            // Si el navegador bloqueó la pestaña, usamos la misma ventana como respaldo.
-            if (!waWindow) {
-                setTimeout(() => {
-                    window.location.href = urlWhatsApp;
-                }, 150);
-            }
-        }
-
-        function cerrarConfirmacionRequisitos() {
-            document.getElementById('confirm-requisitos-modal').classList.remove('active');
-            accionPendienteRequisitos = null;
-        }
-
-        let productoActualModal = null;
-
-        function abrirModal(prod) {
-            productoActualModal = prod;
-            isZoomed = false;
-            document.getElementById('modal-img-container').classList.remove('zoomed');
-            document.getElementById('modal-img').style.transform = 'scale(1)';
-            document.getElementById('modal-img').src = prod.imagen || 'https://via.placeholder.com/400';
-            document.getElementById('modal-category').innerText = prod.subcategoria ? `${prod.categoria || ''} • ${prod.subcategoria}` : (prod.categoria || '');
-            document.getElementById('modal-title').innerText = prod.nombre;
-            document.getElementById('modal-code').innerText = `Código: ${prod.codigo_producto || prod.id || 'N/A'}`;
-            document.getElementById('modal-price').innerHTML = obtenerHtmlPrecio(prod, 'modal-price');
-            
-            const alert = document.getElementById('recharge-alert-container');
-            if (esRecargaSaldo(prod.categoria)) {
-                alert.innerHTML = `<div class="recharge-alert-box"><i class="fa-solid fa-triangle-exclamation"></i><div><strong>Nota:</strong> Incluye 12% adicional. El trámite se procesa tras confirmar el pago.</div></div>`;
-            } else if (esStriming(prod.categoria) || esServicioGeneral(prod.categoria)) {
-                alert.innerHTML = `<div class="recharge-alert-box"><i class="fa-solid fa-circle-info"></i><div><strong>Aviso:</strong> El servicio se procesa tras verificar el pago.</div></div>`;
-            } else {
-                alert.innerHTML = '';
-            }
-            
-            document.getElementById('modal-desc').innerHTML = (prod.descripcion || '') + (prod.mas_detalles ? `<br><br><strong>Detalles:</strong> ${prod.mas_detalles}` : '');
-
-            // Gestión de encargo colectivo (Meta 25 personas)
-            const encargoSec = document.getElementById('modal-encargo-section');
-            const regularActions = document.getElementById('modal-regular-actions');
-            if (esPorEncargo(prod)) {
-                encargoSec.style.display = 'block';
-                regularActions.style.display = 'none';
-                
-                // No se muestra un número compartido falso. El contador real debe venir de Apps Script.
-                document.getElementById('modal-encargo-badge-count').innerText = 'Meta: 25 personas';
-                document.getElementById('modal-encargo-bar').style.width = '0%';
-                
-                const yaAnotado = usuarioEstaAnotadoEnEncargo(prod);
-                const alreadyBox = document.getElementById('modal-encargo-already-joined');
-                if (alreadyBox) alreadyBox.style.display = yaAnotado ? 'block' : 'none';
-
-                const joinBtn = document.getElementById('modal-encargo-btn');
-                if (joinBtn) {
-                    joinBtn.innerHTML = yaAnotado
-                        ? `<i class="fa-solid fa-clipboard-check"></i> Ya estás anotado · Ver / Modificar WhatsApp`
-                        : `<i class="fa-solid fa-hand-holding-dollar"></i> Anotarme en la Lista (Meta 25 pers.)`;
-                }
-            } else {
-                encargoSec.style.display = 'none';
-                regularActions.style.display = 'flex';
-            }
-
-            // Contenedor de requisitos
-            const reqContainer = document.getElementById('modal-requisitos-container');
-            const requisitos = obtenerListaRequisitos(prod);
-            reqContainer.style.display = requisitos.length ? 'block' : 'none';
-
-            // Comprar individual con validación previa de requisitos
-            document.getElementById('modal-wa-btn').onclick = () => {
-                if (requisitos.length > 0) {
-                    mostrarConfirmacionRequisitos(prod, () => {
-                        enviarProductoConRequisitosPorWhatsApp(prod);
-                    });
+            if (tipo === 'categoria') {
+                estadoAsistente.filtroCategoria = dato;
+                estadoAsistente.filtroSubcategoria = null;
+                const productos = productosDisponiblesAsistente().filter(p =>
+                    normalizarTextoAsistente(p.categoria) === normalizarTextoAsistente(dato)
+                );
+                const subcats = contarValoresAsistente(productos, p => p.subcategoria);
+                const opciones = subcats.slice(0,4).map(s =>
+                    botonAsistente(`${s.valor} (${s.cantidad})`, 'fa-solid fa-tag', 'subcategoria', s.valor)
+                );
+                if (opciones.length) {
+                    mostrarRespuestaAsistente(`🗂️ ${dato}`, 'Perfecto. ¿Qué parte de esta categoría te interesa?', opciones);
                 } else {
-                    productoIndividualPendiente = { ...prod, precioFinalCalculado: calcularPrecioFinal(prod) };
-                    cerrarModal();
-                    abrirModalCheckout();
+                    renderResultadosProductosAsistente(productos, `🛍️ ${dato}`, `Encontré ${productos.length} producto(s) disponibles.`);
                 }
-            };
-
-            // Agregar al carrito con validación previa de requisitos
-            document.getElementById('modal-add-cart-btn').onclick = (e) => {
-                const btn = e.currentTarget;
-                if (requisitos.length > 0) {
-                    mostrarConfirmacionRequisitos(prod, () => {
-                        lanzarEfectoVueloAlCarrito(btn, prod.imagen);
-                        agregarAlCarrito(prod);
-                        cerrarModal();
-                        mostrarToast(`"${prod.nombre}" añadido al carrito`, 'fa-solid fa-cart-check', '#22c55e');
-                    });
-                } else {
-                    lanzarEfectoVueloAlCarrito(btn, prod.imagen);
-                    agregarAlCarrito(prod);
-                    cerrarModal();
-                    mostrarToast(`"${prod.nombre}" añadido al carrito`, 'fa-solid fa-cart-check', '#22c55e');
-                }
-            };
-
-            document.getElementById('modal-share-btn').onclick = () => abrirSelectorCompartir(prod);
-            
-            const tiktokBtn = document.getElementById('modal-tiktok-btn');
-            if (prod.video_tiktok && prod.video_tiktok.toString().trim()) {
-                tiktokBtn.style.display = 'flex';
-                tiktokBtn.onclick = () => window.open(prod.video_tiktok, '_blank');
-            } else {
-                tiktokBtn.style.display = 'none';
-                tiktokBtn.onclick = null;
+                return;
             }
 
-            actualizarBotonFavoritoModal(prod);
-            document.getElementById('modal-fav-btn').onclick = (e) => { 
-                toggleFavorito(e, prod); 
-                actualizarBotonFavoritoModal(prod); 
-            };
-            
-            document.getElementById('product-modal').classList.add('active');
-            document.body.style.overflow = 'hidden';
+            if (tipo === 'subcategoria') {
+                estadoAsistente.filtroSubcategoria = dato;
+                const resultados = obtenerRecomendacionesAsistente({
+                    categoria: estadoAsistente.filtroCategoria,
+                    subcategoria: dato
+                });
+                renderResultadosProductosAsistente(resultados, `🏷️ ${dato}`, 'Estas opciones vienen del catálogo actual.');
+                return;
+            }
 
-            registrarProductoVisto(prod);
-            renderProductosRelacionados(prod);
-            actualizarHashProducto(prod);
+            if (tipo === 'precio_rango') {
+                const partes = dato.split('|');
+                estadoAsistente.filtroPrecioMin = parseFloat(partes[0]) || 0;
+                estadoAsistente.filtroPrecioMax = partes[1] === 'Infinity' ? Infinity : parseFloat(partes[1]);
+                const resultados = obtenerRecomendacionesAsistente({
+                    precioMin: estadoAsistente.filtroPrecioMin,
+                    precioMax: estadoAsistente.filtroPrecioMax
+                });
+                renderResultadosProductosAsistente(resultados, '💰 Productos en tu rango', `Encontré ${resultados.length} opción(es) que encajan con ese presupuesto.`);
+                return;
+            }
+
+            if (tipo === 'precio') {
+                if (!prod) { renderRangosPrecioAsistente(); return; }
+                mostrarRespuestaAsistente('💰 Precio', `<strong>${prod.nombre}</strong><br>${prod.precio ? obtenerHtmlPrecio(prod) : 'Consultar'}${tieneOfertaAsistente(prod) ? ' 🔥 Este producto está en oferta.' : ''}`, [
+                    botonAsistente('Ver similares', 'fa-solid fa-wand-magic-sparkles', 'similares'),
+                    botonAsistente('‹ Volver', 'fa-solid fa-arrow-left', 'inicio')
+                ]);
+                return;
+            }
+
+            if (tipo === 'disponibilidad') {
+                if (!prod) { renderInicioAsistente(); return; }
+                mostrarRespuestaAsistente('📦 Disponibilidad', `<strong>${prod.nombre}</strong> aparece como disponible en el catálogo. Para confirmar existencia inmediata, puedes consultarlo por WhatsApp.`, [
+                    botonAsistente('WhatsApp', 'fa-brands fa-whatsapp', 'whatsapp'),
+                    botonAsistente('‹ Volver', 'fa-solid fa-arrow-left', 'inicio')
+                ]);
+                return;
+            }
+
+            if (tipo === 'requisitos') {
+                if (!prod) { renderInicioAsistente(); return; }
+                const reqs = obtenerListaRequisitos(prod);
+                mostrarRespuestaAsistente('📋 Requisitos', reqs.length ? `<strong>Para ${prod.nombre}:</strong><br>${reqs.map(r => `• ${r}`).join('<br>')}` : 'Este producto no tiene requisitos registrados en Google Sheets.', [
+                    botonAsistente('‹ Volver', 'fa-solid fa-arrow-left', 'inicio')
+                ]);
+                return;
+            }
+
+            if (tipo === 'similares' || tipo === 'ofertas_similares') {
+                const resultados = obtenerRecomendacionesAsistente({
+                    contexto: prod,
+                    oferta: tipo === 'ofertas_similares'
+                });
+                renderResultadosProductosAsistente(
+                    resultados,
+                    tipo === 'ofertas_similares' ? '🔥 Ofertas parecidas' : '✨ Productos similares',
+                    'Priorizamos categoría, subcategoría, etiquetas, texto y precio cercano al producto que estás viendo.'
+                );
+                return;
+            }
+
+            if (tipo === 'ofertas') {
+                const resultados = productosDisponiblesAsistente().filter(tieneOfertaAsistente);
+                renderResultadosProductosAsistente(resultados, '🔥 Ofertas disponibles', 'Solo muestro productos que actualmente están marcados como oferta en Google Sheets.');
+                return;
+            }
+
+            if (tipo === 'encargos') {
+                const resultados = productosDisponiblesAsistente().filter(tieneEncargoAsistente);
+                renderResultadosProductosAsistente(resultados, '📦 Productos por encargo', 'Solo muestro productos marcados como por encargo en Google Sheets.');
+                return;
+            }
+
+            if (tipo === 'whatsapp') {
+                if (prod) {
+                    const msg = `Hola 👋 Vengo del catálogo web.\n\nQuiero consultar sobre:\n*Producto:* ${prod.nombre}\n*Código:* ${prod.codigo_producto || prod.id || 'N/A'}${obtenerTextoPrecioWhatsApp(prod,'Precio mostrado')}\n🔗 *Link del producto:* ${obtenerUrlProductoDirecto(prod)}${obtenerLineaImagenWhatsApp(prod)}\n\n¿Me pueden ayudar con este producto?`;
+                    const url = `https://wa.me/${prod.whatsapp || '584149956831'}?text=${encodeURIComponent(msg)}`;
+                    mostrarRespuestaAsistente('📲 WhatsApp', 'Te preparé el mensaje con el producto, código, precio, enlace del producto y enlace directo de la imagen.', [
+                        `<button type="button" class="assistant-mini-btn" onclick="window.open('${url}','_blank')">📲 Abrir WhatsApp</button>`,
+                        botonAsistente('‹ Volver', 'fa-solid fa-arrow-left', 'inicio')
+                    ]);
+                } else {
+                    const url = 'https://wa.me/584149956831?text=' + encodeURIComponent('Hola 👋 Vengo del catálogo web y quiero más información sobre sus productos.');
+                    mostrarRespuestaAsistente('📲 WhatsApp', 'Puedes hablar directamente con la tienda.', [
+                        `<button type="button" class="assistant-mini-btn" onclick="window.open('${url}','_blank')">📲 Abrir WhatsApp</button>`
+                    ]);
+                }
+                return;
+            }
+
+            // Compatibilidad con llamadas antiguas que todavía pudieran existir.
+            if (tipo === 'presupuesto10') { asistenteAccion('precio_rango', '0|10'); return; }
+            if (tipo === 'regalo' || tipo === 'telefono') {
+                const consulta = normalizarTextoAsistente(tipo === 'regalo' ? 'regalo obsequio detalle' : 'telefono celular smartphone iphone samsung cargador cable funda');
+                const resultados = productosDisponiblesAsistente().filter(p => normalizarTextoAsistente(textoCompletoProductoAsistente(p)).includes(consulta.split(' ')[0]));
+                renderResultadosProductosAsistente(resultados, tipo === 'regalo' ? '🎁 Opciones para regalar' : '📱 Opciones relacionadas con teléfono');
+            }
         }
 
         function renderProductosRelacionados(prod) {
