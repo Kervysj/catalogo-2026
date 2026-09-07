@@ -1588,6 +1588,29 @@
         .assistant-action{border:1px solid var(--border-color);background:var(--card-bg);color:var(--text-main);border-radius:12px;padding:12px;text-align:left;cursor:pointer;display:flex;gap:9px;align-items:center;min-height:58px}.assistant-action i{width:28px;text-align:center;color:var(--primary-color);font-size:1rem}.assistant-action span{font-size:.78rem;font-weight:700;line-height:1.2}
         .assistant-answer{margin-top:14px;padding:12px;border-radius:12px;background:rgba(37,99,235,.07);border:1px solid var(--border-color);font-size:.8rem;line-height:1.45;display:none}.assistant-answer.active{display:block}.assistant-answer-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.assistant-mini-btn{border:1px solid var(--border-color);background:var(--card-bg);color:var(--text-main);border-radius:9px;padding:8px 10px;font-size:.72rem;font-weight:800;cursor:pointer}
         @media(max-width:520px){.assistant-fab{right:14px;bottom:82px;width:54px;height:54px}.assistant-card{width:100%;max-height:calc(100dvh - 16px);border-radius:18px}.assistant-body{padding:12px}.assistant-grid{gap:7px}.assistant-action{padding:10px;min-height:54px}.assistant-action span{font-size:.72rem}}
+
+        /* Mejoras visuales: tarjetas reutilizables y recomendaciones automáticas */
+        .card { transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease; will-change: transform; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 14px 30px rgba(15,23,42,.12); }
+        .card-img-container img { transition: transform .3s ease; }
+        .card:hover .card-img-container img { transform: scale(1.035); }
+        .card-hint-btn { transition: transform .2s ease, background .2s ease, color .2s ease; }
+        .card:hover .card-hint-btn { transform: translateY(-1px); }
+        .modal-related-container.auto-recommendations { margin-top:20px; }
+        .auto-reco-head { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+        .auto-reco-head .icon { width:30px; height:30px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:rgba(245,158,11,.12); color:#d97706; }
+        .auto-reco-head strong { font-size:.86rem; color:var(--text-main); }
+        .auto-reco-sub { font-size:.75rem; color:var(--text-muted); margin:0 0 10px 38px; }
+        .auto-reco-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+        .auto-reco-card { border:1px solid var(--border-color); background:var(--card-bg); border-radius:14px; padding:9px; cursor:pointer; text-align:left; transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+        .auto-reco-card:hover { transform:translateY(-3px); box-shadow:var(--shadow-sm); border-color:rgba(99,102,241,.35); }
+        .auto-reco-card img { width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:10px; display:block; margin-bottom:7px; }
+        .auto-reco-name { display:block; font-size:.78rem; font-weight:700; line-height:1.25; color:var(--text-main); }
+        .auto-reco-price { display:block; margin-top:4px; font-size:.76rem; color:var(--success-color); font-weight:800; }
+        .combo-total { margin-top:10px; padding:9px 11px; border-radius:12px; background:rgba(34,197,94,.08); border:1px solid rgba(34,197,94,.2); font-size:.8rem; font-weight:700; color:var(--text-main); }
+        .combo-add-btn { width:100%; margin-top:8px; border:0; border-radius:12px; padding:11px 12px; cursor:pointer; font-weight:800; background:var(--primary-color); color:#fff; transition:transform .2s ease, filter .2s ease; }
+        .combo-add-btn:hover { transform:translateY(-1px); filter:brightness(1.04); }
+        @media (max-width:520px){ .auto-reco-grid{grid-template-columns:1fr 1fr;} .auto-reco-card{padding:8px;} }
 </style>
 </head>
 <body id="main-body">
@@ -4060,21 +4083,68 @@
         function renderProductosRelacionados(prod) {
             const container = document.getElementById('modal-related-container');
             if (!container) return;
+            if (!prod) { container.innerHTML = ''; return; }
+
             const idActual = obtenerIdentificadorProducto(prod);
-            const relacionados = listaProductosGlobal.filter(p =>
-                obtenerIdentificadorProducto(p) !== idActual &&
-                (p.categoria || 'general').trim().toLowerCase() === (prod.categoria || 'general').trim().toLowerCase()
-            ).slice(0, 6);
+            let candidatos = [];
+            try {
+                if (typeof obtenerRecomendacionesAsistente === 'function') {
+                    candidatos = obtenerRecomendacionesAsistente({ contexto: prod }) || [];
+                }
+            } catch (error) {
+                console.warn('No se pudieron calcular recomendaciones automáticas:', error);
+            }
 
-            if (relacionados.length === 0) { container.innerHTML = ''; return; }
+            candidatos = candidatos
+                .filter(p => obtenerIdentificadorProducto(p) !== idActual)
+                .filter(p => !p.status || normalizarTextoAsistente(p.status).includes('activo') || normalizarTextoAsistente(p.status).includes('dispon'))
+                .slice(0, 4);
 
-            container.innerHTML = `<div class="modal-related-title">También te puede interesar</div>
-                <div class="modal-related-list">
-                    ${relacionados.map(p => `<div class="modal-related-card" onclick="abrirModal(buscarProductoPorId(decodeURIComponent('${encodeURIComponent(obtenerIdentificadorProducto(p))}')))">
-                        <img src="${p.imagen || 'https://via.placeholder.com/150'}" alt="${p.nombre}" loading="lazy" decoding="async">
-                        <span>${p.nombre}</span>
-                    </div>`).join('')}
-                </div>`;
+            if (!candidatos.length) {
+                container.innerHTML = '';
+                return;
+            }
+
+            const principal = candidatos[0];
+            const total = (parseFloat(calcularPrecioFinal(prod)) || 0) + (parseFloat(calcularPrecioFinal(principal)) || 0);
+            const totalTxt = (parseFloat(prod.precio) && parseFloat(principal.precio)) ? `$${total.toFixed(2)}` : 'Consultar';
+            const idPrincipal = encodeURIComponent(obtenerIdentificadorProducto(principal));
+
+            container.classList.add('auto-recommendations');
+            container.innerHTML = `
+                <div class="auto-reco-head">
+                    <span class="icon"><i class="fa-solid fa-lightbulb"></i></span>
+                    <strong>Completa tu compra</strong>
+                </div>
+                <p class="auto-reco-sub">Encontramos opciones relacionadas automáticamente según el catálogo actual.</p>
+                <div class="auto-reco-grid">
+                    ${candidatos.map(p => {
+                        const id = encodeURIComponent(obtenerIdentificadorProducto(p));
+                        const precio = parseFloat(p.precio) ? obtenerHtmlPrecio(p) : 'Consultar';
+                        return `<div class="auto-reco-card" onclick="abrirModal(buscarProductoPorId(decodeURIComponent('${id}')))" role="button" tabindex="0">
+                            <img src="${p.imagen || 'https://via.placeholder.com/300'}" alt="${String(p.nombre || 'Producto').replace(/"/g,'&quot;')}" loading="lazy" decoding="async">
+                            <span class="auto-reco-name">${p.nombre || 'Producto'}</span>
+                            <span class="auto-reco-price">${precio}</span>
+                        </div>`;
+                    }).join('')}
+                </div>
+                <div class="combo-total"><i class="fa-solid fa-basket-shopping"></i> Producto actual + recomendación: <strong>${totalTxt}</strong></div>
+                <button type="button" class="combo-add-btn" onclick="agregarComboAutomatico(event, '${idPrincipal}')">
+                    <i class="fa-solid fa-cart-plus"></i> Agregar ambos al pedido
+                </button>`;
+        }
+
+        function agregarComboAutomatico(event, idEncoded) {
+            if (event) { event.preventDefault(); event.stopPropagation(); }
+            const principal = buscarProductoPorId(decodeURIComponent(idEncoded));
+            const actual = productoActualModal;
+            if (!actual || !principal) {
+                mostrarToast('No se pudo preparar el combo. Inténtalo nuevamente.', 'fa-solid fa-circle-exclamation', '#ef4444', 2500);
+                return;
+            }
+            agregarAlCarrito(actual);
+            agregarAlCarrito(principal);
+            mostrarToast('¡Ambos productos fueron agregados al pedido!', 'fa-solid fa-cart-shopping', '#22c55e', 2800);
         }
 
         let modalHistoryPushed = false;
@@ -4136,6 +4206,69 @@
                 clearTimeout(cartBtn._feedbackTimer);
                 cartBtn._feedbackTimer = setTimeout(() => cartBtn.classList.remove('cart-feedback'), 750);
             }, 750);
+        }
+
+        let productoActualModal = null;
+
+        function abrirModal(prod) {
+            if (!prod) return;
+            productoActualModal = prod;
+            registrarProductoVisto(prod);
+
+            const img = document.getElementById('modal-img');
+            if (img) { img.src = prod.imagen || 'https://via.placeholder.com/600'; img.alt = prod.nombre || 'Producto'; }
+            const cat = document.getElementById('modal-category');
+            if (cat) cat.textContent = [prod.categoria, prod.subcategoria].filter(Boolean).join(' · ') || 'General';
+            const title = document.getElementById('modal-title');
+            if (title) title.textContent = prod.nombre || 'Producto';
+            const code = document.getElementById('modal-code');
+            if (code) code.textContent = `Código: ${prod.codigo_producto || prod.id || 'N/A'}`;
+            const price = document.getElementById('modal-price');
+            if (price) price.innerHTML = obtenerHtmlPrecio(prod);
+            const desc = document.getElementById('modal-desc');
+            if (desc) desc.textContent = prod.descripcion || prod.mas_detalles || '';
+
+            const reqs = obtenerListaRequisitos(prod);
+            const reqBox = document.getElementById('modal-requisitos-container');
+            if (reqBox) reqBox.style.display = reqs.length ? 'block' : 'none';
+
+            const encargo = document.getElementById('modal-encargo-section');
+            const regular = document.getElementById('modal-regular-actions');
+            if (esPorEncargo(prod)) {
+                if (encargo) encargo.style.display = 'block';
+                if (regular) regular.style.display = 'none';
+            } else {
+                if (encargo) encargo.style.display = 'none';
+                if (regular) regular.style.display = 'flex';
+            }
+
+            actualizarBotonFavoritoModal(prod);
+            const fav = document.getElementById('modal-fav-btn');
+            if (fav) fav.onclick = e => toggleFavorito(e, prod);
+            const share = document.getElementById('modal-share-btn');
+            if (share) share.onclick = e => abrirSelectorCompartir(prod);
+            const tik = document.getElementById('modal-tiktok-btn');
+            if (tik) { tik.style.display = prod.video_tiktok ? 'inline-flex' : 'none'; tik.onclick = e => abrirVideoTikTokPorId(e, encodeURIComponent(obtenerIdentificadorProducto(prod))); }
+            const cart = document.getElementById('modal-add-cart-btn');
+            if (cart) cart.onclick = e => {
+                const accion = () => { agregarAlCarrito(prod); mostrarToast('Producto agregado al pedido', 'fa-solid fa-cart-shopping', '#22c55e', 2200); };
+                if (reqs.length) mostrarConfirmacionRequisitos(prod, accion); else accion();
+            };
+            const wa = document.getElementById('modal-wa-btn');
+            if (wa) wa.onclick = () => {
+                const accion = () => {
+                    const cod = prod.codigo_producto || prod.id || 'N/A';
+                    const msg = `Hola 👋 Vengo del catálogo web.\n\nQuiero consultar sobre:\n*Producto:* ${prod.nombre}\n*Código:* ${cod}${obtenerTextoPrecioWhatsApp(prod,'Precio')}${obtenerLineaImagenWhatsApp(prod)}\n\n¿Me pueden ayudar con este producto?`;
+                    window.open(`https://wa.me/584149956831?text=${encodeURIComponent(msg)}`, '_blank');
+                };
+                if (reqs.length) mostrarConfirmacionRequisitos(prod, accion); else accion();
+            };
+
+            actualizarHashProducto(prod);
+            const modal = document.getElementById('product-modal');
+            if (modal) modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            renderProductosRelacionados(prod);
         }
 
         function cerrarModal() { 
