@@ -909,8 +909,13 @@
         .cart-item-info { display: flex; flex-direction: column; gap: 2px; flex-grow: 1; }
         .cart-item-title { font-weight: 600; font-size: 0.85rem; color: var(--text-main); }
         .cart-item-details { font-size: 0.75rem; color: var(--text-muted); }
+        .cart-price-stack { display:flex; flex-direction:column; gap:2px; margin-top:2px; }
+        .cart-price-usd { font-size:0.82rem; font-weight:800; color:var(--text-main); }
+        .cart-price-bs { font-size:0.75rem; font-weight:700; color:var(--text-muted); }
         .cart-item-remove { background: none; border: none; color: var(--danger-color); cursor: pointer; font-size: 1rem; padding: 6px; }
         .cart-total { font-size: 1.15rem; font-weight: 800; text-align: right; margin-bottom: 14px; color: var(--success-color); }
+        .cart-total-stack { display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
+        .cart-total-bs { font-size:0.88rem; font-weight:800; color:var(--text-muted); }
 
         /* Checkout Form */
         .checkout-form-group { margin-bottom: 12px; }
@@ -2643,6 +2648,27 @@
             return texto;
         }
 
+        // Precio para el carrito: USD siempre; Bs solo si la tasa está vigente.
+        function obtenerHtmlPrecioCarrito(item) {
+            const usd = Number(item?.precioFinalCalculado || 0);
+            if (!Number.isFinite(usd) || usd <= 0) return 'Consultar';
+            let html = `<div class="cart-price-stack"><div class="cart-price-usd">$${usd.toFixed(2)}</div>`;
+            if (esTasaUsable()) {
+                html += `<div class="cart-price-bs">${formatearBolivares(usd * configuracionCatalogo.tasa_usd)}</div>`;
+            }
+            html += '</div>';
+            return html;
+        }
+
+        function obtenerHtmlTotalCarrito(totalUsd) {
+            let html = `<div class="cart-total-stack"><div>Total: $${Number(totalUsd || 0).toFixed(2)}</div>`;
+            if (esTasaUsable()) {
+                html += `<div class="cart-total-bs">${formatearBolivares(Number(totalUsd || 0) * configuracionCatalogo.tasa_usd)}</div>`;
+            }
+            html += '</div>';
+            return html;
+        }
+
         function actualizarIndicadorTasa() {
             const badge = document.getElementById('rate-indicator');
             const textEl = document.getElementById('rate-indicator-text');
@@ -3948,14 +3974,15 @@
                             <img src="${item.imagen || 'https://via.placeholder.com/100'}" alt="${item.nombre}" class="cart-item-thumb">
                             <div class="cart-item-info">
                                 <span class="cart-item-title">${item.nombre}</span>
-                                <span class="cart-item-details">Cód: ${item.codigo_producto || item.id || 'N/A'} | $${item.precioFinalCalculado.toFixed(2)}</span>
+                                <span class="cart-item-details">Cód: ${item.codigo_producto || item.id || 'N/A'}</span>
+                                <span class="cart-item-price">${obtenerHtmlPrecioCarrito(item)}</span>
                                 ${reqNote}
                             </div>
                             <button class="cart-item-remove" onclick="removerDelCarrito(${idx})" title="Eliminar" aria-label="Eliminar"><i class="fa-solid fa-trash"></i></button>
                         </div>`;
                 });
             }
-            document.getElementById('cart-total-text').innerText = `Total: $${total.toFixed(2)}`;
+            document.getElementById('cart-total-text').innerHTML = obtenerHtmlTotalCarrito(total);
             document.getElementById('cart-modal').classList.add('active');
             document.body.style.overflow = 'hidden';
         }
