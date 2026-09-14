@@ -2148,7 +2148,9 @@
         const urlAPI = 'https://script.google.com/macros/s/AKfycbz_qzzzwFK6szGI5zZRHoy_cFZC04PdakHSwZEqU3JaRUnkaAWGV1qhN261-8gUnBLM9g/exec';
         const API_TIMEOUT_MS = 15000;
         // Actualización periódica moderada: al volver a la pestaña también se comprueba.
-        const AUTO_REFRESH_MS = 5 * 60 * 1000;
+        // Actualización silenciosa en segundo plano
+        // Mantiene productos, eliminaciones y tasa sincronizados sin recargar la página.
+        const AUTO_REFRESH_MS = 20 * 1000;
 
         const CACHE_KEY = 'kervys_catalogo_cache_data_v3';
         const CONFIG_CACHE_KEY = 'kervys_catalogo_config_cache_v1';
