@@ -139,6 +139,46 @@
             white-space: nowrap;
         }
 
+        /* Aviso público configurable desde CONFIGURACION */
+        .public-alert {
+            display: none;
+            align-items: flex-start;
+            gap: 10px;
+            background: var(--warning-bg);
+            color: var(--warning-text);
+            border: 1px solid var(--warning-border);
+            border-left: 4px solid #f59e0b;
+            border-radius: 12px;
+            padding: 11px 12px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-subtle);
+            font-size: 0.84rem;
+            line-height: 1.4;
+        }
+        .public-alert.show { display: flex; }
+        .public-alert-icon { flex: 0 0 auto; font-size: 1rem; color: #f59e0b; margin-top: 1px; }
+        .public-alert-content { flex: 1; min-width: 0; }
+        .public-alert-title { display: block; font-weight: 800; margin-bottom: 2px; }
+        .public-alert-text { font-weight: 600; overflow-wrap: anywhere; }
+        .public-alert-close {
+            flex: 0 0 auto;
+            border: 0;
+            background: transparent;
+            color: var(--warning-text);
+            cursor: pointer;
+            font-size: 1.05rem;
+            line-height: 1;
+            padding: 2px 4px;
+            border-radius: 6px;
+        }
+        .public-alert-close:hover { background: rgba(245,158,11,.12); }
+
+        .community-badge {
+            border-color: rgba(37,99,235,.35);
+            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(37,99,235,.08) 100%);
+        }
+        .community-badge i { color: var(--primary-color) !important; }
+
         /* Banner de temporada */
         .seasonal-banner {
             background: linear-gradient(135deg, var(--danger-color), var(--primary-color));
@@ -1631,6 +1671,16 @@
             </div>
         </div>
 
+        <!-- Aviso público configurable desde CONFIGURACION!B3:B4 -->
+        <div id="public-alert" class="public-alert" role="alert" aria-live="polite">
+            <i id="public-alert-icon" class="fa-solid fa-triangle-exclamation public-alert-icon"></i>
+            <div class="public-alert-content">
+                <span class="public-alert-title">Importante</span>
+                <span id="public-alert-text" class="public-alert-text"></span>
+            </div>
+            <button type="button" class="public-alert-close" onclick="cerrarAvisoPublico()" aria-label="Cerrar aviso">×</button>
+        </div>
+
         <!-- Banner dinámico de temporada -->
         <div id="seasonal-banner" class="seasonal-banner">
             <i id="seasonal-icon" class="fa-solid fa-gift"></i> <span id="seasonal-text">¡Bienvenidos a nuestra temporada especial!</span>
@@ -1656,6 +1706,9 @@
                 <div class="info-badge rate-badge" id="rate-indicator" title="Tasa de referencia usada para convertir precios a bolívares">
                     <i class="fa-solid fa-money-bill-transfer"></i> <span id="rate-indicator-text">Tasa: —</span>
                 </div>
+                <a id="community-badge" href="#" target="_blank" rel="noopener noreferrer" class="info-badge community-badge" style="display:none;">
+                    <i class="fa-solid fa-users"></i> <span>Comunidad</span>
+                </a>
                 <a href="https://tinyurl.com/pageimc" target="_blank" rel="noopener noreferrer" class="info-badge">
                     <i class="fa-brands fa-facebook-f" style="color:#1877f2;"></i> Facebook
                 </a>
@@ -2148,8 +2201,6 @@
         const urlAPI = 'https://script.google.com/macros/s/AKfycbz_qzzzwFK6szGI5zZRHoy_cFZC04PdakHSwZEqU3JaRUnkaAWGV1qhN261-8gUnBLM9g/exec';
         const API_TIMEOUT_MS = 15000;
         // Actualización periódica moderada: al volver a la pestaña también se comprueba.
-        // Actualización silenciosa en segundo plano
-        // Mantiene productos, eliminaciones y tasa sincronizados sin recargar la página.
         const AUTO_REFRESH_MS = 20 * 1000;
 
         const CACHE_KEY = 'kervys_catalogo_cache_data_v3';
@@ -2178,7 +2229,10 @@
             tasa_activa: false,
             ultima_actualizacion: '',
             horas_desde_actualizacion: null,
-            vigencia_horas: 24
+            vigencia_horas: 24,
+            aviso_publico: '',
+            aviso_activo: false,
+            comunidad_url: ''
         };
         let actualizacionAutomaticaIniciada = false;
         let actualizacionEnCurso = false;
@@ -2602,13 +2656,20 @@
             const tasa = convertirNumeroLocal(cfg.tasa_usd);
             const vigencia = Number(cfg.vigencia_horas) > 0 ? Number(cfg.vigencia_horas) : 24;
 
+            const aviso = normalizarTexto(cfg.aviso_publico || cfg.aviso || '');
+            const avisoActivo = normalizarBooleano(cfg.aviso_activo, false);
+            const comunidadUrl = normalizarTexto(cfg.comunidad_url || cfg.comunidad || '');
+
             return {
                 tasa_usd: tasa > 0 ? tasa : 0,
                 tasa_activa: cfg.tasa_activa === true || cfg.tasa_activa === 'true',
                 ultima_actualizacion: cfg.ultima_actualizacion || '',
                 horas_desde_actualizacion: cfg.horas_desde_actualizacion ?? null,
                 vigencia_horas: vigencia,
-                mensaje: cfg.mensaje || ''
+                mensaje: cfg.mensaje || '',
+                aviso_publico: aviso,
+                aviso_activo: avisoActivo,
+                comunidad_url: comunidadUrl
             };
         }
 
@@ -2702,10 +2763,55 @@
             }
         }
 
+        function cerrarAvisoPublico() {
+            const banner = document.getElementById('public-alert');
+            if (!banner) return;
+            banner.classList.remove('show');
+            const texto = normalizarTexto(configuracionCatalogo.aviso_publico);
+            if (texto) localStorage.setItem('kervys_aviso_publico_cerrado', texto);
+        }
+
+        function actualizarAvisoPublico() {
+            const banner = document.getElementById('public-alert');
+            const textEl = document.getElementById('public-alert-text');
+            if (!banner || !textEl) return;
+
+            const texto = normalizarTexto(configuracionCatalogo.aviso_publico);
+            const activo = configuracionCatalogo.aviso_activo === true && !!texto;
+            const cerradoParaEsteTexto = localStorage.getItem('kervys_aviso_publico_cerrado') === texto;
+
+            textEl.textContent = texto;
+            banner.classList.toggle('show', activo && !cerradoParaEsteTexto);
+
+            if (!activo || !texto) {
+                localStorage.removeItem('kervys_aviso_publico_cerrado');
+            }
+        }
+
+        function actualizarComunidad() {
+            const link = document.getElementById('community-badge');
+            if (!link) return;
+            const url = normalizarTexto(configuracionCatalogo.comunidad_url);
+            const esUrlValida = /^https?:\/\//i.test(url);
+            if (esUrlValida) {
+                link.href = url;
+                link.style.display = 'inline-flex';
+            } else {
+                link.removeAttribute('href');
+                link.style.display = 'none';
+            }
+        }
+
+        function actualizarElementosConfiguracionPublica() {
+            actualizarIndicadorTasa();
+            actualizarAvisoPublico();
+            actualizarComunidad();
+        }
+
         function aplicarConfiguracionCatalogo(config) {
             configuracionCatalogo = normalizarConfiguracionCatalogo({configuracion: config});
             ultimaFirmaConfiguracion = JSON.stringify(configuracionCatalogo);
-            actualizarIndicadorTasa();
+            actualizarElementosConfiguracionPublica();
         }
 
         function leerEstadoCacheCatalogo() {
