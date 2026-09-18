@@ -196,6 +196,54 @@
         .view-toggle-btn.active { background: var(--primary-color); color: #fff; }
         .view-toggle-btn:hover:not(.active) { background: rgba(37, 99, 235, 0.08); }
 
+        /* Modo de visualización del catálogo: "Todo junto" (una sola lista, se filtra por
+           categoría/buscador) vs "Por categoría" (agrupado en secciones). Solo cambia cómo
+           se ve "Todos los productos"; el buscador y los filtros siguen funcionando igual
+           en ambos modos. Muy útil cuando el catálogo crece a 100-200+ artículos. */
+        .catalog-mode-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 0 4px 10px;
+        }
+        .catalog-mode-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .catalog-mode-toggle {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 2px;
+        }
+        .catalog-mode-btn {
+            border: 0;
+            background: transparent;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 0.78rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .catalog-mode-btn.active { background: var(--primary-color); color: #fff; }
+        .catalog-mode-btn:hover:not(.active) { background: rgba(37, 99, 235, 0.08); }
+
         /* Modo Lista: cada tarjeta pasa de vertical a fila horizontal, sin tocar el HTML de las tarjetas */
         .grid.list-view {
             grid-template-columns: 1fr;
@@ -2405,6 +2453,23 @@
             </div>
         </div>
 
+        <!-- Modo de visualización del catálogo: deja que el cliente elija cómo quiere ver
+             los productos. "Todo junto" = una sola lista (se filtra con el buscador y las
+             categorías de abajo). "Por categoría" = agrupado en secciones, una por categoría.
+             El buscador y los filtros funcionan igual en ambos modos; esto solo cambia el
+             orden/agrupación visual cuando se está viendo "Todos los productos". -->
+        <div class="catalog-mode-row">
+            <span class="catalog-mode-label"><i class="fa-solid fa-sliders"></i> Ver catálogo</span>
+            <div class="catalog-mode-toggle" role="group" aria-label="Cómo ver el catálogo">
+                <button type="button" class="catalog-mode-btn active" id="modo-catalogo-junto" onclick="cambiarModoCatalogo('junto')" title="Ver todos los productos en una sola lista">
+                    <i class="fa-solid fa-border-all"></i> Todo junto
+                </button>
+                <button type="button" class="catalog-mode-btn" id="modo-catalogo-agrupado" onclick="cambiarModoCatalogo('agrupado')" title="Agrupar los productos por categoría">
+                    <i class="fa-solid fa-layer-group"></i> Por categoría
+                </button>
+            </div>
+        </div>
+
         <!-- Barra scrollable horizontal de Categorías: se ve normal en computadora/pantallas
              grandes. En móvil/tablet queda oculta por completo a favor del selector compacto
              de abajo (el selector de vista ya se movió junto al buscador), para que el
@@ -3015,6 +3080,9 @@
 
         let listaProductosGlobal = [];
         let categoriaSeleccionada = 'todos';
+        // 'junto' = todos los productos en una sola lista (buscador + filtros de categoría).
+        // 'agrupado' = los productos de "Todos los productos" se agrupan por categoría.
+        let modoVistaCatalogo = 'junto';
         let isZoomed = false;
         let carritoGlobal = [];
         let productoIndividualPendiente = null;
@@ -3415,6 +3483,26 @@
             let modo = 'grid';
             try { modo = localStorage.getItem('kervys_vista_productos') || 'grid'; } catch (e) {}
             cambiarVistaProductos(modo);
+        }
+
+        // Alterna cómo se organiza el catálogo: "Todo junto" (lista única, se filtra con el
+        // buscador/categorías) o "Por categoría" (agrupado en secciones). No reemplaza al
+        // buscador ni a los filtros, solo cambia el orden/agrupación visual y solo aplica
+        // cuando se está viendo "Todos los productos" sin búsqueda ni subcategoría activa.
+        function cambiarModoCatalogo(modo, rerender = true) {
+            modoVistaCatalogo = (modo === 'agrupado') ? 'agrupado' : 'junto';
+            const btnJunto = document.getElementById('modo-catalogo-junto');
+            const btnAgrupado = document.getElementById('modo-catalogo-agrupado');
+            if (btnJunto) btnJunto.classList.toggle('active', modoVistaCatalogo === 'junto');
+            if (btnAgrupado) btnAgrupado.classList.toggle('active', modoVistaCatalogo === 'agrupado');
+            try { localStorage.setItem('kervys_modo_vista_catalogo', modoVistaCatalogo); } catch (e) {}
+            if (rerender) filtrarCombinado();
+        }
+
+        function inicializarModoVistaCatalogo() {
+            let modo = 'junto';
+            try { modo = localStorage.getItem('kervys_modo_vista_catalogo') || 'junto'; } catch (e) {}
+            cambiarModoCatalogo(modo, false);
         }
 
         // ================= GESTIÓN DE OFERTAS, TENDENCIAS Y ENCARGOS (META 25) =================
@@ -4349,10 +4437,29 @@
 
             const subFiltroActivo = document.getElementById('filter-subcategory').value !== 'all';
             const hayBusqueda = document.getElementById('search-input').value.trim() !== '';
+
+            let indiceAnimacion = 0;
+
+            // Modo "Por categoría": solo aplica viendo "Todos los productos", sin búsqueda ni
+            // subcategoría activa (si el cliente busca o filtra, siempre se ve la lista plana
+            // de resultados, para no ocultar coincidencias entre categorías).
+            const agruparPorCategoriaActivo = modoVistaCatalogo === 'agrupado' && categoriaSeleccionada === 'todos' && !subFiltroActivo && !hayBusqueda;
+            if (agruparPorCategoriaActivo) {
+                const categoriasPresentes = [...new Set(lista.map(p => (p.categoria || 'General').trim()))];
+                categoriasPresentes.forEach(cat => {
+                    const grupo = lista.filter(p => (p.categoria || 'General').trim() === cat);
+                    const header = document.createElement('div');
+                    header.className = 'subcat-group-title group-enter';
+                    header.innerHTML = `<i class="fa-solid fa-layer-group"></i> ${escaparHtml(cat)}`;
+                    grid.appendChild(header);
+                    grupo.forEach(prod => grid.appendChild(crearCardElemento(prod, indiceAnimacion++)));
+                });
+                return;
+            }
+
             const contextoAgrupable = !subFiltroActivo && !hayBusqueda && !['todos', 'ofertas', 'encargos', 'favoritos', 'recientes'].includes(categoriaSeleccionada);
             const subcatsPresentes = contextoAgrupable ? [...new Set(lista.map(p => (p.subcategoria || '').trim()).filter(Boolean))] : [];
 
-            let indiceAnimacion = 0;
             if (contextoAgrupable && subcatsPresentes.length > 1) {
                 subcatsPresentes.forEach(sub => {
                     const grupo = lista.filter(p => (p.subcategoria || '').trim() === sub);
@@ -6144,6 +6251,7 @@
             inicializarTema();
             aplicarCampanaTemporada();
             inicializarVistaProductos();
+            inicializarModoVistaCatalogo();
             cargarCatalogo().finally(() => iniciarActualizacionAutomatica());
             mostrarPistaSocialDock();
             const footerYearEl = document.getElementById('footer-year');
