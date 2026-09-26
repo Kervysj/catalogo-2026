@@ -3243,7 +3243,7 @@
                 <h2 class="modal-title" style="color:var(--danger-color); margin-bottom:4px;">
                     <i class="fa-solid fa-location-dot"></i> Nuestra Ubicación
                 </h2>
-                <p style="color:var(--text-muted); font-size:0.82rem; margin-bottom:12px;">Ubicación exacta: Inversiones Martinez Caña C.A., San José de Guanipa.</p>
+                <p id="location-address-text" style="color:var(--text-muted); font-size:0.82rem; margin-bottom:12px;">Ubicación exacta: Inversiones Martinez Caña C.A., San José de Guanipa.</p>
                 <div id="interactive-map" class="map-modal-container"></div>
                 <div class="route-info-box" id="route-text-status">
                     <i class="fa-solid fa-compass"></i>
@@ -3451,6 +3451,45 @@
         let favoritosGlobal = [];
         let recientesGlobal = [];
         let leafletMap = null;
+        let leafletMarker = null;
+        const UBICACION_LAT_DEFECTO = 8.8891204;
+        const UBICACION_LNG_DEFECTO = -64.1521477;
+        const UBICACION_DIRECCION_DEFECTO = 'Inversiones Martinez Caña C.A., San José de Guanipa';
+        const GEOCODE_CACHE_KEY = 'kervys_geocode_cache_v1';
+
+        function leerCacheGeocodificacion() {
+            try { return JSON.parse(localStorage.getItem(GEOCODE_CACHE_KEY) || '{}'); }
+            catch (_) { return {}; }
+        }
+
+        function guardarCacheGeocodificacion(cache) {
+            try { localStorage.setItem(GEOCODE_CACHE_KEY, JSON.stringify(cache)); } catch (_) {}
+        }
+
+        // Convierte un texto de dirección en coordenadas usando Nominatim (OpenStreetMap),
+        // gratis y sin API key. El resultado se guarda en localStorage para no repetir
+        // la consulta cada vez que alguien abre el modal de ubicación.
+        async function geocodificarDireccion(direccion) {
+            const cache = leerCacheGeocodificacion();
+            const cacheado = cache[direccion];
+            if (cacheado && Number.isFinite(cacheado.lat) && Number.isFinite(cacheado.lng)) {
+                return cacheado;
+            }
+            try {
+                const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(direccion)}`;
+                const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                const data = await res.json();
+                if (Array.isArray(data) && data.length > 0) {
+                    const punto = { lat: Number(data[0].lat), lng: Number(data[0].lon) };
+                    if (Number.isFinite(punto.lat) && Number.isFinite(punto.lng)) {
+                        cache[direccion] = punto;
+                        guardarCacheGeocodificacion(cache);
+                        return punto;
+                    }
+                }
+            } catch (_) {}
+            return null;
+        }
         const ENCARGOS_KEY = 'kervys_catalogo_encargos_registrados';
         let encargosRegistrados = JSON.parse(localStorage.getItem(ENCARGOS_KEY) || '{}');
         let hashInicialProcesado = false;
@@ -4168,6 +4207,11 @@
             const comunidadUrl = normalizarTexto(cfg.comunidad_url || cfg.comunidad || '');
             const ubicacionActiva = normalizarBooleano(cfg.ubicacion_activa, true);
             const ubicacionUrl = normalizarTexto(cfg.ubicacion_url || '');
+            const ubicacionDireccion = normalizarTexto(cfg.ubicacion_direccion || '');
+            const ubicacionLatNum = convertirNumeroLocal(cfg.ubicacion_lat);
+            const ubicacionLngNum = convertirNumeroLocal(cfg.ubicacion_lng);
+            const ubicacionLat = (cfg.ubicacion_lat !== null && cfg.ubicacion_lat !== undefined && cfg.ubicacion_lat !== '' && Number.isFinite(ubicacionLatNum)) ? ubicacionLatNum : null;
+            const ubicacionLng = (cfg.ubicacion_lng !== null && cfg.ubicacion_lng !== undefined && cfg.ubicacion_lng !== '' && Number.isFinite(ubicacionLngNum)) ? ubicacionLngNum : null;
 
             return {
                 tasa_usd: tasa > 0 ? tasa : 0,
@@ -4180,7 +4224,10 @@
                 aviso_activo: avisoActivo,
                 comunidad_url: comunidadUrl,
                 ubicacion_activa: ubicacionActiva,
-                ubicacion_url: ubicacionUrl
+                ubicacion_url: ubicacionUrl,
+                ubicacion_direccion: ubicacionDireccion,
+                ubicacion_lat: ubicacionLat,
+                ubicacion_lng: ubicacionLng
             };
         }
 
@@ -4361,6 +4408,12 @@
             if (linkMaps) {
                 const url = normalizarTexto(configuracionCatalogo.ubicacion_url);
                 if (/^https?:\/\//i.test(url)) linkMaps.href = url;
+            }
+
+            const textoEl = document.getElementById('location-address-text');
+            if (textoEl) {
+                const direccion = normalizarTexto(configuracionCatalogo.ubicacion_direccion) || UBICACION_DIRECCION_DEFECTO;
+                textoEl.textContent = `Ubicación exacta: ${direccion}.`;
             }
         }
 
@@ -6600,16 +6653,34 @@
             document.getElementById('location-modal').classList.add('active');
             document.body.style.overflow = 'hidden';
             await asegurarLeaflet();
+
+            const direccion = normalizarTexto(configuracionCatalogo.ubicacion_direccion) || UBICACION_DIRECCION_DEFECTO;
+            let lat = configuracionCatalogo.ubicacion_lat;
+            let lng = configuracionCatalogo.ubicacion_lng;
+
+            // Si no se cargaron lat/lng manuales pero sí hay una dirección de texto
+            // en el Sheet, se geocodifica automáticamente esa dirección.
+            if (!(Number.isFinite(lat) && Number.isFinite(lng)) && normalizarTexto(configuracionCatalogo.ubicacion_direccion)) {
+                const punto = await geocodificarDireccion(configuracionCatalogo.ubicacion_direccion);
+                if (punto) { lat = punto.lat; lng = punto.lng; }
+            }
+            if (!Number.isFinite(lat)) lat = UBICACION_LAT_DEFECTO;
+            if (!Number.isFinite(lng)) lng = UBICACION_LNG_DEFECTO;
+
             setTimeout(() => {
                 if (!leafletMap) {
-                    leafletMap = L.map('interactive-map').setView([8.8891204, -64.1521477], 16);
+                    leafletMap = L.map('interactive-map').setView([lat, lng], 16);
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                         attribution: '&copy; OpenStreetMap'
                     }).addTo(leafletMap);
-                    L.marker([8.8891204, -64.1521477]).addTo(leafletMap)
-                        .bindPopup('<b>📍 Tienda Principal</b><br>Inversiones Martinez Caña C.A., San José de Guanipa')
+                    leafletMarker = L.marker([lat, lng]).addTo(leafletMap)
+                        .bindPopup(`<b>📍 Tienda Principal</b><br>${direccion}`)
                         .openPopup();
                 } else {
+                    leafletMap.setView([lat, lng], 16);
+                    if (leafletMarker) {
+                        leafletMarker.setLatLng([lat, lng]).setPopupContent(`<b>📍 Tienda Principal</b><br>${direccion}`).openPopup();
+                    }
                     leafletMap.invalidateSize();
                 }
             }, 250);
@@ -6618,13 +6689,13 @@
                 navigator.geolocation.getCurrentPosition(pos => {
                     const latUser = pos.coords.latitude;
                     const lonUser = pos.coords.longitude;
-                    const distanciaKm = calcularDistanciaGeo(latUser, lonUser, 8.8891204, -64.1521477);
+                    const distanciaKm = calcularDistanciaGeo(latUser, lonUser, lat, lng);
                     document.getElementById('route-distance-label').innerText = `Estás a aprox. ${distanciaKm.toFixed(1)} km de la tienda.`;
                 }, () => {
-                    document.getElementById('route-distance-label').innerText = 'Inversiones Martinez Caña C.A., San José de Guanipa.';
+                    document.getElementById('route-distance-label').innerText = `${direccion}.`;
                 });
             } else {
-                document.getElementById('route-distance-label').innerText = 'Inversiones Martinez Caña C.A., San José de Guanipa.';
+                document.getElementById('route-distance-label').innerText = `${direccion}.`;
             }
         }
 
