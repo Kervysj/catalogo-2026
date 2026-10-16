@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Generador de Álbum PDF por categoría</title>
+<style>
+  :root { --azul:#2563eb; --fondo:#f3f6fb; --borde:#d9e1ee; --texto:#1e293b; --suave:#64748b; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--fondo); color:var(--texto); }
+  .wrap { max-width:760px; margin:0 auto; padding:18px 14px 60px; }
+  h1 { font-size:1.35rem; margin:6px 0 2px; }
+  .sub { color:var(--suave); font-size:.9rem; margin:0 0 16px; }
+  .card { background:#fff; border:1px solid var(--borde); border-radius:12px; padding:14px; margin-bottom:14px; }
+  label { display:block; font-size:.8rem; font-weight:600; margin:10px 0 4px; }
+  input[type=text], input[type=number] { width:100%; padding:9px 10px; border:1px solid var(--borde); border-radius:8px; font-size:.9rem; }
+  button { cursor:pointer; border:0; border-radius:8px; padding:10px 14px; font-size:.9rem; font-weight:600; background:var(--azul); color:#fff; }
+  button.sec { background:#e8eefb; color:var(--azul); }
+  button:disabled { opacity:.5; cursor:not-allowed; }
+  .fila { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .cat { display:flex; align-items:center; gap:10px; padding:9px 4px; border-bottom:1px solid #eef2f8; }
+  .cat:last-child { border-bottom:0; }
+  .cat .nombre { flex:1; font-weight:600; }
+  .cat .n { color:var(--suave); font-size:.82rem; }
+  .cat button { padding:7px 10px; font-size:.8rem; }
+  #estado { font-size:.88rem; color:var(--suave); margin-top:8px; min-height:1.2em; }
+  #estado.error { color:#b91c1c; }
+  .barra { height:8px; background:#e5ebf5; border-radius:6px; overflow:hidden; margin-top:8px; display:none; }
+  .barra > div { height:100%; width:0; background:var(--azul); transition:width .15s; }
+  details { margin-top:6px; } summary { cursor:pointer; font-size:.85rem; color:var(--azul); }
+  textarea { width:100%; height:90px; margin-top:8px; border:1px solid var(--borde); border-radius:8px; padding:8px; font-size:.8rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Generador de Álbum PDF por categoría</h1>
+  <p class="sub">Herramienta aparte: lee tu catálogo (solo lectura) y arma un PDF con imagen, descripción corta y precio. No modifica el catálogo, el Google Sheet ni el script.</p>
+
+  <div class="card">
+    <label for="urlApi">URL del Apps Script (la misma que usa el catálogo)</label>
+    <input type="text" id="urlApi" value="https://script.google.com/macros/s/AKfycbzn8cyAzMXjAXiwJBy5a40AikTsN7oazhlt6_opD2WFLQ1ItnhkrIdNmweE3hSxhZHCeg/exec">
+
+    <label for="baseImg">Dirección base de las imágenes (para fotos con ruta relativa como productos_Images/1.jpg)</label>
+    <input type="text" id="baseImg" value="https://kervysj.github.io/catalogo-2026/">
+
+    <div class="fila">
+      <div style="flex:1;min-width:200px">
+        <label for="titulo">Título del álbum</label>
+        <input type="text" id="titulo" value="CATÁLOGO DIGITAL">
+      </div>
+      <div style="flex:1;min-width:200px">
+        <label for="wsp">WhatsApp para pedidos (pie de página, opcional)</label>
+        <input type="text" id="wsp" value="+58 414 9956831">
+      </div>
+      <div style="flex:1;min-width:160px">
+        <label for="tasa">Tasa Bs/$ (opcional, vacío = solo USD)</label>
+        <input type="number" id="tasa" step="0.01" min="0" placeholder="Ej: 40.50">
+      </div>
+    </div>
+
+    <div class="fila" style="margin-top:14px">
+      <button id="btnCargar">Cargar catálogo</button>
+    </div>
+    <div id="estado"></div>
+
+    <details>
+      <summary>¿No carga? Usar un archivo/JSON manual</summary>
+      <p class="sub" style="margin:8px 0 0">Abre la URL del Apps Script en otra pestaña, copia todo el texto que muestre y pégalo aquí, o carga el archivo guardado.</p>
+      <textarea id="jsonManual" placeholder="Pega aquí el JSON del catálogo..."></textarea>
+      <div class="fila" style="margin-top:6px">
+        <input type="file" id="archivoJson" accept=".json,.txt,application/json">
+        <button class="sec" id="btnJson">Usar este JSON</button>
+      </div>
+    </details>
+  </div>
+
+  <div class="card" id="panelCats" style="display:none">
+    <div class="fila" style="justify-content:space-between">
+      <strong>Categorías</strong>
+      <div class="fila">
+        <button class="sec" id="btnTodas">Marcar / desmarcar todas</button>
+        <button id="btnMarcadas">PDF de las marcadas</button>
+      </div>
+    </div>
+    <div id="listaCats" style="margin-top:8px"></div>
+    <div class="barra" id="barra"><div></div></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// GENERADOR DE ÁLBUM PDF — herramienta independiente (solo lectura)
+// ============================================================
+const JSPDF_URL = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+const $ = (id) => document.getElementById(id);
+
+let productos = [];          // productos disponibles, ya normalizados
+let grupos = [];             // [{categoria, items:[...]}]
+let ocupado = false;
+const cacheImg = new Map();  // src -> {data,w,h} | null
+
+/* ---------- Utilidades de texto ---------- */
+function txt(v) { return v == null ? '' : String(v).trim(); }
+function sinAcentos(s) { return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+
+// jsPDF (fuentes estándar) solo dibuja Latin-1: quitamos emojis/símbolos para que no salgan rotos.
+function limpiarPDF(s) {
+  return txt(s)
+    .replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"')
+    .replace(/[\u2013\u2014]/g, '-').replace(/\u2026/g, '...').replace(/[\u2022\u00B7]/g, '-')
+    .replace(/[^\u0000-\u00FF]/g, '')
+    .replace(/\s+/g, ' ').trim();
+}
+
+/* ---------- Lectura del catálogo (misma lógica del catálogo, solo lectura) ---------- */
+function campo(obj, aliases, fb = '') {
+  for (const k of aliases) {
+    if (Object.prototype.hasOwnProperty.call(obj, k) && obj[k] !== '' && obj[k] != null) return obj[k];
+  }
+  const set = aliases.map(a => sinAcentos(a).toLowerCase());
+  for (const k of Object.keys(obj)) {
+    const n = sinAcentos(k).toLowerCase().trim().replace(/\s+/g, '_');
+    if (set.includes(n) && obj[k] !== '' && obj[k] != null) return obj[k];
+  }
+  return fb;
+}
+function filasAObjetos(rows) {
+  if (!Array.isArray(rows) || !rows.length) return [];
+  if (rows.every(it => it && typeof it === 'object' && !Array.isArray(it))) return rows;
+  const enc = Array.isArray(rows[0]) ? rows[0].map((h, i) => txt(h) || ('campo_' + (i + 1))) : [];
+  if (!enc.length) return [];
+  return rows.slice(1).map(f => {
+    const o = {}; enc.forEach((k, i) => { o[k] = Array.isArray(f) ? (f[i] ?? '') : ''; }); return o;
+  }).filter(o => Object.values(o).some(v => String(v ?? '').trim() !== ''));
+}
+function extraerItems(data) {
+  let raw = [];
+  if (Array.isArray(data)) raw = data;
+  else if (data && typeof data === 'object') {
+    const pos = [data.productos, data.products, data.items, data.data, data.result, data.results, data.rows, data.values, data.catalogo, data.catalog];
+    raw = pos.find(Array.isArray) || [];
+  }
+  return filasAObjetos(raw);
+}
+function esMarcaSi(v) {
+  if (typeof v === 'boolean') return v;
+  return ['si', 'true', '1', 'oferta', 'en oferta', 'promocion', 'promo'].includes(sinAcentos(txt(v)).toLowerCase());
+}
+function parsePrecio(v) {
+  if (typeof v === 'number') return isFinite(v) ? v : 0;
+  let s = String(v ?? '').replace(/[^0-9.,-]/g, '');
+  if (/,\d{1,2}$/.test(s) && !/\.\d{1,2}$/.test(s)) s = s.replace(/\./g, '').replace(',', '.');
+  else s = s.replace(/,/g, '');
+  return parseFloat(s) || 0;
+}
+function normalizar(raw, i) {
+  const nombre = txt(campo(raw, ['nombre', 'titulo', 'producto', 'nombre_producto'], 'Producto ' + (i + 1)));
+  const desc = txt(campo(raw, ['descripcion', 'descripción', 'detalles'], ''));
+  const mas = txt(campo(raw, ['mas_detalles', 'más_detalles', 'detalle_adicional'], ''));
+  return {
+    nombre,
+    categoria: txt(campo(raw, ['categoria', 'seccion', 'categoría'], 'General')) || 'General',
+    subcategoria: txt(campo(raw, ['subcategoria', 'subcategoría', 'sub_categoria'], '')),
+    precio: parsePrecio(campo(raw, ['precio', 'precio_usd', 'precio_dolares', 'precio_dólares', 'valor'], '')),
+    descripcion: desc || mas,
+    imagen: txt(campo(raw, ['imagen', 'foto', 'url_imagen', 'image', 'foto_url'], '')),
+    en_oferta: esMarcaSi(campo(raw, ['en_oferta', 'oferta', 'es_oferta'], false)),
+    status: txt(campo(raw, ['status', 'estado', 'disponible', 'activo'], 'disponible')).toLowerCase()
+  };
+}
+function disponible(p) {
+  if (!p.status) return true;
+  return !['agotado', 'no disponible', 'no_disponible', 'inactivo', 'oculto', 'false', '0'].includes(p.status);
+}
+function procesarDatos(data) {
+  const lista = extraerItems(data).map(normalizar).filter(disponible);
+  if (!lista.length) throw new Error('No se encontraron productos en la respuesta.');
+  productos = lista;
+  const mapa = new Map();
+  for (const p of lista) { if (!mapa.has(p.categoria)) mapa.set(p.categoria, []); mapa.get(p.categoria).push(p); }
+  grupos = [...mapa.entries()].map(([categoria, items]) => ({ categoria, items }));
+  pintarCategorias();
+}
+
+/* ---------- Interfaz ---------- */
+function estado(msg, error = false) { const e = $('estado'); e.textContent = msg; e.className = error ? 'error' : ''; }
+function progreso(frac) {
+  const b = $('barra'); b.style.display = frac == null ? 'none' : 'block';
+  if (frac != null) b.firstElementChild.style.width = Math.round(frac * 100) + '%';
+}
+function bloquear(v) { ocupado = v; document.querySelectorAll('button').forEach(b => b.disabled = v); }
+
+function pintarCategorias() {
+  const cont = $('listaCats'); cont.innerHTML = '';
+  grupos.forEach((g, i) => {
+    const fila = document.createElement('div'); fila.className = 'cat';
+    const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = true; cb.dataset.i = i;
+    const nom = document.createElement('span'); nom.className = 'nombre'; nom.textContent = g.categoria;
+    const n = document.createElement('span'); n.className = 'n'; n.textContent = g.items.length + (g.items.length === 1 ? ' artículo' : ' artículos');
+    const bt = document.createElement('button'); bt.className = 'sec'; bt.textContent = 'Descargar PDF';
+    bt.onclick = () => generar([g]);
+    fila.append(cb, nom, n, bt); cont.appendChild(fila);
+  });
+  $('panelCats').style.display = 'block';
+  estado(productos.length + ' productos disponibles en ' + grupos.length + ' categorías.');
+}
+
+async function cargarDesdeAPI() {
+  bloquear(true); estado('Cargando catálogo...');
+  try {
+    const base = txt($('urlApi').value);
+    if (!base) throw new Error('Falta la URL del Apps Script.');
+    const url = base + (base.includes('?') ? '&' : '?') + 't=' + Date.now();
+    const res = await fetch(url, { method: 'GET', cache: 'no-store', redirect: 'follow' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    procesarDatos(JSON.parse(await res.text()));
+  } catch (e) {
+    estado('No se pudo cargar automáticamente (' + e.message + '). Usa la opción "¿No carga?" de abajo.', true);
+    document.querySelector('details').open = true;
+  } finally { bloquear(false); }
+}
+function cargarDesdeTexto(texto) {
+  try { procesarDatos(JSON.parse(texto)); }
+  catch (e) { estado('JSON no válido: ' + e.message, true); }
+}
+
+/* ---------- Imágenes ---------- */
+function fuentesImagen(src) {
+  const original = txt(src); if (!original) return [];
+  const out = []; const add = (u) => { if (u && !out.includes(u)) out.push(u); };
+  let abs = original;
+  try { abs = new URL(original, txt($('baseImg').value) || location.href).href; } catch (e) {}
+  try {
+    const u = new URL(abs);
+    if (u.hostname === 'github.com') {
+      const p = u.pathname.split('/').filter(Boolean);
+      if (p.length >= 5 && p[2] === 'blob') add(`https://raw.githubusercontent.com/${p[0]}/${p[1]}/${p[3]}/${p.slice(4).join('/')}`);
+    }
+  } catch (e) {}
+  const d = abs.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=\w+&)?id=|thumbnail\?id=)([\w-]+)/);
+  if (d) { add(`https://drive.google.com/thumbnail?id=${d[1]}&sz=w800`); add(`https://lh3.googleusercontent.com/d/${d[1]}=w800`); }
+  add(abs);
+  if (/^https?:/i.test(abs)) add(`https://wsrv.nl/?url=${encodeURIComponent(abs)}&w=700&output=jpg`);
+  return out;
+}
+function cargarUna(url, ms = 12000) {
+  return new Promise(res => {
+    const img = new Image(); img.crossOrigin = 'anonymous'; let fin = false;
+    const t = setTimeout(() => { if (!fin) { fin = true; res(null); } }, ms);
+    img.onload = () => { if (!fin) { fin = true; clearTimeout(t); res(img); } };
+    img.onerror = () => { if (!fin) { fin = true; clearTimeout(t); res(null); } };
+    img.src = url;
+  });
+}
+// Descarga, reduce (máx. 520 px) y comprime a JPEG para que el PDF sea liviano (apto WhatsApp).
+async function obtenerImagen(src) {
+  if (!src) return null;
+  if (cacheImg.has(src)) return cacheImg.get(src);
+  let resultado = null;
+  for (const f of fuentesImagen(src)) {
+    const img = await cargarUna(f); if (!img) continue;
+    try {
+      const k = Math.min(1, 520 / Math.max(img.naturalWidth, img.naturalHeight));
+      const w = Math.max(1, Math.round(img.naturalWidth * k)), h = Math.max(1, Math.round(img.naturalHeight * k));
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, w, h); x.drawImage(img, 0, 0, w, h);
+      resultado = { data: c.toDataURL('image/jpeg', 0.72), w, h }; break;
+    } catch (e) { /* canvas bloqueado por CORS: probamos la siguiente fuente */ }
+  }
+  cacheImg.set(src, resultado);
+  return resultado;
+}
+async function precargarImagenes(items, alAvanzar) {
+  const lista = items.filter(p => p.imagen); let hechas = 0;
+  const cola = lista.slice();
+  async function trabajador() {
+    while (cola.length) { const p = cola.shift(); await obtenerImagen(p.imagen); hechas++; alAvanzar(hechas, lista.length); }
+  }
+  await Promise.all(Array.from({ length: 6 }, trabajador));
+}
+
+/* ---------- Construcción del PDF ---------- */
+function construirPDF(JsPDF, gruposSel, opts) {
+  const doc = new JsPDF({ unit: 'mm', format: 'letter' });
+  const PW = 215.9, PH = 279.4, M = 10, GAP = 5, HEAD = 20;
+  const COLS = 2, ROWS = 3, POR_PAG = COLS * ROWS;
+  const top = HEAD + 6, bottom = PH - 14;
+  const cw = (PW - 2 * M - GAP) / COLS;
+  const ch = (bottom - top - (ROWS - 1) * GAP) / ROWS;
+  const imgH = 44;
+  const AZUL = [37, 99, 235];
+  const titulo = limpiarPDF(opts.titulo) || 'CATALOGO DIGITAL';
+  const fecha = new Date().toLocaleDateString('es-VE', { day: '2-digit', month: 'long', year: 'numeric' });
+  let primera = true;
+
+  function banda(nombreCat) {
+    doc.setFillColor(...AZUL); doc.rect(0, 0, PW, HEAD, 'F');
+    doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
+    doc.text(titulo, M, 12.5);
+    doc.setFontSize(12); doc.text(limpiarPDF(nombreCat), PW - M, 12.5, { align: 'right' });
+  }
+  function nuevaPagina() { if (!primera) doc.addPage(); primera = false; }
+
+  if (opts.portada) {
+    nuevaPagina();
+    doc.setFillColor(...AZUL); doc.rect(0, 0, PW, 95, 'F');
+    doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(30);
+    doc.text(titulo, PW / 2, 50, { align: 'center' });
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(13);
+    doc.text('Album de productos - ' + fecha, PW / 2, 62, { align: 'center' });
+    doc.setTextColor(30, 41, 59); doc.setFont('helvetica', 'bold'); doc.setFontSize(14);
+    doc.text('Categorias', M + 10, 115);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(12);
+    let y = 125;
+    for (const g of gruposSel) {
+      if (y > PH - 25) break;
+      doc.text('- ' + limpiarPDF(g.categoria) + '  (' + g.items.length + ')', M + 14, y); y += 8;
+    }
+  }
+
+  for (const g of gruposSel) {
+    g.items.forEach((p, idx) => {
+      if (idx % POR_PAG === 0) { nuevaPagina(); banda(g.categoria); }
+      const pos = idx % POR_PAG, col = pos % COLS, fila = Math.floor(pos / COLS);
+      const x = M + col * (cw + GAP), y = top + fila * (ch + GAP);
+
+      doc.setDrawColor(217, 225, 238); doc.setFillColor(255, 255, 255); doc.setLineWidth(0.3);
+      doc.roundedRect(x, y, cw, ch, 2, 2, 'FD');
+      doc.setFillColor(244, 247, 252); doc.rect(x + 0.3, y + 0.3, cw - 0.6, imgH, 'F');
+
+      const im = cacheImg.get(p.imagen);
+      if (im) {
+        const k = Math.min((cw - 4) / im.w, (imgH - 3) / im.h);
+        const w = im.w * k, h = im.h * k;
+        doc.addImage(im.data, 'JPEG', x + (cw - w) / 2, y + 0.3 + (imgH - h) / 2, w, h, undefined, 'FAST');
+      } else {
+        doc.setTextColor(160, 170, 185); doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+        doc.text('Sin foto', x + cw / 2, y + imgH / 2 + 1, { align: 'center' });
+      }
+
+      if (p.en_oferta) {
+        doc.setFillColor(220, 38, 38); doc.roundedRect(x + 2, y + 2, 17, 6, 1.5, 1.5, 'F');
+        doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(8);
+        doc.text('OFERTA', x + 10.5, y + 6.2, { align: 'center' });
+      }
+
+      const ancho = cw - 6; let ty = y + imgH + 6;
+      doc.setTextColor(30, 41, 59); doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
+      const nom = recortarLineas(doc, limpiarPDF(p.nombre), ancho, 2);
+      doc.text(nom, x + 3, ty); ty += nom.length * 4.3 + 0.5;
+
+      const d = limpiarPDF(p.descripcion);
+      if (d) {
+        doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+        const dl = recortarLineas(doc, d, ancho, 2);
+        doc.text(dl, x + 3, ty);
+      }
+
+      doc.setFont('helvetica', 'bold');
+      if (p.precio > 0) {
+        doc.setTextColor(...AZUL); doc.setFontSize(13);
+        doc.text('$' + p.precio.toFixed(2), x + 3, y + ch - 4);
+        if (opts.tasa > 0) {
+          doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+          doc.text('Bs ' + (p.precio * opts.tasa).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }), x + cw - 3, y + ch - 4, { align: 'right' });
+        }
+      } else {
+        doc.setTextColor(100, 116, 139); doc.setFontSize(10); doc.text('Consultar precio', x + 3, y + ch - 4);
+      }
+    });
+  }
+
+  const total = doc.getNumberOfPages();
+  const wsp = limpiarPDF(opts.wsp);
+  for (let i = 1; i <= total; i++) {
+    doc.setPage(i); doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(120, 130, 145);
+    if (wsp) doc.text('Pedidos por WhatsApp: ' + wsp, M, PH - 7);
+    doc.text('Pag ' + i + ' de ' + total, PW - M, PH - 7, { align: 'right' });
+  }
+  return doc;
+}
+// Parte el texto en líneas del ancho dado; si sobra, corta la última con "...".
+function recortarLineas(doc, texto, ancho, max) {
+  const l = doc.splitTextToSize(texto, ancho);
+  if (l.length <= max) return l;
+  const r = l.slice(0, max);
+  let u = r[max - 1];
+  while (u.length > 1 && doc.getTextWidth(u + '...') > ancho) u = u.slice(0, -1);
+  r[max - 1] = u.trimEnd() + '...';
+  return r;
+}
+
+/* ---------- Flujo de generación ---------- */
+function cargarJsPDF() {
+  if (window.jspdf && window.jspdf.jsPDF) return Promise.resolve();
+  return new Promise((ok, mal) => {
+    const s = document.createElement('script'); s.src = JSPDF_URL; s.onload = ok;
+    s.onerror = () => mal(new Error('No se pudo descargar jsPDF (revisa tu internet).')); document.head.appendChild(s);
+  });
+}
+function nombreArchivo(sel) {
+  const base = sel.length === 1 ? sel[0].categoria : 'Catalogo_completo';
+  return 'Album_' + sinAcentos(base).replace(/[^\w]+/g, '_').replace(/^_|_$/g, '') + '.pdf';
+}
+async function generar(sel) {
+  if (ocupado) return;
+  if (!sel.length) { estado('Marca al menos una categoría.', true); return; }
+  bloquear(true); progreso(0);
+  try {
+    estado('Preparando generador de PDF...'); await cargarJsPDF();
+    const items = sel.flatMap(g => g.items);
+    await precargarImagenes(items, (h, t) => { estado(`Descargando imágenes ${h} de ${t}...`); progreso(0.9 * h / Math.max(t, 1)); });
+    estado('Armando el PDF...'); progreso(0.95);
+    await new Promise(r => setTimeout(r, 30));
+    const tasa = parseFloat($('tasa').value) || 0;
+    const doc = construirPDF(window.jspdf.jsPDF, sel, { titulo: $('titulo').value, wsp: $('wsp').value, tasa, portada: sel.length > 1 });
+    const sinFoto = items.filter(p => !p.imagen || !cacheImg.get(p.imagen)).length;
+    doc.save(nombreArchivo(sel)); progreso(1);
+    estado('Listo: ' + items.length + ' artículos en el PDF' + (sinFoto ? ` (${sinFoto} sin foto o con foto que no cargó).` : '.'));
+  } catch (e) { estado('Error: ' + e.message, true); }
+  finally { bloquear(false); setTimeout(() => progreso(null), 1200); }
+}
+
+/* ---------- Eventos ---------- */
+$('btnCargar').onclick = cargarDesdeAPI;
+$('btnJson').onclick = () => cargarDesdeTexto($('jsonManual').value);
+$('archivoJson').onchange = (ev) => {
+  const f = ev.target.files[0]; if (!f) return;
+  const r = new FileReader(); r.onload = () => cargarDesdeTexto(String(r.result)); r.readAsText(f);
+};
+$('btnTodas').onclick = () => {
+  const cbs = [...document.querySelectorAll('#listaCats input[type=checkbox]')];
+  const todas = cbs.every(c => c.checked); cbs.forEach(c => c.checked = !todas);
+};
+$('btnMarcadas').onclick = () => {
+  const sel = [...document.querySelectorAll('#listaCats input[type=checkbox]')].filter(c => c.checked).map(c => grupos[+c.dataset.i]);
+  generar(sel);
+};
+</script>
+</body>
+</html>
